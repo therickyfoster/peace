@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Neutral Monitor · Dispute Observation & De-Escalation Console</title>
+
+<!-- Security posture for single-file demo -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' blob:;
+  img-src 'self' data: blob:;
+  style-src 'self' 'unsafe-inline';
+  script-src 'self' 'unsafe-inline' blob:;
+  connect-src 'self';
+  frame-ancestors 'none';
+  base-uri 'none';
+" />
+<meta name="color-scheme" content="dark light" />
+<link rel="icon" href="data:,">
+
+<style>
+:root{
+  --bg:#0b0f17; --panel:#121826; --ink:#e6ecff; --muted:#9fb0d1;
+  --accent:#8be9fd; --accent2:#b4ff9f; --warn:#ffd166; --bad:#ff6b6b; --good:#30e0a1;
+  --ring: 0 0 0 2px rgba(139,233,253,.24);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:linear-gradient(180deg,#0b0f17 0%,#0e1423 100%);
+  color:var(--ink);font-family:var(--sans);line-height:1.45;
+}
+header{
+  position:sticky;top:0;z-index:5;background:linear-gradient(180deg,#0b0f17ee,#0b0f1700);
+  backdrop-filter:saturate(1.2) blur(6px);border-bottom:1px solid #20283b;
+}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+.grid{display:grid;gap:16px}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.card{
+  background:linear-gradient(180deg,#131a2b,#0f1627);
+  border:1px solid #1f2740;border-radius:16px;padding:14px 16px;box-shadow:0 6px 24px rgba(0,0,0,.25);
+}
+.card h3{margin:0 0 10px 0;font-size:1rem;color:#cfe0ff}
+small, .muted{color:var(--muted)}
+button, .btn{
+  appearance:none;border:1px solid #2a3555;background:#0f1a33;color:var(--ink);padding:8px 12px;
+  border-radius:10px;cursor:pointer;font-weight:600;transition:.2s;box-shadow:var(--ring);
+}
+button:hover{transform:translateY(-1px)}
+button.primary{background:linear-gradient(90deg,var(--accent),#9acbff);color:#04121f;border:none}
+button.good{background:linear-gradient(90deg,var(--good),#6affc9);color:#031911;border:none}
+button.warn{background:linear-gradient(90deg,var(--warn),#ffe29f);color:#201400;border:none}
+button.bad{background:linear-gradient(90deg,var(--bad),#ff9aa0);color:#220707;border:none}
+input,select,textarea{
+  width:100%;background:#0b1326;border:1px solid #263153;color:var(--ink);padding:10px;border-radius:10px;font-family:var(--sans);
+}
+label{font-size:.9rem;color:#c1d3ff}
+kbd{font-family:var(--mono);background:#0d1426;border:1px solid #273152;padding:2px 6px;border-radius:6px}
+hr{border:0;border-top:1px dashed #2a3555;margin:12px 0}
+.badge{display:inline-block;padding:3px 8px;border-radius:999px;border:1px solid #2b3658;color:#cfe0ff}
+.badge.ok{border-color:#2e6f5b;color:#9dffd9}
+.badge.warn{border-color:#6b5d2a;color:#ffeab3}
+.badge.bad{border-color:#6f2e2e;color:#ffbdbd}
+table{width:100%;border-collapse:collapse}
+th,td{padding:8px;border-bottom:1px solid #212a44;font-size:.92rem}
+tfoot td{color:var(--muted)}
+footer{opacity:.8}
+.toast{position:fixed;right:12px;bottom:12px;background:#0f1a33;border:1px solid #2a3555;color:#cfe0ff;padding:10px 14px;border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.4);z-index:999}
+progress{width:100%;height:10px;border:none;border-radius:8px;background:#1b223a}
+progress::-webkit-progress-bar{background:#1b223a;border-radius:8px}
+progress::-webkit-progress-value{background:linear-gradient(90deg,var(--accent),#9acbff);border-radius:8px}
+.modal{
+  position:fixed;inset:0;background:rgba(7,10,20,.6);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:16px;z-index:50;
+}
+.modal .sheet{max-width:960px;width:100%;background:#10172a;border:1px solid #273255;border-radius:16px;padding:18px;max-height:85vh;overflow:auto}
+code,pre{font-family:var(--mono)}
+.canvas{
+  height:280px;border-radius:14px;background:
+    radial-gradient(1000px 300px at 50% -100px, rgba(139,233,253,.20), transparent 60%),
+    radial-gradient(400px 200px at 10% 110%, rgba(180,255,159,.08), transparent 60%),
+    linear-gradient(180deg,#0a0f1c,#0a1020);
+  border:1px solid #1f2740;position:relative;overflow:hidden;
+}
+.dot{position:absolute;width:6px;height:6px;border-radius:50%;background:#8be9fd55;box-shadow:0 0 10px #8be9fd55}
+.legend{display:flex;gap:8px;flex-wrap:wrap}
+.legend span{font-size:.85rem}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="container">
+    <div class="grid cols-3" style="align-items:center">
+      <div><strong>Neutral Monitor</strong><br><small class="muted">Dispute Observation & De-Escalation Console</small></div>
+      <div class="legend">
+        <span class="badge">Unverified</span>
+        <span class="badge ok">Corroborated</span>
+        <span class="badge warn">Needs Review</span>
+        <span class="badge bad">Do Not Publish</span>
+      </div>
+      <div style="text-align:right">
+        <button id="btn-export" class="good">Export Redacted Report</button>
+        <button id="btn-settings">Settings</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container" style="padding-top:16px">
+  <div class="grid cols-2">
+    <section class="card">
+      <h3>Incident Intake</h3>
+      <p class="muted">Record alleged events neutrally. The engine will score confidence and prompt for corroboration before anything is publishable.</p>
+      <form id="form-incident" class="grid cols-2">
+        <div>
+          <label>Timestamp (UTC)</label>
+          <input id="f-time" type="datetime-local" />
+        </div>
+        <div>
+          <label>Location (lat,lon)</label>
+          <input id="f-loc" placeholder="31.2,34.3" />
+        </div>
+        <div>
+          <label>Parties Involved</label>
+          <input id="f-parties" placeholder="e.g., Egypt; Israel; UN Observer" />
+        </div>
+        <div>
+          <label>Category</label>
+          <select id="f-category">
+            <option value="border">Border/Boundary</option>
+            <option value="military">Military Activity</option>
+            <option value="humanitarian">Humanitarian Access</option>
+            <option value="maritime">Maritime/AIS</option>
+            <option value="infrastructure">Infrastructure</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="cols-2" style="grid-column:1/-1">
+          <label>Description</label>
+          <textarea id="f-desc" rows="3" placeholder="Neutral, specific, time-bound description…"></textarea>
+        </div>
+        <div>
+          <label>Evidence: Remote Sensing</label>
+          <input id="f-e1" placeholder="e.g., Sentinel-2 tile ID / SAR pass / image hash" />
+        </div>
+        <div>
+          <label>Evidence: AIS / Telemetry</label>
+          <input id="f-e2" placeholder="e.g., MMSI logs, AIS gaps, port call" />
+        </div>
+        <div>
+          <label>Evidence: NGO / Field</label>
+          <input id="f-e3" placeholder="e.g., NGO ticket #, hotline case, observer note" />
+        </div>
+        <div>
+          <label>Evidence: Media / Civic</label>
+          <input id="f-e4" placeholder="e.g., journalist ID, verified social post hash" />
+        </div>
+        <div style="grid-column:1/-1;display:flex;gap:8px;align-items:center">
+          <button type="button" id="btn-add" class="primary">Add Incident</button>
+          <button type="button" id="btn-sample">Load Sample Incidents</button>
+          <small class="muted">Rule: publish only if ≥ 2 independent high-quality sources corroborate.</small>
+        </div>
+      </form>
+    </section>
+
+    <section class="card">
+      <h3>Confidence & Governance</h3>
+      <div class="grid cols-2">
+        <div>
+          <label>Confidence Thresholds</label>
+          <div style="display:grid;gap:8px">
+            <div><small>Publishable</small> <input id="t-publish" type="range" min="0" max="1" step="0.05" value="0.7" /></div>
+            <div><small>Alert Parties</small> <input id="t-notify" type="range" min="0" max="1" step="0.05" value="0.5" /></div>
+          </div>
+        </div>
+        <div>
+          <label>Response Tiers</label>
+          <ul class="muted" style="margin:0;padding-left:18px">
+            <li>Tier 1: Rapid Inquiry (liaisons)</li>
+            <li>Tier 2: Joint Commission Review</li>
+            <li>Tier 3: External Mediator Escalation</li>
+          </ul>
+        </div>
+      </div>
+      <hr>
+      <div>
+        <label>Charter Snippet (public)</label>
+        <textarea id="charter" rows="4">Monitoring body is neutral and civilian-led. No public attribution without ≥2 independent corroborations. Reports are aggregated/redacted to protect sources. Access is granted for peaceful verification only.</textarea>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button id="btn-charter" class="good">Open Full Charter</button>
+        <button id="btn-reset" class="warn">Reset Console</button>
+      </div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h3>Operational Canvas</h3>
+    <div class="canvas" id="viz"></div>
+    <small class="muted">Dots = incidents (position jittered for privacy). Drag to pan. Wheel to zoom.</small>
+  </section>
+
+  <section class="card">
+    <h3>Incident Register</h3>
+    <div style="overflow:auto">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th>#</th><th>When (UTC)</th><th>Where</th><th>Parties</th><th>Cat.</th><th>Confidence</th><th>Corroboration</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr><td colspan="9">Tip: Use <kbd>Ctrl/Cmd+S</kbd> to export JSON; <kbd>Ctrl/Cmd+O</kbd> to import JSON.</td></tr>
+        </tfoot>
+      </table>
+    </div>
+  </section>
+</main>
+
+<footer class="container" style="padding-bottom:28px">
+  <div class="grid cols-2">
+    <div class="muted">Built for neutrality, verification, and de-escalation. Offline-capable. Single-file.</div>
+    <div style="text-align:right">
+      <span class="badge">v1.0 · Local</span>
+      <span id="sw-status" class="badge ok">Offline Ready</span>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" class="toast" style="display:none"></div>
+<div id="modal" class="modal"><div class="sheet" id="sheet"></div></div>
+
+
+<!-- Templates (rendered via JS) -->
+<template id="tpl-row">
+  <tr>
+    <td class="idx"></td>
+    <td class="when"></td>
+    <td class="where"></td>
+    <td class="parties"></td>
+    <td class="cat"></td>
+    <td class="conf"></td>
+    <td class="sources"></td>
+    <td class="status"></td>
+    <td class="acts"></td>
+  </tr>
+</template>
+
+<template id="tpl-actions">
+  <div style="display:flex;gap:6px">
+    <button data-act="details">Details</button>
+    <button data-act="promote" class="good">Mark Corroborated</button>
+    <button data-act="redact" class="warn">Redact</button>
+    <button data-act="remove" class="bad">Remove</button>
+  </div>
+</template>
+
+<script>
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const toast = (msg)=>{const t=$("#toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",2200)}
+const modal = (html)=>{$("#sheet").innerHTML=html;$("#modal").style.display="flex"}
+const closeModal = ()=>$("#modal").style.display="none"
+document.addEventListener("keydown",e=>{ if(e.key==="Escape") closeModal() })
+$("#modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeModal() })
+</script>
+
+
+<script>
+// --- Persistence ---
+const STORE_KEY = "neutral-monitor:v1";
+const save = () => localStorage.setItem(STORE_KEY, JSON.stringify({incidents, settings:getSettings()}));
+const load = () => { try{ return JSON.parse(localStorage.getItem(STORE_KEY))||{} }catch{return{}} }
+
+// --- Settings ---
+function getSettings(){
+  return {
+    tPublish: parseFloat($("#t-publish").value),
+    tNotify: parseFloat($("#t-notify").value),
+    charter: $("#charter").value.trim()
+  }
+}
+function applySettings(s){
+  if(!s) return;
+  $("#t-publish").value = s.tPublish ?? 0.7;
+  $("#t-notify").value  = s.tNotify ?? 0.5;
+  $("#charter").value   = s.charter ?? $("#charter").value;
+}
+
+// --- Incident model ---
+/*
+ Each incident:
+ {
+   id, timeISO, lat, lon, parties:[], category, desc,
+   evidence: {e1,e2,e3,e4}, corroboratedSources: number,
+   confidence: 0..1, status: 'unverified'|'notify'|'publishable'|'redacted'
+ }
+*/
+let incidents = [];
+
+// --- Confidence Scoring Heuristic (simple, transparent) ---
+function scoreConfidence(inc){
+  // base by evidence channels
+  let score = 0, channels = 0;
+  const qual = {e1:.35, e2:.25, e3:.25, e4:.15}; // weights by typical reliability
+  for(const k of ["e1","e2","e3","e4"]){
+    if(inc.evidence[k] && inc.evidence[k].trim()){
+      score += qual[k];
+      channels++;
+    }
+  }
+  // cross-check bonus
+  if(channels>=2) score += .1;
+  if(channels>=3) score += .05;
+
+  // time recency bonus (now - time ≤ 72h)
+  const t = Date.parse(inc.timeISO||"");
+  if(!isNaN(t)){
+    const hours = (Date.now()-t)/36e5;
+    if(hours<=24) score += .08; else if(hours<=72) score += .03;
+  }
+
+  // cap
+  score = Math.min(1, Math.max(0, score));
+  inc.corroboratedSources = channels;
+  inc.confidence = parseFloat(score.toFixed(2));
+  return inc.confidence;
+}
+
+function statusFrom(inc){
+  const {tPublish, tNotify} = getSettings();
+  if(inc.status==="redacted") return "redacted";
+  if(inc.confidence>=tPublish && inc.corroboratedSources>=2) return "publishable";
+  if(inc.confidence>=tNotify) return "notify";
+  return "unverified";
+}
+
+// --- Add Incident ---
+function addIncident(raw){
+  const [lat,lon] = (raw.loc||"").split(",").map(s=>parseFloat(s.trim()));
+  const inc = {
+    id: crypto.randomUUID(),
+    timeISO: new Date(raw.time || Date.now()).toISOString(),
+    lat: isFinite(lat)?lat:null, lon: isFinite(lon)?lon:null,
+    parties: (raw.parties||"").split(";").map(s=>s.trim()).filter(Boolean),
+    category: raw.category||"other",
+    desc: (raw.desc||"").trim(),
+    evidence: { e1:raw.e1||"", e2:raw.e2||"", e3:raw.e3||"", e4:raw.e4||"" },
+    corroboratedSources: 0, confidence: 0, status:"unverified"
+  };
+  scoreConfidence(inc);
+  inc.status = statusFrom(inc);
+  incidents.unshift(inc);
+  render();
+  save();
+}
+
+// --- Render Table ---
+function render(){
+  const tbody = $("#tbl tbody"); tbody.innerHTML="";
+  const rowT = $("#tpl-row").content.firstElementChild;
+  const actsT = $("#tpl-actions").content.firstElementChild;
+
+  incidents.forEach((inc, i)=>{
+    const tr = rowT.cloneNode(true);
+    tr.querySelector(".idx").textContent = i+1;
+    tr.querySelector(".when").textContent = inc.timeISO.replace("T"," ").replace("Z"," Z");
+    tr.querySelector(".where").textContent = (inc.lat!=null&&inc.lon!=null)? `${inc.lat.toFixed(3)},${inc.lon.toFixed(3)}` : "—";
+    tr.querySelector(".parties").textContent = inc.parties.join(" | ") || "—";
+    tr.querySelector(".cat").textContent = inc.category;
+    tr.querySelector(".conf").innerHTML = `${inc.confidence} <progress max="1" value="${inc.confidence}"></progress>`;
+    tr.querySelector(".sources").textContent = `${inc.corroboratedSources}`;
+    const st = statusFrom(inc);
+    tr.querySelector(".status").innerHTML = ({
+      publishable:`<span class="badge ok">Publishable</span>`,
+      notify:`<span class="badge warn">Notify Parties</span>`,
+      unverified:`<span class="badge">Unverified</span>`,
+      redacted:`<span class="badge bad">Redacted</span>`
+    })[st];
+
+    const acts = actsT.cloneNode(true);
+    acts.querySelectorAll("button").forEach(b=>b.dataset.id=inc.id);
+    tr.querySelector(".acts").appendChild(acts);
+    tbody.appendChild(tr);
+  });
+
+  draw();
+}
+
+// --- Action Handlers ---
+document.addEventListener("click", (e)=>{
+  const id = e.target?.dataset?.id;
+  const act = e.target?.dataset?.act;
+  if(!id || !act) return;
+
+  const idx = incidents.findIndex(x=>x.id===id);
+  if(idx<0) return;
+
+  if(act==="remove"){
+    incidents.splice(idx,1); render(); save(); toast("Incident removed");
+  }else if(act==="promote"){
+    incidents[idx].corroboratedSources = Math.max(2, incidents[idx].corroboratedSources);
+    scoreConfidence(incidents[idx]); render(); save(); toast("Marked as corroborated");
+  }else if(act==="redact"){
+    incidents[idx].status = "redacted"; render(); save(); toast("Incident redacted");
+  }else if(act==="details"){
+    const inc = incidents[idx];
+    modal(`
+      <h3>Incident Details</h3>
+      <div class="grid cols-2">
+        <div class="card"><h3>Summary</h3>
+          <p><strong>When:</strong> ${inc.timeISO}</p>
+          <p><strong>Where:</strong> ${(inc.lat??"—")}, ${(inc.lon??"—")}</p>
+          <p><strong>Parties:</strong> ${inc.parties.join(", ")||"—"}</p>
+          <p><strong>Category:</strong> ${inc.category}</p>
+          <p><strong>Status:</strong> ${statusFrom(inc)}</p>
+          <p><strong>Confidence:</strong> ${inc.confidence}</p>
+        </div>
+        <div class="card"><h3>Description</h3><p>${inc.desc||"<em>None</em>"}</p></div>
+      </div>
+      <div class="grid cols-2" style="margin-top:8px">
+        <div class="card"><h3>Evidence</h3>
+          <ul>
+            <li><strong>Remote:</strong> ${inc.evidence.e1||"—"}</li>
+            <li><strong>AIS/Telem:</strong> ${inc.evidence.e2||"—"}</li>
+            <li><strong>NGO/Field:</strong> ${inc.evidence.e3||"—"}</li>
+            <li><strong>Media/Civic:</strong> ${inc.evidence.e4||"—"}</li>
+          </ul>
+        </div>
+        <div class="card"><h3>Governance Path</h3>
+          <ol>
+            <li>Tier 1: Notify liaisons if confidence ≥ ${getSettings().tNotify}</li>
+            <li>Tier 2: Joint Commission review if corroboratedSources ≥ 2</li>
+            <li>Tier 3: External mediator if ≥ publish threshold or risk ↑</li>
+          </ol>
+          <button onclick="closeModal()">Close</button>
+        </div>
+      </div>
+    `);
+  }
+});
+
+// --- Intake Form ---
+$("#btn-add").addEventListener("click", ()=>{
+  const raw = {
+    time: $("#f-time").value, loc: $("#f-loc").value, parties: $("#f-parties").value,
+    category: $("#f-category").value, desc: $("#f-desc").value,
+    e1: $("#f-e1").value, e2: $("#f-e2").value, e3: $("#f-e3").value, e4: $("#f-e4").value
+  };
+  addIncident(raw);
+  $("#form-incident").reset();
+  toast("Incident added to register");
+});
+
+$("#t-publish").addEventListener("input", ()=>{ render(); save(); });
+$("#t-notify").addEventListener("input", ()=>{ render(); save(); });
+$("#btn-reset").addEventListener("click", ()=>{
+  if(confirm("Reset console? This clears incidents & settings.")){
+    incidents = []; localStorage.removeItem(STORE_KEY); render(); toast("Reset complete");
+  }
+});
+
+// --- Export / Import ---
+$("#btn-export").addEventListener("click", ()=>{
+  const pub = incidents.filter(i=>statusFrom(i)!=="redacted").map(i=>({
+    id:i.id, time:i.timeISO, lat:i.lat, lon:i.lon, parties:i.parties, category:i.category,
+    // redact evidence contents in public export; keep only channel presence
+    evidence:{remote:!!i.evidence.e1, telemetry:!!i.evidence.e2, ngo:!!i.evidence.e3, media:!!i.evidence.e4},
+    confidence:i.confidence, status:statusFrom(i), summary:i.desc
+  }));
+  const pkg = { generatedAt:new Date().toISOString(), charter:getSettings().charter, items:pub };
+  const blob = new Blob([JSON.stringify(pkg,null,2)],{type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href=url; a.download="neutral-monitor-report.json"; a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.addEventListener("keydown", (e)=>{
+  // quick save/load
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="s"){ e.preventDefault(); $("#btn-export").click(); }
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="o"){ 
+    e.preventDefault();
+    const inp = document.createElement("input"); inp.type="file"; inp.accept="application/json";
+    inp.onchange = async () => {
+      const text = await inp.files[0].text();
+      try{
+        const data = JSON.parse(text);
+        if(Array.isArray(data.items)){ incidents = data.items.map(migrateImport); render(); save(); toast("Import successful"); }
+        else if(Array.isArray(data.incidents)){ incidents = data.incidents.map(migrateImport); render(); save(); toast("Import successful"); }
+        else { throw new Error("Bad format") }
+      }catch(err){ toast("Import failed: "+err.message) }
+    };
+    inp.click();
+  }
+});
+function migrateImport(i){
+  // tolerate public export shape or full internal shape
+  return {
+    id: i.id || crypto.randomUUID(),
+    timeISO: i.time || i.timeISO || new Date().toISOString(),
+    lat: i.lat ?? null, lon: i.lon ?? null,
+    parties: i.parties || [],
+    category: i.category || "other",
+    desc: i.summary || i.desc || "",
+    evidence: i.evidence?.remote!==undefined ? 
+      {e1:i.evidence.remote?'present':'', e2:i.evidence.telemetry?'present':'', e3:i.evidence.ngo?'present':'', e4:i.evidence.media?'present':''}
+      : (i.evidence || {e1:"",e2:"",e3:"",e4:""}),
+    corroboratedSources: i.corroboratedSources ?? 0,
+    confidence: i.confidence ?? 0,
+    status: i.status || "unverified"
+  };
+}
+
+// --- Charter Modal ---
+$("#btn-charter").addEventListener("click", ()=>{
+  modal(`
+    <h3>Monitoring Charter (Draft)</h3>
+    <p class="muted">Compact language suitable for an MoU; adapt to Egypt–Israel or any co-government context.</p>
+    <div class="card" style="white-space:pre-wrap;font-family:var(--mono);font-size:.92rem">
+Mandate: Observe and verify alleged incidents neutrally to prevent escalation and enable peaceful remediation.
+Verification: No public attribution absent at least two independent corroborations from distinct channels.
+Access: Parties facilitate safe passage for civilian monitors; where access is denied, remote sensing & OSINT are permissible.
+Privacy: Human sources are protected; public outputs are aggregated and redacted.
+Response: Tiered pathway — (1) Rapid Inquiry via liaisons, (2) Joint Commission Review, (3) External Mediator referral.
+Limits: No intelligence or targeting support; tooling is for de-escalation and humanitarian protection only.
+    </div>
+    <div style="margin-top:10px"><button onclick="closeModal()">Close</button></div>
+  `);
+});
+
+// --- Sample Incidents ---
+$("#btn-sample").addEventListener("click", ()=>{
+  const now = Date.now();
+  const samples = [
+    {time:new Date(now-4*36e5).toISOString(), loc:"31.26,34.27", parties:"Egypt; Israel", category:"border",
+     desc:"Alleged boundary overflight reported. Remote sensing pass queued.", e1:"S2A_20250930T", e2:"", e3:"", e4:"journalist#A1"},
+    {time:new Date(now-18*36e5).toISOString(), loc:"31.44,34.31", parties:"UN Observer; Egypt; Israel", category:"humanitarian",
+     desc:"Temporary pause of aid convoy reported at checkpoint. NGO ticket opened.", e1:"", e2:"", e3:"NGO-7735", e4:""},
+    {time:new Date(now-56*36e5).toISOString(), loc:"31.13,34.20", parties:"Egypt; Israel", category:"military",
+     desc:"Night-time light signatures detected; AIS shows unusual maritime loitering nearby.", e1:"SAR_PASS#992", e2:"AIS gap 27m", e3:"", e4:""}
+  ];
+  samples.forEach(addIncident);
+  toast("3 sample incidents loaded");
+});
+
+// --- Viz (simple pan/zoom starfield + points, privacy jitter) ---
+let view = {x:0,y:0,z:1};
+const V = $("#viz");
+function draw(){
+  V.querySelectorAll(".dot").forEach(n=>n.remove());
+  const w = V.clientWidth, h = V.clientHeight;
+  const rng = (seed)=>{ let x=seed; return ()=> (x = (x*1664525+1013904223)%4294967296)/4294967296 }
+  incidents.forEach((inc,i)=>{
+    if(inc.lat==null||inc.lon==null) return;
+    const r = rng(parseInt(inc.id.slice(0,8),16));
+    // jitter for privacy
+    const jx = (r()-0.5)*0.8, jy = (r()-0.5)*0.8;
+    // fake projection into canvas (not a real map)
+    const px = ((inc.lon+180)/360 + jx/100)*w*view.z + view.x;
+    const py = ((90-(inc.lat))/180 + jy/100)*h*view.z + view.y;
+    const dot = document.createElement("div"); dot.className="dot";
+    dot.style.left = (px%w)+"px"; dot.style.top = (py%h)+"px";
+    let col = "#8be9fd55";
+    const st = statusFrom(inc);
+    if(st==="publishable") col="#30e0a155";
+    if(st==="notify") col="#ffd16655";
+    if(st==="redacted") col="#ff6b6b55";
+    dot.style.background = col; dot.title = `${inc.category} · ${inc.confidence}`;
+    V.appendChild(dot);
+  });
+}
+let isDown=false, sx=0, sy=0, ox=0, oy=0;
+V.addEventListener("mousedown",(e)=>{isDown=true;sx=e.clientX;sy=e.clientY;ox=view.x;oy=view.y});
+window.addEventListener("mouseup",()=>isDown=false);
+window.addEventListener("mousemove",(e)=>{if(!isDown)return; view.x = ox+(e.clientX-sx); view.y = oy+(e.clientY-sy); draw()});
+V.addEventListener("wheel",(e)=>{e.preventDefault(); view.z = Math.max(.6, Math.min(3, view.z*(e.deltaY>0?1.1:0.9))); draw()},{passive:false});
+
+// --- Settings Modal ---
+$("#btn-settings").addEventListener("click", ()=>{
+  modal(`
+    <h3>Settings</h3>
+    <div class="grid cols-2">
+      <div class="card"><h3>Thresholds</h3>
+        <p>Publish ≥ <strong>${$("#t-publish").value}</strong></p>
+        <p>Notify ≥ <strong>${$("#t-notify").value}</strong></p>
+      </div>
+      <div class="card"><h3>Charter</h3><pre style="white-space:pre-wrap">${$("#charter").value}</pre></div>
+    </div>
+    <div style="margin-top:10px"><button onclick="closeModal()">Close</button></div>
+  `);
+});
+
+// --- Boot ---
+(function boot(){
+  const state = load();
+  applySettings(state.settings);
+  incidents = Array.isArray(state.incidents)? state.incidents : [];
+  incidents.forEach(scoreConfidence);
+  render();
+})();
+</script>
+
+
+<script>
+// Inline Service Worker via Blob (keeps this a single file)
+if("serviceWorker" in navigator){
+  const swCode = `
+    const CACHE='nm-v1';
+    self.addEventListener('install',e=>{
+      e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate',e=>{self.clients.claim()});
+    self.addEventListener('fetch',e=>{
+      const req=e.request;
+      // network-first for same-origin, fallback to cache
+      e.respondWith(fetch(req).then(res=>{
+        if(res.ok){ const copy=res.clone(); caches.open(CACHE).then(c=>c.put(req,copy)); }
+        return res;
+      }).catch(()=>caches.match(req).then(r=>r||caches.match('./'))));
+    });
+  `;
+  const blob = new Blob([swCode],{type:'text/javascript'});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url).then(()=>{
+    document.getElementById('sw-status').textContent='Offline Ready'; 
+  }).catch(()=>{ document.getElementById('sw-status').textContent='SW Error'; });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1031 @@
+<!doctype html>
+<html lang="en" data-app="mycelial-peace-lab">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mycelial Peace Laboratory — Live AI Conflict Transformation</title>
+  <meta name="description" content="Interactive exploration of ten AI-driven solutions for conflict transformation between Russian–English entanglement" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="color-scheme" content="dark light" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <style>
+    :root{
+      --bg:#0a0f1c; --card:#111827; --ink:#f1f5f9; --muted:#94a3b8; --ink-weak:#cbd5e1;
+      --accent:#34d399; --warm:#f59e0b; --danger:#ef4444; --mystic:#a855f7; --cool:#06b6d4;
+      --maxw:1400px; --radius:16px; --gap:1.2rem; --shadow:0 12px 40px rgba(0,0,0,.4);
+      --dur:.4s; --ease:cubic-bezier(.2,.8,.2,1); --focus: 0 0 0 3px rgba(52,211,153,.5);
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#475569; --ink-weak:#334155; --shadow:0 8px 28px rgba(0,0,0,.12) }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;overflow-x:hidden}
+    body{
+      margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif; color:var(--ink);
+      background:
+        radial-gradient(1400px 800px at 20% -15%, rgba(52,211,153,.08), transparent 70%),
+        radial-gradient(1400px 800px at 80% -15%, rgba(168,85,247,.08), transparent 70%),
+        radial-gradient(800px 400px at 50% 50%, rgba(245,158,11,.04), transparent 60%),
+        conic-gradient(from 0deg at 50% 100%, rgba(6,182,212,.02), transparent 20%, rgba(239,68,68,.02), transparent 40%),
+        var(--bg);
+      min-height:100vh;
+    }
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:1.5rem}
+    
+    /* Header */
+    header{
+      display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center;
+      padding:2rem; border-radius:var(--radius); margin-bottom:2rem;
+      background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      box-shadow:var(--shadow); position:relative; overflow:hidden;
+    }
+    header::before{
+      content:''; position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(52,211,153,.15), transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(168,85,247,.15), transparent 50%);
+      animation:headerFlow 20s ease-in-out infinite;
+    }
+    @keyframes headerFlow{
+      0%,100%{transform:scale(1) rotate(0deg)}
+      33%{transform:scale(1.06) rotate(120deg)}
+      66%{transform:scale(.94) rotate(240deg)}
+    }
+    @media (prefers-reduced-motion: reduce){
+      header::before{animation:none}
+      *{scroll-behavior:auto}
+    }
+    .header-content{position:relative; z-index:2}
+    .title{font-weight:900; font-size:clamp(2rem, 5vw, 3.5rem); letter-spacing:-.02em; margin:0;
+      background:linear-gradient(135deg, var(--accent), var(--mystic)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+    .subtitle{color:var(--muted); font-size:1.1rem; margin:.5rem 0 1rem}
+    .tagline{color:var(--ink-weak); font-style:italic; font-size:1rem}
+    .live-stats{
+      display:grid; gap:1rem; position:relative; z-index:2;
+      grid-template-columns:repeat(2, 1fr);
+    }
+    .stat-card{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+      padding:1rem; border-radius:12px; text-align:center}
+    .stat-value{font-size:1.5rem; font-weight:700; margin-bottom:.2rem}
+    .stat-label{font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+    .stat-change{font-size:.75rem; margin-top:.3rem}
+    .stat-up{color:var(--accent)} .stat-down{color:var(--danger)}
+    
+    /* Controls */
+    .toolbar{
+      display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin:.5rem 0 1.2rem
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06);
+      color:var(--ink); padding:.55rem .9rem; border-radius:10px; cursor:pointer; 
+      transition:all var(--dur) var(--ease); text-decoration:none; display:inline-flex;
+      align-items:center; gap:.5rem;
+    }
+    .btn:hover{background:rgba(255,255,255,.12); transform:translateY(-1px)}
+    .btn[aria-pressed="true"]{background:var(--accent); color:#000; border-color:var(--accent)}
+    .btn:disabled{opacity:.5; cursor:not-allowed;}
+    
+    /* RSS and Template sections */
+    .feed-section{
+      background:rgba(168,85,247,.06); border:1px solid rgba(168,85,247,.25);
+      border-radius:var(--radius); padding:1.5rem; margin:1.5rem 0;
+    }
+    .feed-header{display:flex; align-items:center; gap:1rem; margin-bottom:1rem;}
+    .feed-input{
+      flex:1; padding:.7rem; border:1px solid rgba(255,255,255,.2); 
+      background:rgba(255,255,255,.05); color:var(--ink); border-radius:8px;
+    }
+    .feed-list{max-height:300px; overflow-y:auto; margin:1rem 0;}
+    .feed-item{
+      padding:1rem; margin:.5rem 0; background:rgba(255,255,255,.03);
+      border-radius:8px; border-left:3px solid var(--accent);
+    }
+    .feed-title{font-weight:600; margin-bottom:.5rem;}
+    .feed-meta{font-size:.8rem; color:var(--muted); margin-bottom:.5rem;}
+    .feed-actions{display:flex; gap:.5rem; margin-top:.5rem;}
+    
+    .template-section{
+      background:rgba(52,211,153,.06); border:1px solid rgba(52,211,153,.25);
+      border-radius:var(--radius); padding:1.5rem; margin:1.5rem 0;
+    }
+    .template-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:1rem;}
+    .template-card{
+      background:rgba(255,255,255,.05); padding:1rem; border-radius:8px;
+      border:1px solid rgba(255,255,255,.1);
+    }
+    .template-preview{
+      background:rgba(0,0,0,.2); padding:.8rem; border-radius:6px; 
+      font-family:ui-monospace,monospace; font-size:.85rem; margin:.5rem 0;
+      white-space:pre-wrap;
+    }
+    
+    .control-panel{
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;
+      padding:1.2rem; background:rgba(255,255,255,.03); border-radius:var(--radius);
+      border:1px solid rgba(255,255,255,.08); margin-bottom:1.2rem;
+    }
+    .control-group{display:flex; flex-direction:column; gap:.4rem}
+    .control-label{font-size:.85rem; color:var(--muted); font-weight:600}
+    .slider{appearance:none; height:4px; border-radius:2px; background:rgba(255,255,255,.2); outline:none}
+    .slider::-webkit-slider-thumb{appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer}
+    .toggle{appearance:none; width:46px; height:24px; border-radius:12px; background:rgba(255,255,255,.2); cursor:pointer; position:relative; transition:background var(--dur)}
+    .toggle:checked{background:var(--accent)}
+    .toggle::before{content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:white; top:3px; left:3px; transition:transform var(--dur)}
+    .toggle:checked::before{transform:translateX(22px)}
+    
+    /* Modes */
+    .mode-selector{display:flex; gap:.5rem; margin-bottom:1rem; padding:.8rem; background:rgba(255,255,255,.03); border-radius:var(--radius)}
+    
+    /* Solutions */
+    .solutions-container{position:relative}
+    .solutions-grid{
+      display:grid; gap:var(--gap); transition:all var(--dur) var(--ease);
+      grid-template-columns:repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    }
+    .solutions-grid.network{grid-template-columns:repeat(5,1fr)}
+    .solutions-grid.timeline{grid-template-columns:1fr}
+    .solution-card{
+      background:var(--card); border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); padding:1.2rem; box-shadow:var(--shadow);
+      transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur);
+      position:relative; overflow:hidden; cursor:pointer; outline:none;
+    }
+    .solution-card:focus{box-shadow:var(--focus)}
+    .solution-card::before{
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg, var(--accent), var(--mystic), var(--warm));
+      transform:scaleX(0); transition:transform var(--dur) var(--ease);
+    }
+    .solution-card:hover{transform:translateY(-3px)}
+    .solution-card:hover::before{transform:scaleX(1)}
+    .solution-card.active{border-color:var(--accent); box-shadow:0 0 0 2px rgba(52,211,153,.35)}
+    .solution-header{display:flex; align-items:flex-start; gap:1rem; margin-bottom:.7rem}
+    .solution-number{flex-shrink:0; width:3rem; height:3rem; border-radius:50%;
+      background:linear-gradient(135deg, var(--accent), var(--mystic));
+      display:flex; align-items:center; justify-content:center; font-weight:800; color:white; font-size:1rem; position:relative}
+    .solution-number::after{content:attr(data-status); position:absolute; top:-8px; right:-8px; width:16px; height:16px; border-radius:50%; font-size:10px; display:grid; place-items:center}
+    .solution-number[data-status="🟢"]::after{background:var(--accent)}
+    .solution-number[data-status="🟡"]::after{background:var(--warm)}
+    .solution-number[data-status="🔴"]::after{background:var(--danger)}
+    .solution-title{font-weight:800; font-size:1.2rem; margin:0}
+    .solution-description{color:var(--muted); margin:.4rem 0 .8rem}
+    .simulation-panel{background:rgba(0,0,0,.25); border-radius:12px; padding:.8rem; margin:.6rem 0; font-family:ui-monospace,monospace; font-size:.86rem; border:1px solid rgba(52,211,153,.3)}
+    .sim-header{color:var(--accent); font-weight:700; margin-bottom:.3rem}
+    .sim-data{display:grid; grid-template-columns:1fr 1fr; gap:.4rem}
+    .sim-metric{padding:.3rem; background:rgba(255,255,255,.05); border-radius:6px}
+    .expandable{background:rgba(255,255,255,.02); border:1px dashed rgba(255,255,255,.15); border-radius:12px; margin-top:.6rem; overflow:hidden; max-height:0; opacity:0; transition:max-height var(--dur) var(--ease), opacity var(--dur) var(--ease), padding var(--dur) var(--ease); padding:0}
+    .expandable.expanded{max-height:2000px; opacity:1; padding:1rem}
+    .feature-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.8rem}
+    .feature-card{background:rgba(255,255,255,.05); padding:.8rem; border-radius:8px; border-left:3px solid var(--accent)}
+    .prototype-demo{background:linear-gradient(135deg, rgba(52,211,153,.1), rgba(168,85,247,.06)); border:1px solid rgba(52,211,153,.3); border-radius:8px; padding:.9rem; font-family:ui-monospace,monospace; font-size:.88rem; position:relative}
+    .prototype-demo::before{content:'LIVE PROTOTYPE'; position:absolute; top:.5rem; right:.8rem; font-size:.7rem; color:var(--accent); font-weight:700}
+    
+    /* Network stub */
+    .network-canvas{width:100%; height:300px; border-radius:12px; margin:.6rem 0; background:radial-gradient(circle at 50% 50%, rgba(52,211,153,.1), transparent 70%); position:relative; overflow:hidden}
+    .network-node{position:absolute; width:12px; height:12px; border-radius:50%; background:var(--accent); cursor:pointer; transition:transform var(--dur)}
+    .network-node:focus{outline:none; box-shadow:var(--focus)}
+    .network-connection{position:absolute; height:2px; background:rgba(52,211,153,.4); transform-origin:left center}
+    
+    /* Metrics */
+    .metrics-dashboard{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; margin:1.2rem 0; padding:1rem; background:rgba(255,255,255,.02); border-radius:var(--radius); border:1px solid rgba(255,255,255,.08)}
+    .metric-card{text-align:center; padding:1rem}
+    .metric-value{font-size:2.2rem; font-weight:900; margin-bottom:.25rem; background:linear-gradient(135deg, var(--accent), var(--mystic)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+    .metric-label{color:var(--muted); font-size:.95rem; margin-bottom:.3rem}
+    .metric-trend{display:flex; align-items:center; justify-content:center; gap:.3rem; font-size:.82rem; font-weight:600}
+    
+    /* Activity */
+    .activity-feed{max-height:300px; overflow-y:auto; padding:1rem; margin:1rem 0; background:rgba(0,0,0,.2); border-radius:12px; border:1px solid rgba(255,255,255,.1)}
+    .activity-item{padding:.7rem; margin-bottom:.5rem; border-radius:8px; background:rgba(255,255,255,.03); border-left:3px solid var(--accent); font-size:.92rem}
+    .activity-time{color:var(--muted); font-size:.8rem}
+    .activity-desc{margin:.2rem 0}
+    .activity-impact{color:var(--accent); font-weight:700; font-size:.8rem}
+    
+    /* Scenario explorer */
+    .scenario-explorer{padding:1rem; background:rgba(168,85,247,.06); border-radius:var(--radius); border:1px solid rgba(168,85,247,.25); margin:1rem 0}
+    .scenario-controls{display:flex; gap:.5rem; margin-bottom:.7rem; flex-wrap:wrap}
+    .scenario-btn{border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:var(--ink); padding:.45rem .8rem; border-radius:8px; cursor:pointer; transition:all var(--dur); font-size:.9rem}
+    .scenario-btn:hover{background:rgba(168,85,247,.2); border-color:var(--mystic)}
+    .scenario-btn[aria-pressed="true"]{background:var(--mystic); color:#fff}
+    .scenario-output{padding:.8rem; background:rgba(0,0,0,.28); border-radius:8px; font-family:ui-monospace,monospace; font-size:.86rem; min-height:120px; border:1px solid rgba(168,85,247,.3)}
+    
+    /* Responsive */
+    @media (max-width: 1200px){ .solutions-grid.network{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width: 768px){
+      .solutions-grid{grid-template-columns:1fr}
+      .solutions-grid.network{grid-template-columns:1fr}
+      .wrap{padding:1rem}
+      header{grid-template-columns:1fr; text-align:center}
+      .control-panel{grid-template-columns:1fr}
+      .live-stats{grid-template-columns:1fr}
+      .mode-selector{flex-wrap:wrap}
+      .template-grid{grid-template-columns:1fr}
+    }
+    
+    /* Utilities */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .muted{color:var(--muted)}
+    .kbd{background:rgba(255,255,255,.1);padding:.18rem .38rem;border-radius:4px}
+    .loading{opacity:.6; pointer-events:none;}
+    .error{border-color:var(--danger); background:rgba(239,68,68,.1);}
+    .success{border-color:var(--accent); background:rgba(52,211,153,.1);}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <div class="wrap">
+    <header role="banner" aria-labelledby="lab-title">
+      <div class="header-content">
+        <h1 id="lab-title" class="title">Mycelial Peace Laboratory</h1>
+        <p class="subtitle" id="subtitle">Live AI Conflict Transformation Simulator</p>
+        <p class="tagline">"Cross-pollinating solutions to destabilize destructive entropies."</p>
+        <div class="toolbar" role="toolbar" aria-label="Session tools">
+          <button id="btnPause" class="btn" aria-pressed="false" title="Space to toggle pause">⏯ Pause</button>
+          <button id="btnReset" class="btn" title="R to reset">🔄 Reset</button>
+          <button id="btnExport" class="btn" title="Export current state">📤 Export</button>
+          <label class="btn" for="importFile" title="Import a saved state" style="position:relative">
+            📥 Import
+            <input id="importFile" type="file" accept="application/json" aria-label="Import state" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+          </label>
+          <button id="btnLang" class="btn" aria-pressed="false" title="Toggle Russian/English">🌐 RU/EN</button>
+        </div>
+      </div>
+      <div class="live-stats" role="status" aria-live="polite">
+        <div class="stat-card" aria-label="Active Connections">
+          <div class="stat-value" id="activeConnections">0</div>
+          <div class="stat-label">Active Connections</div>
+          <div class="stat-change stat-up" id="connectionTrend">+0%</div>
+        </div>
+        <div class="stat-card" aria-label="Entropy Level">
+          <div class="stat-value" id="entropyLevel">0.0</div>
+          <div class="stat-label">Entropy Level</div>
+          <div class="stat-change" id="entropyTrend">stable</div>
+        </div>
+        <div class="stat-card" aria-label="Peace Index">
+          <div class="stat-value" id="peaceIndex">0</div>
+          <div class="stat-label">Peace Index</div>
+          <div class="stat-change stat-up" id="peaceTrend">+0%</div>
+        </div>
+        <div class="stat-card" aria-label="Cultural Bridges">
+          <div class="stat-value" id="culturalBridges">0</div>
+          <div class="stat-label">Cultural Bridges</div>
+          <div class="stat-change stat-up" id="bridgeTrend">+0%</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- RSS Feed Integration Section -->
+    <section class="feed-section">
+      <div class="feed-header">
+        <h3>📡 RSS Feed Monitor</h3>
+        <input type="url" class="feed-input" id="rssInput" placeholder="Enter RSS feed URL (e.g., news sites, conflict reports)" />
+        <button class="btn" id="addFeedBtn">Add Feed</button>
+        <button class="btn" id="refreshFeedsBtn">Refresh All</button>
+      </div>
+      <div class="feed-list" id="feedList">
+        <div class="feed-item">
+          <div class="feed-title">No feeds added yet</div>
+          <div class="feed-meta">Add RSS feeds to monitor conflict-related news and apply reframing templates</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Narrative Reframing Templates Section -->
+    <section class="template-section">
+      <h3>🧬 Narrative Reframing Templates</h3>
+      <p class="muted">Templates for aggressive peace propagation through perspective transformation</p>
+      <div class="template-grid">
+        <div class="template-card">
+          <h4>🔄 Conflict → Collaboration Reframe</h4>
+          <div class="template-preview" id="template1">Original: "{conflict_description}"
+
+Reframed: "This tension reveals an opportunity for {parties} to pioneer new collaborative approaches to {shared_challenge}, building on their complementary strengths in {strength_a} and {strength_b}."</div>
+          <button class="btn" onclick="applyTemplate('collaboration')">Apply to Selected Content</button>
+        </div>
+
+        <div class="template-card">
+          <h4>🌱 Scarcity → Abundance Reframe</h4>
+          <div class="template-preview" id="template2">Original: "{scarcity_narrative}"
+
+Reframed: "While {resource} appears limited, this challenge invites {parties} to co-create innovative solutions that multiply value for all. Historical precedent shows that cooperation in {domain} generates {positive_outcome}."</div>
+          <button class="btn" onclick="applyTemplate('abundance')">Apply to Selected Content</button>
+        </div>
+
+        <div class="template-card">
+          <h4>🌉 Us-vs-Them → Shared Identity</h4>
+          <div class="template-preview" id="template3">Original: "{division_narrative}"
+
+Reframed: "Beneath surface differences, {party_a} and {party_b} share deep commitments to {shared_value}. This common ground offers a foundation for addressing {challenge} in ways that honor both perspectives."</div>
+          <button class="btn" onclick="applyTemplate('unity')">Apply to Selected Content</button>
+        </div>
+
+        <div class="template-card">
+          <h4>⚡ Crisis → Catalyst Reframe</h4>
+          <div class="template-preview" id="template4">Original: "{crisis_description}"
+
+Reframed: "This crisis serves as a catalyst, accelerating necessary changes in {system}. The disruption creates space for {innovative_approach} that addresses root causes rather than symptoms."</div>
+          <button class="btn" onclick="applyTemplate('catalyst')">Apply to Selected Content</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="control-panel" aria-labelledby="controls-title">
+      <h2 id="controls-title" class="sr-only">Controls</h2>
+      <div class="control-group">
+        <label class="control-label" for="speedSlider">Simulation Speed</label>
+        <input type="range" class="slider" id="speedSlider" min="0.5" max="3" step="0.1" value="1" />
+        <span id="speedValue" aria-live="polite">1.0×</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="entropySlider">Entropy Sensitivity</label>
+        <input type="range" class="slider" id="entropySlider" min="0.1" max="2" step="0.1" value="1" />
+        <span id="entropyValue" aria-live="polite">1.0</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="culturalToggle">Cultural Mixing</label>
+        <input type="checkbox" class="toggle" id="culturalToggle" checked role="switch" aria-checked="true" />
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="liveToggle">Live Data Feed</label>
+        <input type="checkbox" class="toggle" id="liveToggle" checked role="switch" aria-checked="true" />
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="autoReframeToggle">Auto-Reframe Content</label>
+        <input type="checkbox" class="toggle" id="autoReframeToggle" role="switch" aria-checked="false" />
+      </div>
+    </section>
+
+    <nav class="mode-selector" role="tablist" aria-label="Exploration modes">
+      <button class="btn mode-btn" role="tab" aria-selected="true" data-mode="grid">Solution Grid</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="network">Network View</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="timeline">Timeline</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="scenarios">Scenarios</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="feeds">Feed Analysis</button>
+    </nav>
+
+    <main id="main" class="solutions-container" tabindex="-1">
+      <section id="solutionsGrid" class="solutions-grid" aria-label="Solutions list"></section>
+
+      <section class="metrics-dashboard" id="metricsBoard" aria-label="Impact metrics">
+        <div class="metric-card">
+          <div class="metric-value" id="narrativeSync">0</div>
+          <div class="metric-label">Narrative Convergence</div>
+          <div class="metric-trend"><span>↗</span> <span id="narrativeTrend">+0% this hour</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="empathyScore">0</div>
+          <div class="metric-label">Cross-Cultural Empathy</div>
+          <div class="metric-trend"><span>↗</span> <span id="empathyTrend">+0% this hour</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="cooperationIndex">0</div>
+          <div class="metric-label">Cooperation Events</div>
+          <div class="metric-trend"><span>↗</span> <span id="cooperationTrend">+0% this hour</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="reframeCount">0</div>
+          <div class="metric-label">Peace Reframes Applied</div>
+          <div class="metric-trend"><span>↗</span> <span id="reframeTrend">+0 today</span></div>
+        </div>
+      </section>
+
+      <section class="scenario-explorer" id="scenarioPanel" hidden aria-labelledby="scenarioTitle">
+        <h3 id="scenarioTitle">Scenario Explorer</h3>
+        <p class="muted">Test solution interplay under different conflict conditions.</p>
+        <div class="scenario-controls" role="tablist" aria-label="Scenarios">
+          <button class="scenario-btn" role="tab" aria-selected="true" data-scenario="baseline">Baseline</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="escalation">Tension Escalation</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="breakthrough">Cultural Breakthrough</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="resource">Resource Crisis</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="diaspora">Diaspora Activation</button>
+        </div>
+        <div class="scenario-output" id="scenarioOutput" role="region" aria-live="polite"></div>
+      </section>
+
+      <section class="activity-feed" id="activityFeed" aria-label="Activity feed">
+        <div class="activity-item">
+          <div class="activity-time">just now</div>
+          <div class="activity-desc">System online. RSS monitoring and reframing templates loaded.</div>
+          <div class="activity-impact">ready</div>
+        </div>
+      </section>
+    </main>
+
+    <footer style="margin-top:2rem; text-align:center; padding:2rem; color:var(--muted); font-size:.9rem">
+      <p>Each node strengthens the network. Press <span class="kbd">Space</span> to pause • <span class="kbd">R</span> to reset entropy • <span class="kbd">F</span> to add feed</p>
+    </footer>
+  </div>
+
+  <script>
+  (() => {
+    // -------- Enhanced i18n scaffold (EN/RU) with new features
+    const i18n = {
+      en: {
+        title: "Mycelial Peace Laboratory",
+        subtitle: "Live AI Conflict Transformation Simulator",
+        tagline: ""Cross-pollinating solutions to destabilize destructive entropies."",
+        controls: { speed: "Simulation Speed", entropy: "Entropy Sensitivity", mix: "Cultural Mixing", live: "Live Data Feed", autoReframe: "Auto-Reframe Content" },
+        modes: ["Solution Grid","Network View","Timeline","Scenarios","Feed Analysis"],
+        scenarios: ["Baseline","Tension Escalation","Cultural Breakthrough","Resource Crisis","Diaspora Activation"],
+        templates: {
+          collaboration: "Conflict → Collaboration Reframe",
+          abundance: "Scarcity → Abundance Reframe", 
+          unity: "Us-vs-Them → Shared Identity",
+          catalyst: "Crisis → Catalyst Reframe"
+        }
+      },
+      ru: {
+        title: "Мицелиальная Лаборатория Мира",
+        subtitle: "Живой симулятор трансформации конфликтов на ИИ",
+        tagline: "«Перекрёстное опыление решений для ослабления разрушительных энтропий»",
+        controls: { speed: "Скорость симуляции", entropy: "Чувствительность к энтропии", mix: "Культурное смешение", live: "Поток живых данных", autoReframe: "Авто-рефрейминг контента" },
+        modes: ["Сетка решений","Сеть","Хронология","Сценарии","Анализ лент"],
+        scenarios: ["Базовый","Эскалация напряжения","Культурный прорыв","Ресурсный кризис","Активация диаспоры"],
+        templates: {
+          collaboration: "Конфликт → Сотрудничество",
+          abundance: "Дефицит → Изобилие",
+          unity: "Мы против них → Общая идентичность", 
+          catalyst: "Кризис → Катализатор"
+        }
+      }
+    };
+    let lang = localStorage.getItem('mpl.lang') || 'en';
+    const t = (path) => path.split('.').reduce((o,k)=>o?.[k], i18n[lang]);
+
+    // -------- RSS Feed Management
+    class RSSManager {
+      constructor() {
+        this.feeds = JSON.parse(localStorage.getItem('mpl.feeds') || '[]');
+        this.feedItems = [];
+        this.lastUpdate = 0;
+      }
+
+      async addFeed(url) {
+        if (!url || this.feeds.some(f => f.url === url)) return false;
+        
+        try {
+          // Use a CORS proxy for RSS feeds (in production, you'd want your own proxy)
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+          const response = await fetch(proxyUrl);
+          const text = await response.text();
+          
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/xml');
+          
+          const title = doc.querySelector('channel > title')?.textContent || 'Unknown Feed';
+          const description = doc.querySelector('channel > description')?.textContent || '';
+          
+          const feed = {
+            id: Date.now(),
+            url,
+            title,
+            description,
+            added: new Date().toISOString(),
+            active: true,
+            conflictRelevance: this.analyzeConflictRelevance(title + ' ' + description)
+          };
+          
+          this.feeds.push(feed);
+          this.savFeeds();
+          this.refreshFeed(feed);
+          return true;
+        } catch (error) {
+          console.error('Failed to add feed:', error);
+          return false;
+        }
+      }
+
+      analyzeConflictRelevance(text) {
+        const conflictKeywords = [
+          'conflict', 'war', 'peace', 'negotiation', 'dispute', 'crisis', 'tension',
+          'ukraine', 'russia', 'diplomatic', 'sanctions', 'ceasefire', 'mediation',
+          'конфликт', 'война', 'мир', 'переговоры', 'кризис', 'напряжение'
+        ];
+        const words = text.toLowerCase();
+        return conflictKeywords.filter(keyword => words.includes(keyword)).length;
+      }
+
+      async refreshFeed(feed) {
+        try {
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feed.url)}`;
+          const response = await fetch(proxyUrl);
+          const text = await response.text();
+          
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/xml');
+          
+          const items = Array.from(doc.querySelectorAll('item')).slice(0, 10).map(item => ({
+            id: item.querySelector('guid')?.textContent || item.querySelector('link')?.textContent,
+            title: item.querySelector('title')?.textContent || 'Untitled',
+            description: item.querySelector('description')?.textContent || '',
+            link: item.querySelector('link')?.textContent || '',
+            pubDate: item.querySelector('pubDate')?.textContent || '',
+            feedId: feed.id,
+            feedTitle: feed.title,
+            conflictRelevance: this.analyzeConflictRelevance(item.querySelector('title')?.textContent + ' ' + item.querySelector('description')?.textContent),
+            reframed: false
+          }));
+          
+          // Add new items to feed items array
+          const existingIds = new Set(this.feedItems.map(item => item.id));
+          const newItems = items.filter(item => !existingIds.has(item.id));
+          this.feedItems = [...newItems, ...this.feedItems].slice(0, 100); // Keep last 100 items
+          
+          if (newItems.length > 0) {
+            peaceLab.pushActivity(`Added ${newItems.length} new items from ${feed.title}`, `${newItems.filter(i => i.conflictRelevance > 0).length} conflict-relevant`);
+          }
+          
+          return newItems.length;
+        } catch (error) {
+          console.error('Failed to refresh feed:', feed.title, error);
+          return 0;
+        }
+      }
+
+      async refreshAllFeeds() {
+        let totalNew = 0;
+        for (const feed of this.feeds.filter(f => f.active)) {
+          totalNew += await this.refreshFeed(feed);
+        }
+        this.lastUpdate = Date.now();
+        return totalNew;
+      }
+
+      removeFeed(feedId) {
+        this.feeds = this.feeds.filter(f => f.id !== feedId);
+        this.feedItems = this.feedItems.filter(i => i.feedId !== feedId);
+        this.saveFeeds();
+      }
+
+      saveFeeds() {
+        localStorage.setItem('mpl.feeds', JSON.stringify(this.feeds));
+      }
+
+      getFeedItems(limit = 20) {
+        return this.feedItems
+          .sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate))
+          .slice(0, limit);
+      }
+    }
+
+    // -------- Narrative Reframing Engine
+    class ReframingEngine {
+      constructor() {
+        this.templates = {
+          collaboration: {
+            pattern: /\b(conflict|fight|battle|dispute|argument|disagreement)\b/gi,
+            reframe: (text, context) => {
+              return text.replace(/\b(conflict|fight|battle|dispute|argument|disagreement)\b/gi, 
+                (match) => {
+                  const alternatives = ['collaboration opportunity', 'partnership challenge', 'cooperative solution space', 'joint problem-solving'];
+                  return alternatives[Math.floor(Math.random() * alternatives.length)];
+                }
+              );
+            }
+          },
+          abundance: {
+            pattern: /\b(shortage|scarcity|limited|lacking|insufficient|deficit)\b/gi,
+            reframe: (text, context) => {
+              return text.replace(/\b(shortage|scarcity|limited|lacking|insufficient|deficit)\b/gi,
+                (match) => {
+                  const alternatives = ['opportunity for innovation', 'catalyst for efficiency', 'space for creative solutions', 'invitation to optimize'];
+                  return alternatives[Math.floor(Math.random() * alternatives.length)];
+                }
+              );
+            }
+          },
+          unity: {
+            pattern: /\b(enemy|opponent|adversary|rival|them vs us|us vs them)\b/gi,
+            reframe: (text, context) => {
+              return text.replace(/\b(enemy|opponent|adversary|rival|them vs us|us vs them)\b/gi,
+                (match) => {
+                  const alternatives = ['potential partner', 'fellow stakeholder', 'other perspective holder', 'complementary viewpoint'];
+                  return alternatives[Math.floor(Math.random() * alternatives.length)];
+                }
+              );
+            }
+          },
+          catalyst: {
+            pattern: /\b(crisis|disaster|catastrophe|emergency|breakdown)\b/gi,
+            reframe: (text, context) => {
+              return text.replace(/\b(crisis|disaster|catastrophe|emergency|breakdown)\b/gi,
+                (match) => {
+                  const alternatives = ['transformation catalyst', 'evolution accelerator', 'innovation trigger', 'adaptive opportunity'];
+                  return alternatives[Math.floor(Math.random() * alternatives.length)];
+                }
+              );
+            }
+          }
+        };
+        this.reframeCount = parseInt(localStorage.getItem('mpl.reframeCount') || '0');
+      }
+
+      reframeText(text, templateType = 'auto') {
+        if (!text) return text;
+        
+        let reframed = text;
+        let appliedTemplates = [];
+
+        if (templateType === 'auto') {
+          // Apply all relevant templates
+          for (const [type, template] of Object.entries(this.templates)) {
+            if (template.pattern.test(reframed)) {
+              reframed = template.reframe(reframed);
+              appliedTemplates.push(type);
+            }
+          }
+        } else if (this.templates[templateType]) {
+          reframed = this.templates[templateType].reframe(reframed);
+          appliedTemplates.push(templateType);
+        }
+
+        if (appliedTemplates.length > 0) {
+          this.reframeCount++;
+          localStorage.setItem('mpl.reframeCount', this.reframeCount.toString());
+        }
+
+        return {
+          original: text,
+          reframed: reframed,
+          templatesApplied: appliedTemplates,
+          changed: appliedTemplates.length > 0
+        };
+      }
+
+      getReframeCount() {
+        return this.reframeCount;
+      }
+    }
+
+    // -------- Enhanced Data Model
+    const solutions = [
+      { id:1, title:"Narrative Symbiosis Engine", status:"🟢",
+        description:"AI mines cultural archives across languages to surface shared myths & collaborations and deploys living stories as counterweights to enmity.",
+        features:[
+          {icon:"🔍", title:"Deep Archive Mining", desc:"Processes multilingual corpora for collaboration patterns"},
+          {icon:"🧬", title:"Myth Pattern Recognition", desc:"Detects archetypes common to all sides"},
+          {icon:"🎮", title:"Living Story Deployment", desc:"Publishes interactive storylines into games/media"},
+          {icon:"📊", title:"Narrative Impact Analytics", desc:"Measures perception shifts over time"}
+        ],
+        demoCode:`const narrativeEngine = {
+  discover() { return this.scanArchives(); },
+  trackNarrativeResonance(id) { return {reach: 42, sentiment: 0.8}; },
+  deployStory(myth) { return this.publish(myth); }
+};`,
+        connections:["Cross-Cultural Commons","Mythic Convergence","Peace Games","Polyglot Mediation"],
+        progress:73, implementation:"Active prototype in 3 communities",
+        liveMetrics:{ storiesGenerated:0, culturalResonance:0, narrativeShift:0 }
+      },
+      { id:2, title:"Cross-Cultural Generative Commons", status:"🟡",
+        description:"Co-designs hybrid songs, art, humor, and slang that feel 'half mine' to everyone involved.",
+        features:[
+          {icon:"🎨", title:"Multilingual Creative AI", desc:"Blends cultural motifs into new works"},
+          {icon:"😄", title:"Humor Bridge Generator", desc:"Crafts jokes that soften identity borders"},
+          {icon:"🎵", title:"Hybrid Music Composer", desc:"Merges folk scales and rhythms"},
+          {icon:"💬", title:"Slang Evolution Lab", desc:"Tracks & seeds cross-pollinated phrases"}
+        ],
+        demoCode:`class CulturalCommons { 
+  generateHybridArt(cultures) { 
+    return this.blend(cultures).validate(); 
+  }
+  trackAdoption(artwork) { return this.metrics(artwork); }
+}`,
+        connections:["Narrative Symbiosis","Polyglot Mediation","Emotional Thermometer","Mythic Convergence"],
+        progress:58, implementation:"Beta with artist collectives",
+        liveMetrics:{ hybridWorks:0, culturalAdoption:0, bridgeStrength:0 }
+      },
+      { id:3, title:"Entropy Mapping Dashboard", status:"🟢",
+        description:"Quantifies 'entropic hotspots' across info-energy-emotion layers to time preemptive interventions.",
+        features:[
+          {icon:"🌡️", title:"Real-time Tension Monitoring", desc:"Tracks 200+ indicators"},
+          {icon:"🎯", title:"Predictive Intervention Points", desc:"Suggests windows to act"},
+          {icon:"📈", title:"Entropy Visualization", desc:"Maps instability fields"},
+          {icon:"⚡", title:"Early Warning System", desc:"Sends just-in-time signals"}
+        ],
+        demoCode:`const entropyMapper = {
+  calculate(data) { 
+    return {overall: this.analyze(data), hotspots: this.detect(data)}; 
+  },
+  predict(timeline) { return this.forecast(timeline); }
+};`,
+        connections:["Emotional Thermometer","Peace Games","Resource Contracts"],
+        progress:66, implementation:"Pilot with peace NGOs",
+        liveMetrics:{ alerts:0, hotspots:0, avoidedCrises:0 }
+      },
+      { id:4, title:"Peace Games (AI DM)", status:"🟡",
+        description:"Cooperative narrative scenarios where all sides must survive together; empathy by doing.",
+        features:[
+          {icon:"🧠", title:"Adaptive Difficulty", desc:"Keeps agency balanced"},
+          {icon:"🤝", title:"Asymmetric Roles", desc:"Mutual reliance mechanics"},
+          {icon:"📜", title:"Lore Infusion", desc:"Pulls from real history"},
+          {icon:"🛰️", title:"Live Events", desc:"Diaspora matchmaking"}
+        ],
+        demoCode:`const peaceGame = {
+  createScenario(parties) { 
+    return this.generateCoopChallenge(parties); 
+  },
+  measureEmpathy(session) { return this.analyze(session); }
+};`,
+        connections:["Narrative Symbiosis","Mythic Convergence"],
+        progress:49, implementation:"University labs sandbox",
+        liveMetrics:{ matches:0, coopRate:0, empathyGain:0 }
+      },
+      { id:5, title:"Polyglot Mediation Agent", status:"🟢",
+        description:"Not just translation—relational repair across Russian/Ukrainian/English pragmatics.",
+        features:[
+          {icon:"🗣️", title:"Connotation Smoothing", desc:"Rephrases to reduce threat"},
+          {icon:"🧩", title:"Grounded Context", desc:"Pulls shared references"},
+          {icon:"🧯", title:"De-escalation Tactics", desc:"Micro-interventions"},
+          {icon:"🔐", title:"Privacy by Design", desc:"On-device options"}
+        ],
+        demoCode:`async function mediate(message) {
+  const analysis = await analyzeIntent(message);
+  return reframe(message, analysis.threatLevel);
+}`,
+        connections:["Emotional Thermometer","Generative Commons"],
+        progress:62, implementation:"Mediator cohort trials",
+        liveMetrics:{ sessions:0, reframes:0, tensionDrop:0 }
+      },
+      { id:6, title:"Ecological Reciprocity AI", status:"🟢",
+        description:"Pairs cross-border communities on river/forest restoration so peace is rooted in land.",
+        features:[
+          {icon:"🌲", title:"Bioregion Matchmaking", desc:"Watershed-first logic"},
+          {icon:"💧", title:"Upstream/Downstream Equity", desc:"Fair benefits"},
+          {icon:"🛠️", title:"Toolkits & Grants", desc:"Low-friction starts"},
+          {icon:"📐", title:"Impact Modeling", desc:"Hydro & fire metrics"}
+        ],
+        demoCode:`const ecoAI = {
+  matchCommunities(bioregions) { 
+    return this.findSynergies(bioregions); 
+  },
+  trackProgress(project) { return this.measure(project); }
+};`,
+        connections:["Resource Contracts","Peace Games"],
+        progress:71, implementation:"Two river basins onboarded",
+        liveMetrics:{ hectares:0, jointCrews:0, waterQuality:0 }
+      },
+      { id:7, title:"Distributed Ancestral Archive", status:"🟡",
+        description:"Genealogies & oral histories stitched to reveal long entanglements & kinship.",
+        features:[
+          {icon:"🧬", title:"Kinship Graphs", desc:"Consent-respecting"},
+          {icon:"🗂️", title:"Oral Story Capture", desc:"Low-tech workflows"},
+          {icon:"🔎", title:"Serendipity Finds", desc:"Shared ancestors/habits"},
+          {icon:"📜", title:"Cultural Licenses", desc:"Community control"}
+        ],
+        demoCode:`const ancestralArchive = {
+  linkFamilies(consent) { 
+    return this.buildGraph(consent); 
+  },
+  findConnections() { return this.discover(); }
+};`,
+        connections:["Narrative Symbiosis","Mythic Convergence"],
+        progress:38, implementation:"Community archives pilots",
+        liveMetrics:{ linesLinked:0, reunions:0, sharedRituals:0 }
+      },
+      { id:8, title:"AI-Backed Resource Rotation Contracts", status:"🟢",
+        description:"Transparent, rotating access (grain/energy corridors) with cross-chain audits.",
+        features:[
+          {icon:"🔁", title:"Rotation Schedules", desc:"Fair-use windows"},
+          {icon:"🔭", title:"Forecast Guardrails", desc:"Weather/logistics-aware"},
+          {icon:"⚖️", title:"Dispute Escrow", desc:"Third-party verifiable"},
+          {icon:"🧾", title:"Public Ledgers", desc:"Censorship-resistant reads"}
+        ],
+        demoCode:`const resourceContracts = {
+  createRotation(parties, resource) { 
+    return this.schedule(parties, resource); 
+  },
+  auditCompliance(contract) { return this.verify(contract); }
+};`,
+        connections:["Ecological AI","Entropy Mapping"],
+        progress:44, implementation:"Spec + sandbox chain",
+        liveMetrics:{ onTimeRotations:0, disputes:0, trustScore:0 }
+      },
+      { id:9, title:"Emotional Thermometer", status:"🟢",
+        description:"Tracks emotional temperature (fear/anger/hope) to cue cooling interventions.",
+        features:[
+          {icon:"📡", title:"Signal Mix", desc:"Text, audio prosody, tempos"},
+          {icon:"🧯", title:"Cooling Toolkit", desc:"Music/humor/ritual prompts"},
+          {icon:"🧭", title:"Ethics Layer", desc:"No covert manipulation"},
+          {icon:"🪄", title:"Cultural Tailoring", desc:"Local idiom packs"}
+        ],
+        demoCode:`const emotionalThermometer = {
+  measureTemp(signals) { 
+    return this.analyze(signals); 
+  },
+  suggestCooling(temp) { return this.recommend(temp); }
+};`,
+        connections:["Polyglot Mediation","Generative Commons","Peace Games"],
+        progress:69, implementation:"City newsroom pilot",
+        liveMetrics:{ alerts:0, cooledSpikes:0, avgTemp:0 }
+      },
+      { id:10, title:"Mythic Convergence AI", status:"🟡",
+        description:"Merges mythic threads into shared epics; transnational heroes/quests.",
+        features:[
+          {icon:"🐉", title:"Archetype Merge", desc:"Dragon/bogatyr/kozaks"},
+          {icon:"🎭", title:"Ritual Kits", desc:"Schools & festivals"},
+          {icon:"📚", title:"Public Domain First", desc:"Open cultural commons"},
+          {icon:"🧵", title:"Diaspora Loom", desc:"Weaves abroad/home"}
+        ],
+        demoCode:`const mythicAI = {
+  mergeArchetypes(cultures) { 
+    return this.synthesize(cultures); 
+  },
+  generateEpic(merged) { return this.compose(merged); }
+};`,
+        connections:["Narrative Symbiosis","Peace Games","Ancestral Archive"],
+        progress:41, implementation:"Festival scripting phase",
+        liveMetrics:{ stories:0, adoptions:0, festivalNodes:0 }
+      }
+    ];
+
+    // -------- Enhanced State Engine with Error Handling
+    const state = {
+      paused: false,
+      speed: parseFloat(localStorage.getItem('mpl.speed') || '1'),
+      entropySensitivity: parseFloat(localStorage.getItem('mpl.entropy') || '1'),
+      culturalMix: localStorage.getItem('mpl.mix') !== 'false',
+      live: localStorage.getItem('mpl.live') !== 'false',
+      autoReframe: localStorage.getItem('mpl.autoReframe') === 'true',
+      mode: localStorage.getItem('mpl.mode') || 'grid',
+      metrics: { narrative:0, empathy:0, cooperation:0 },
+      entropy: 0.42,
+      connections: 3,
+      peace: 12,
+      bridges: 1,
+      errors: []
+    };
+
+    // -------- Initialize Managers
+    const rssManager = new RSSManager();
+    const reframingEngine = new ReframingEngine();
+
+    // -------- DOM Helpers (with error handling)
+    const $ = sel => {
+      try {
+        return document.querySelector(sel);
+      } catch (error) {
+        state.errors.push(`DOM query error: ${sel}`);
+        return null;
+      }
+    };
+    const $$ = sel => {
+      try {
+        return Array.from(document.querySelectorAll(sel));
+      } catch (error) {
+        state.errors.push(`DOM queryAll error: ${sel}`);
+        return [];
+      }
+    };
+
+    // -------- Render Solutions (Enhanced)
+    const grid = $('#solutionsGrid');
+    function renderSolutions(){
+      if (!grid) return;
+      
+      try {
+        grid.classList.toggle('network', state.mode==='network');
+        grid.classList.toggle('timeline', state.mode==='timeline');
+        grid.setAttribute('aria-busy','true');
+        grid.innerHTML = '';
+        
+        solutions.forEach(s => {
+          const card = document.createElement('article');
+          card.className = 'solution-card';
+          card.tabIndex = 0;
+          card.setAttribute('role','button');
+          card.setAttribute('aria-expanded','false');
+          card.dataset.id = s.id;
+
+          card.innerHTML = `
+            <div class="solution-header">
+              <div class="solution-number" data-status="${s.status}" aria-hidden="true">${s.id}</div>
+              <div>
+                <h3 class="solution-title">${s.title}</h3>
+                <p class="solution-description">${s.description}</p>
+              </div>
+            </div>
+            <div class="simulation-panel">
+              <div class="sim-header">Live Simulation</div>
+              <div class="sim-data">
+                <div class="sim-metric">Progress: <strong>${s.progress}%</strong></div>
+                <div class="sim-metric">Implementation: <strong>${s.implementation}</strong></div>
+              </div>
+            </div>
+            <div class="expandable" id="expand-${s.id}">
+              <div class="feature-grid">
+                ${s.features.map(f=>`
+                  <div class="feature-card">
+                    <div class="feature-icon">${f.icon}</div>
+                    <div class="feature-title">${f.title}</div>
+                    <div class="feature-desc">${f.desc}</div>
+                  </div>
+                `).join('')}
+              </div>
+              <div class="prototype-demo" aria-label="Prototype snippet">
+                <pre><code>${escapeHtml(s.demoCode)}</code></pre>
+              </div>
+              <div class="network-canvas" aria-hidden="true"></div>
+            </div>
+          `;
+          
+          card.addEventListener('click', ()=>toggleExpand(card,s.id));
+          card.addEventListener('keydown', (e)=>{
+            if(e.key==='Enter' || e.key===' ') { 
+              e.preventDefault(); 
+              toggleExpand(card,s.id); 
+            }
+            if(e.key==='Escape'){ 
+              collapse(card,s.id); 
+            }
+          });
+          grid.appendChild(card);
+        });
+        grid.removeAttribute('aria-busy');
+      } catch (error) {
+        state.errors.push(`Render solutions error: ${error.message}`);
+        console.error('Error rendering solutions:', error);
+      }
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function toggleExpand(card, id){
+      try {
+        const box = document.getElementById(`expand-${id}`);
+        if (!box) return;
+        
+        const expanded = box.classList.toggle('expanded');
+        card.classList.toggle('active', expanded);
+        card.setAttribute('aria-expanded', String(expanded));
+        
+        if (document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+          document.startViewTransition(()=>{});
+        }
+      } catch (error) {
+        console.error('Error toggling expand:', error);
+      }
+    }
+
+    function collapse(card, id){
+      try {
+        const box = document.getElementById(`expand-${id}`);
+        if (!box) return;
+        
+        box.classList.remove('expanded'); 
+        card.classList.remove('active');
+        card.setAttribute('aria-expanded','false');
+      } catch (error) {
+        console.error('Error collapsing:', error);
+      }
+    }
+
+    // -------- RSS Feed UI
+    function renderFeeds() {
+      const feedList = $('#feedList');
+      if (!feedList) return;
+      
+      const feeds = rssManager.feeds;
+      const items = rssManager.getFeedItems(10);
+      
+      if (feeds.length === 0 && items.length === 0) {
+        feedList.innerHTML = `
+          <div class="feed-item">
+            <div class="feed-title">No feeds added yet</div>
+            <div class="feed-meta">Add RSS feeds to monitor conflict-related news and apply reframing templates</div>
+          </div>
+        `;
+        return;
+      }
+      
+      feedList.innerHTML = feeds.map(feed => `
+        <div class="feed-item ${feed.active ? '' : 'muted'}">
+          <div class="feed-title">${escapeHtml(feed.title)}</div>
+          <div class="feed-meta">${escapeHtml(feed.url)} • Conflict relevance: ${feed.conflictRelevance}/10</div>
+          <div class="feed-actions">
+            <button class="btn" onclick="toggleFeed(${feed.id})">${feed.active ? 'Pause' : 'Resume'}</button>
+            <button class="btn" onclick="removeFeed(${feed.id})">Remove</button>
+          </div>
+        </div>
+      `).join('') + 
+      
+      (items.length > 0 ? `
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,.1);">
+          <h4>Recent Items</h4>
+          ${items.slice(0, 5).map(item => `
+            <div class="feed-item ${item.conflictRelevance > 2 ? '' : 'muted'}">
+              <div class="feed-title">${escapeHtml(item.title)}</div>
+              <div class="feed-meta">${item.feedTitle} • ${new Date(item.pubDate).toLocaleDateString()}</div>
+              <div class="feed-actions">
+                <button class="btn" onclick="reframeItem('${item.id}')">🔄 Reframe</button>
+                <a class="btn" href="${item.link}" target="_blank" rel="noopener">🔗 View</a>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      ` : '');
+    }
+
+    // ----

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en" data-app="lightforge">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lightforge — Ritual Engine for Recovery & Momentum</title>
+  <meta name="description" content="Small monthly subscription that gamifies daily rituals, sobriety, and momentum. Offline-first single file with subscriber capture." />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#0b1020" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+
+  <style>
+    :root{
+      --bg:#0b1020; --bg2:#0b1326; --card:#111827; --ink:#e6edf3; --ink-weak:#cfd9e3; --muted:#94a3b8;
+      --accent:#38bdf8; --good:#34d399; --warn:#f59e0b; --bad:#ef4444; --ring:#60a5fa;
+      --shadow: 0 12px 40px rgba(0,0,0,.35);
+      --radius:18px; --gap:1.1rem; --maxw:1100px;
+      --focus: 0 0 0 3px #0ea5e9, 0 0 0 6px #0b1020;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;background:linear-gradient(180deg,var(--bg),var(--bg2));color:var(--ink);font:16px/1.5 system-ui,Segoe UI,Inter,Roboto,Arial}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:var(--maxw);margin:0 auto;padding:2rem}
+    header.hero{display:grid;gap:1.2rem;padding:2rem;border-radius:var(--radius);
+      background:radial-gradient(1200px 500px at 10% 0%,rgba(56,189,248,.15),transparent 60%),linear-gradient(180deg,#101a33,#0e162c);box-shadow:var(--shadow)}
+    .title{font-size:clamp(1.6rem,5vw,2.4rem);font-weight:800;letter-spacing:.3px}
+    .subtitle{color:var(--muted);max-width:70ch}
+    .cta{display:flex;flex-wrap:wrap;gap:.6rem}
+    .btn{background:linear-gradient(180deg,#1f2937,#0f172a);border:1px solid #23324a;color:#cfe8ff;padding:.75rem 1rem;border-radius:14px;cursor:pointer;box-shadow:var(--shadow)}
+    .btn:hover{transform:translateY(-1px)}
+    @media (prefers-reduced-motion: reduce){ .btn:hover{transform:none} }
+    .btn.primary{background:linear-gradient(180deg,#059669,#047857);border-color:#065f46}
+    .btn.accent{background:linear-gradient(180deg,#2563eb,#1d4ed8);border-color:#1e3a8a}
+    section.card{margin-top:1.6rem;padding:1.2rem 1.2rem;border-radius:var(--radius);
+      background:linear-gradient(180deg,#0f172a,#0b1222);border:1px solid #1f2a44;box-shadow:var(--shadow)}
+    h2{font-size:1.25rem;margin:.2rem 0 1rem}
+    ul{padding-left:1.2rem}
+    .grid{display:grid;gap:var(--gap)}
+    .grid.cols-2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+    .pill{display:inline-flex;gap:.4rem;align-items:center;border:1px solid #2a3a5f;background:#0f1a33;padding:.3rem .6rem;border-radius:999px;color:#c3e6ff}
+    .muted{color:var(--muted)}
+    .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+    .kbd{padding:.1rem .35rem;border:1px solid #2c3a5a;border-bottom-width:2px;background:#0b1326;border-radius:6px}
+    .timeline{display:grid;gap:.6rem}
+    .milestone{border-left:3px solid var(--ring);padding-left:.8rem}
+    .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.8rem}
+    .kpi .tile{background:#0c1428;border:1px solid #1a284a;padding:.8rem;border-radius:12px}
+    .sr-only{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+    :focus-visible{outline: none; box-shadow: var(--focus)}
+    /* Check-in mini app */
+    .checkins{display:grid;gap:.8rem}
+    .checkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.6rem}
+    .tile2{border:1px solid #1a284a;background:#0b1326;border-radius:12px;padding:.8rem}
+    .badge{display:inline-block;background:#0f1a33;border:1px solid #2a3a5f;border-radius:999px;padding:.15rem .5rem;color:#cde7ff}
+    footer{margin:2rem 0;color:#8aa4c5}
+    .skip{position:absolute;left:-999px;top:auto;z-index:100;background:#0f172a;color:#fff;padding:.5rem 1rem;border-radius:10px}
+    .skip:focus{left:1rem;top:1rem}
+    /* Container queries for compact cards */
+    @container (max-width: 520px){
+      .title{font-size:1.6rem}
+    }
+  </style>
+</head>
+
+<body>
+  <a href="#main" class="skip">Skip to content</a>
+  <div class="wrap">
+    <header class="hero" role="banner">
+      <div class="pill" aria-label="Feature tags"><span>🧭 Daily Quests</span><span>🛡️ Virtues</span><span>🌱 Recovery</span></div>
+      <h1 class="title">Lightforge — Make Tomorrow Lighter</h1>
+      <p class="subtitle">A gentle, gamified ritual loop. Tiny steps, tracked. Community prompts. Private by default.</p>
+      <div class="cta" role="group" aria-label="Primary actions">
+        <a class="btn primary" href="#subscribe">Start Subscription</a>
+        <a class="btn accent" href="#roadmap">See 90-Day Plan</a>
+        <button class="btn" onclick="share(document.title,'Lightforge: ritual engine + recovery prompts.')">Share</button>
+      </div>
+      <div class="kpi" role="list">
+        <div class="tile" role="listitem"><strong>Goal (90d)</strong><div class="muted">300+ active subs</div></div>
+        <div class="tile" role="listitem"><strong>Pillars</strong><div class="muted">Quests · Check-ins · Rewards</div></div>
+        <div class="tile" role="listitem"><strong>Bundle</strong><div class="muted">Included with EcoDraft preorders (3 mo)</div></div>
+      </div>
+      <div class="muted" id="cycleCountdown" aria-live="polite"></div>
+    </header>
+
+    <main id="main" tabindex="-1">
+      <section class="card grid cols-2" aria-labelledby="what">
+        <div>
+          <h2 id="what">What subscribers get</h2>
+          <ul>
+            <li>Weekly mini-challenges & season arcs.</li>
+            <li>Private dashboard + exportable logs.</li>
+            <li>“Lightforge Logs” livestream summaries.</li>
+          </ul>
+          <h2>Pricing</h2>
+          <ul>
+            <li>Starter: $5 CAD / mo</li>
+            <li>Supporter: $10 CAD / mo</li>
+          </ul>
+        </div>
+        <div>
+          <h2>Privacy & Data</h2>
+          <ul>
+            <li>Local by default. Export when you choose.</li>
+            <li>No trackers. Bring your own community space.</li>
+          </ul>
+          <p class="muted">Support & Interac e-Transfer: <button class="btn" onclick="copySupport()">cjigger@yahoo.com</button></p>
+        </div>
+      </section>
+
+      <section id="subscribe" class="card" aria-labelledby="join">
+        <h2 id="join">Subscribe / Join List</h2>
+        <form id="leadform_lightforge" onsubmit="event.preventDefault();saveLead('lightforge')" aria-describedby="formnote">
+          <div class="grid cols-2">
+            <label class="sr-only" for="name">Name</label>
+            <input id="name" name="name" placeholder="Your name" class="in" required />
+
+            <label class="sr-only" for="email">Email</label>
+            <input id="email" name="email" placeholder="Email" type="email" inputmode="email" class="in" required />
+
+            <label class="sr-only" for="tier">Tier</label>
+            <select id="tier" name="tier" class="in" required>
+              <option value="">Choose a tier…</option>
+              <option>Starter — $5 CAD</option>
+              <option>Supporter — $10 CAD</option>
+            </select>
+
+            <label class="sr-only" for="handle">Public handle (optional)</label>
+            <input id="handle" name="handle" placeholder="Public handle (optional)" class="in" />
+          </div>
+
+          <!-- Honeypot -->
+          <input aria-hidden="true" tabindex="-1" class="sr-only" type="text" id="extra" name="extra" autocomplete="off">
+
+          <div class="cta">
+            <button class="btn primary">Join Lightforge</button>
+            <button type="button" class="btn" onclick="exportCSV('lightforge')">Export CSV</button>
+            <button type="button" class="btn" onclick="genReferral('lightforge')">Copy Referral Link</button>
+            <button type="button" class="btn" onclick="share(document.title,'Join the mission:')">Share</button>
+            <button type="button" class="btn" onclick="printPlan()">Print</button>
+          </div>
+        </form>
+        <style>
+          form .in{width:100%;padding:.75rem;border-radius:12px;border:1px solid #2a3a5f;background:#0b1326;color:#cfe8ff}
+          form .in:focus{outline:2px solid var(--ring);outline-offset:2px}
+        </style>
+        <p id="formnote" class="muted">We’ll contact you with payment options (Interac/crypto) after you export and send.</p>
+      </section>
+
+      <!-- Mini ritual/check-in engine (local only) -->
+      <section class="card checkins" aria-labelledby="checkins">
+        <h2 id="checkins">Today’s Rituals</h2>
+        <div class="checkgrid" id="ritualGrid" role="list"></div>
+        <div class="tile2">
+          <span class="badge" id="streakBadge" aria-live="polite">Streak: 0</span>
+          <button class="btn" onclick="resetRituals()">Reset day</button>
+          <button class="btn" onclick="downloadLogs()">Export Logs CSV</button>
+        </div>
+        <p class="muted">Your rituals & logs never leave this browser unless you export them.</p>
+      </section>
+
+      <section id="roadmap" class="card" aria-labelledby="plan">
+        <h2 id="plan">90-Day Revenue Roadmap</h2>
+        <div class="timeline">
+          <div class="milestone">
+            <strong>Weeks 1–3 — Seeding</strong>
+            <ul>
+              <li>Launch lean landing + waitlist. Film demo/proof video.</li>
+              <li>Lightforge: $5–10/mo plan + soft launch; weekly Logs stream.</li>
+              <li>Mycelium: 1-pager deck; outreach to incubators/municipal/NGO.</li>
+            </ul>
+          </div>
+          <div class="milestone">
+            <strong>Weeks 4–6 — First Roots</strong>
+            <ul>
+              <li>EcoDraft: 5–10 preorders; lock parts; DIY kit tests.</li>
+              <li>Lightforge: 50 subs + 2-week challenge; collect testimonials.</li>
+              <li>Mycelium: land pilot; host free webinar for leads.</li>
+            </ul>
+          </div>
+          <div class="milestone">
+            <strong>Weeks 7–9 — Branching Out</strong>
+            <ul>
+              <li>Deliver first 5 EcoDraft units; start referral model.</li>
+              <li>File provisional IP for credibility.</li>
+              <li>Lightforge: 150 subs; bundle 3 months with EcoDraft.</li>
+              <li>Mycelium: complete phase 1; publish case study.</li>
+            </ul>
+          </div>
+          <div class="milestone">
+            <strong>Weeks 10–12 — Stabilization</strong>
+            <ul>
+              <li>EcoDraft: 20–30 units sold; test a distributor.</li>
+              <li>Lightforge: 300+ subs; referrals automated.</li>
+              <li>Mycelium: $10–25k pilot; prep second client.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="faq">
+        <h2 id="faq">FAQ</h2>
+        <details><summary>Is this a medical program?</summary><p class="muted">No. It’s a motivational habit loop. Not medical advice.</p></details>
+        <details><summary>Refunds?</summary><p class="muted">Yes within 7 days of a new month if not satisfied.</p></details>
+      </section>
+    </main>
+
+    <footer role="contentinfo">
+      <div>© 2025 Foster + Navi · Single-file build · v1.2</div>
+      <p class="muted">
+        Support / Interac e-Transfer: <button class="btn" onclick="copySupport()" aria-label="Copy support email">cjigger@yahoo.com</button>
+        · <button class="btn" onclick="installPrompt()" id="installBtn" hidden>Install Lightforge</button>
+      </p>
+    </footer>
+  </div>
+
+  <!-- App scripts: lead capture, export, referral, SW, rituals -->
+  <script>
+    // ---------- Utilities ----------
+    const $ = (sel, root=document)=>root.querySelector(sel);
+    const storeKey = (name)=> `pra_${name}_v2`;
+    const supportEmail = "cjigger@yahoo.com";
+
+    function copySupport(){
+      navigator.clipboard.writeText(supportEmail).then(()=>alert("Support email copied: "+supportEmail));
+    }
+
+    function share(title,text){
+      const url = window.location.href; const full = `${text}\n${url}`;
+      if(navigator.share){ navigator.share({title, text, url}); }
+      else { navigator.clipboard.writeText(full); alert('Copied share text to clipboard!'); }
+    }
+
+    function printPlan(){ window.print(); }
+
+    // ---------- Lead capture / export / referrals ----------
+    function saveLead(page){
+      const f = $(`#leadform_${page}`); if(!f) return;
+      // honeypot
+      if(f.extra && f.extra.value.trim()!==""){ return; }
+      // basic validation
+      const email = f.email.value.trim();
+      if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ alert("Please enter a valid email."); return; }
+      if(!f.tier.value){ alert("Please select a tier."); return; }
+
+      const lead = Object.fromEntries(new FormData(f));
+      lead.timestamp = new Date().toISOString();
+      const arr = JSON.parse(localStorage.getItem(storeKey(page))||'[]'); arr.push(lead);
+      localStorage.setItem(storeKey(page), JSON.stringify(arr));
+      alert('Saved locally. Use "Export CSV" to send when ready.');
+      f.reset();
+    }
+
+    function exportCSV(page){
+      const arr = JSON.parse(localStorage.getItem(storeKey(page))||'[]');
+      if(!arr.length){ alert('No leads yet.'); return; }
+      const headers = Object.keys(arr[0]);
+      const rows = [headers.join(','), ...arr.map(o=>headers.map(h=>JSON.stringify(o[h]??'')).join(','))].join('\n');
+      const blob = new Blob([rows], {type:'text/csv'});
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), {href:url, download:`${page}_leads_${new Date().toISOString().slice(0,10)}.csv`});
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }

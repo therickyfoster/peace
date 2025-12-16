@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peace · Lab — Planetary Restoration Archive</title>
+<meta name="description" content="A practical lab for narrative reframing, gamified workplace culture, and science-backed peacebuilding. Standalone, offline-friendly.">
+<style>
+  :root{
+    --bg:#0b0f10; --panel:#12181a; --ink:#e7f2f2; --mute:#a6b4b4; --accent:#6cf2c4; --accent2:#8acbff; --warn:#ffd36e; --good:#7bff9b; --bad:#ff8a8a; --line:#1c2427;
+    --radius:14px; --pad:14px; --shadow:0 6px 18px rgba(0,0,0,.25);
+    --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    --sans: system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+  }
+  html,body{background:var(--bg);color:var(--ink);margin:0;font:16px/1.55 var(--sans);}
+  a{color:var(--accent2);text-decoration:none} a:hover{text-decoration:underline}
+  header{position:sticky;top:0;z-index:10;background:linear-gradient(180deg, rgba(11,15,16,0.96), rgba(11,15,16,0.8) 60%, transparent);backdrop-filter:saturate(1.2) blur(6px)}
+  .wrap{max-width:1200px;margin:0 auto;padding:18px;}
+  .title{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+  .logo{width:40px;height:40px;border-radius:10px;background: conic-gradient(from 40deg at 50% 50%, #6cf2c4, #8acbff, #6cf2c4);box-shadow:0 0 20px rgba(140,220,255,.3)}
+  .title h1{margin:0;font-size:20px;letter-spacing:.02em}
+  nav.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  nav.tabs button{background:#0e1416;border:1px solid var(--line);color:var(--ink);padding:9px 12px;border-radius:10px;cursor:pointer}
+  nav.tabs button.active{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(138,203,255,.15)}
+  .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+  @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  section.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:var(--pad);box-shadow:var(--shadow)}
+  h2{margin:.2em 0 .6em 0;font-size:18px}
+  h3{margin:1.2em 0 .3em 0;font-size:15px;color:var(--mute)}
+  .muted{color:var(--mute)}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  textarea,input,select{background:#0c1214;color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px;font:14px var(--sans);width:100%}
+  textarea{min-height:140px;resize:vertical}
+  .btn{background:#0e1416;border:1px solid var(--line);color:var(--ink);padding:10px 12px;border-radius:10px;cursor:pointer}
+  .btn.primary{border-color:var(--accent);box-shadow:0 0 0 2px rgba(108,242,196,.12)}
+  .tag{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid var(--line);color:var(--mute);font-size:12px}
+  .badge{display:inline-flex;align-items:center;gap:6px;background:#0c1214;border:1px dashed var(--line);padding:6px 8px;border-radius:10px}
+  .pill{border:1px solid var(--line);padding:4px 8px;border-radius:999px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+  .card{background:#0c1214;border:1px solid var(--line);border-radius:12px;padding:12px}
+  .small{font-size:12px;color:var(--mute)}
+  .good{color:var(--good)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+  details{background:#0c1214;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+  code,pre{font-family:var(--mono);font-size:13px}
+  .foot{margin-top:28px;border-top:1px solid var(--line);padding-top:12px;color:var(--mute);font-size:12px}
+  .mono{font-family:var(--mono)}
+  .diff ins{background:rgba(108,242,196,.2);text-decoration:none}
+  .diff del{background:rgba(255,138,138,.2)}
+  .list{display:grid;gap:6px}
+  .kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .kpi .card{display:flex;align-items:center;justify-content:space-between}
+  .notice{background:#0e1416;border:1px solid var(--line);border-radius:10px;padding:10px}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="title">
+      <div class="logo" aria-hidden="true"></div>
+      <h1>Peace · Lab <span class="muted">— Narrative Reframing & Gamified Culture</span></h1>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button data-tab="reframe" class="active">Reframer</button>
+      <button data-tab="kits">Workplace Kits</button>
+      <button data-tab="samples">Samples & Templates</button>
+      <button data-tab="science">Science of Narratives</button>
+      <button data-tab="feeds">Live Feeds (RSS)</button>
+      <button data-tab="about">About & Guide</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap" id="app">
+  <div id="reframe" class="grid tab">
+    <section class="panel">
+      <h2>Narrative Reframer</h2>
+      <p class="muted">Paste text you plan to send/post. The tool will suggest edits for peace, unity, sovereignty, and zero-harm. You keep full agency—accept or skip any suggestion.</p>
+      <h3>Input</h3>
+      <textarea id="inputText" placeholder="Paste message here…"></textarea>
+      <div class="row">
+        <label class="pill"><input type="checkbox" id="toneBridge" checked> Bridge language (I-statements, empathy)</label>
+        <label class="pill"><input type="checkbox" id="tonePrecision" checked> Replace absolutes with precision</label>
+        <label class="pill"><input type="checkbox" id="toneDeEscalate" checked> De-escalate conflict metaphors</label>
+        <label class="pill"><input type="checkbox" id="toneAgency" checked> Restore human agency (avoid dehumanization)</label>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <button class="btn primary" id="runReframe">Reframe</button>
+        <button class="btn" id="copyOut">Copy Output</button>
+      </div>
+      <h3>Output</h3>
+      <textarea id="outputText" placeholder="Reframed message appears here…" aria-label="Reframed output"></textarea>
+      <details style="margin-top:10px">
+        <summary>Show change highlights</summary>
+        <div id="diffView" class="diff small" aria-live="polite"></div>
+      </details>
+      <div class="foot small">Method: rule-based inline edits (on-device). Tips draw on peace linguistics, framing effects, social identity theory.</div>
+    </section>
+
+    <section class="panel">
+      <h2>Quick Templates</h2>
+      <div class="list" id="templates"></div>
+      <h3>Bridge Phrases</h3>
+      <div class="cards">
+        <div class="card small">“Here’s where I think we actually agree…”</div>
+        <div class="card small">“I might be missing something; how does this land for you?”</div>
+        <div class="card small">“Can we try a solution that protects everyone’s core needs?”</div>
+        <div class="card small">“I’m committed to zero-harm outcomes—help me pressure-test this.”</div>
+        <div class="card small">“Let’s turn this from blame to repair—what’s our first reversible step?”</div>
+      </div>
+      <h3 style="margin-top:16px;">De-escalation Moves</h3>
+      <ul class="small">
+        <li>Replace war metaphors (“fight, destroy, crush”) with stewardship (“build, repair, align”).</li>
+        <li>Swap absolutes (“always/never”) for bounded claims (“often, in this case, given X”).</li>
+        <li>Name shared values first; then propose a small, testable action.</li>
+        <li>Use concrete nouns & verbs; avoid vague villainy.</li>
+      </ul>
+    </section>
+  </div>
+
+  <div id="kits" class="grid tab" style="display:none">
+    <section class="panel">
+      <h2>Gamified Workplace Kits</h2>
+      <p class="muted">Pick a kit, run it with your team, export results. Kits are modular: quests → rituals → artefacts → feedback loops.</p>
+      <div class="cards" id="kitList"></div>
+      <h3 style="margin-top:16px">Generate a Narrative Quest</h3>
+      <div class="row">
+        <select id="questTheme">
+          <option value="reciprocity">Reciprocity over extraction</option>
+          <option value="sovereignty">Sovereignty over coercion</option>
+          <option value="stewardship">Stewardship over domination</option>
+          <option value="truth">Truth-seeking over certainty</option>
+          <option value="repair">Repair over blame</option>
+        </select>
+        <button class="btn primary" id="genQuest">Generate</button>
+        <button class="btn" id="exportQuest">Export JSON</button>
+      </div>
+      <textarea id="questOut" class="mono" placeholder="Quest spec…"></textarea>
+    </section>
+
+    <section class="panel">
+      <h2>Scorecards & Badges</h2>
+      <div class="kpi">
+        <div class="card"><span>Psychological Safety</span><strong id="kpiSafety">—</strong></div>
+        <div class="card"><span>Reciprocity Signals</span><strong id="kpiRecip">—</strong></div>
+        <div class="card"><span>Conflict Heat</span><strong id="kpiHeat">—</strong></div>
+        <div class="card"><span>Repair Velocity</span><strong id="kpiRepair">—</strong></div>
+      </div>
+      <p class="small muted" style="margin-top:8px">Tip: update KPIs weekly via quick pulse surveys and meeting transcripts (keyword heuristics).</p>
+      <div class="row" style="margin-top:10px">
+        <button class="btn" id="awardBadge">Award “Repair First” Badge</button>
+        <div id="badgeWall" class="row"></div>
+      </div>
+    </section>
+  </div>
+
+  <div id="samples" class="grid tab" style="display:none">
+    <section class="panel">
+      <h2>Samples & Templates</h2>
+      <div class="cards">
+        <div class="card">
+          <strong>From “Win at all costs” → “Win with all stakeholders”</strong>
+          <p class="small">Reframe competitive language into stewardship & reciprocity. Use customer & community impact stories as leading indicators.</p>
+          <details class="small"><summary>Template</summary><pre>We measure success by the good our work does for customers, coworkers, suppliers, and the communities we belong to. When tradeoffs appear, we seek a repair that preserves dignity and safety for all.</pre></details>
+        </div>
+        <div class="card">
+          <strong>From “Blame & shame” → “Repair & learn”</strong>
+          <p class="small">Swap punitive narratives for post-mortem learning with reversible first steps.</p>
+          <details class="small"><summary>Template</summary><pre>When harm occurs, we pause, acknowledge impact, and co-design a repair. We treat errors as information, not identity.</pre></details>
+        </div>
+        <div class="card">
+          <strong>From “Resources to extract” → “Relations to steward”</strong>
+          <p class="small">Language shift: from objects to relationships, from use to care.</p>
+          <details class="small"><summary>Template</summary><pre>We treat time, attention, data, and ecosystems as living relationships. We return value where we draw value.</pre></details>
+        </div>
+        <div class="card">
+          <strong>Team Ritual: Gratitude Round</strong>
+          <p class="small">Close meetings with one gratitude for a peer. 90 seconds. Builds reciprocity.</p>
+        </div>
+        <div class="card">
+          <strong>Symbol Contest</strong>
+          <p class="small">Design an artefact (motto/emblem) that encodes your narrative. Winner becomes an onboarding artifact.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Story Prompts</h2>
+      <ul class="small">
+        <li>Tell a story where someone protected another’s time or attention.</li>
+        <li>Describe a moment when a small repair prevented a large conflict.</li>
+        <li>Share a time you shifted from certainty to curiosity and it improved the outcome.</li>
+        <li>When did we act as stewards for data or the environment?</li>
+      </ul>
+      <div class="notice small">Tip: capture these as a living “Lore Log”. Patterns become your culture codebook.</div>
+    </section>
+  </div>
+
+  <div id="science" class="grid tab" style="display:none">
+    <section class="panel">
+      <h2>Science of Narratives</h2>
+      <p class="muted">A crisp primer to ground practice. Each concept links to a practical move.</p>
+      <h3>Cognitive & Behavioral</h3>
+      <ul class="small">
+        <li><b>Framing effects:</b> how wording changes judgment. Practical move: audit verbs & metaphors.</li>
+        <li><b>Confirmation & coherence bias:</b> we prefer tidy stories. Move: invite counter-stories before decisions.</li>
+        <li><b>Habit loops & cues:</b> repeated rituals embed narrative. Move: add micro-rituals (gratitude, check-ins).</li>
+      </ul>
+      <h3>Neuroscience & Emotion</h3>
+      <ul class="small">
+        <li>Emotion + story → stronger memory encoding (hippocampus) and behavior change.</li>
+        <li>Perspective-taking and empathy recruit mirror systems. Move: role-play edge cases.</li>
+      </ul>
+      <h3>Social Identity & Systems</h3>
+      <ul class="small">
+        <li>Group identity is narrated. Move: tell “we” stories that include dissent & repair.</li>
+        <li>Systems have narrative attractors. Move: shift metaphors from zero-sum to mutual flourishing.</li>
+      </ul>
+      <details class="small"><summary>Operational Heuristics</summary>
+        <ul>
+          <li>Name shared values → specify harm/need → propose reversible first step → commit to review.</li>
+          <li>Replace absolutes with constraints (“in this case”, “often”, “given these data”).</li>
+          <li>Translate moral outrage into design constraints (zero-harm, consent, reversibility).</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="panel">
+      <h2>Why Gamification Helps</h2>
+      <ul class="small">
+        <li><b>Clear goals + feedback</b> increase engagement; badges work best when aligned with intrinsic values.</li>
+        <li><b>Rituals & artefacts</b> make abstract values tangible and memorable.</li>
+        <li><b>Social proof</b> normalizes desired narratives; public recognition multiplies adoption.</li>
+      </ul>
+      <div class="notice small">Ethics: no coercion, no surveillance scoring, ensure opt-in and escape hatches.</div>
+    </section>
+  </div>
+
+  <div id="feeds" class="grid tab" style="display:none">
+    <section class="panel">
+      <h2>Live Feeds (RSS)</h2>
+      <p class="muted">Add feeds you trust. Items are stored locally (browser) and fetched via a reader path that avoids most CORS issues. Works best with standard RSS/Atom.</p>
+      <div class="row">
+        <input id="feedUrl" placeholder="https://example.com/feed.xml">
+        <input id="feedLabel" placeholder="Label (optional)">
+        <button class="btn primary" id="addFeed">Add Feed</button>
+        <button class="btn" id="refreshFeeds">Refresh</button>
+        <button class="btn" id="exportFeeds">Export</button>
+        <input type="file" id="importFeeds" style="display:none" accept=".json">
+        <button class="btn" id="importFeedsBtn">Import</button>
+      </div>
+      <div class="small muted" style="margin-top:6px">Hint: click a label to filter. Default set includes narrative science & org-culture sources.</div>
+      <div id="feedChips" class="row" style="margin-top:10px"></div>
+      <div id="feedItems" class="cards" style="margin-top:12px"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Default Feeds</h2>
+      <ul class="small" id="defaultList"></ul>
+      <div class="notice small">If a site blocks cross-origin access, items may show as “summary via reader.” You can still click through to the original.</div>
+    </section>
+  </div>
+
+  <div id="about" class="grid tab" style="display:none">
+    <section class="panel">
+      <h2>About & Guide</h2>
+      <p class="muted">This lab turns narrative science into repeatable, zero-harm practice. Everything here is local, exportable, and remix-friendly.</p>
+      <h3>How to Use</h3>
+      <ol class="small">
+        <li>Draft your message → run <b>Reframer</b> → copy/paste output.</li>
+        <li>Pick a <b>Workplace Kit</b> → run a 2–8 week cycle → log “Lore”.</li>
+        <li>Track RSS <b>Feeds</b> to keep methods fresh.</li>
+      </ol>
+      <h3>Privacy & Storage</h3>
+      <p class="small">All settings save to your browser (<code>localStorage</code>). Export JSON for backup. No external libraries.</p>
+      <h3>Attribution</h3>
+      <p class="small">Inspired by cognitive science, peace linguistics, social identity theory, behavioral design, and systems thinking. Share improvements as templates for others.</p>
+    </section>
+
+    <section class="panel">
+      <h2>One-Page Checklist</h2>
+      <ul class="small">
+        <li>Lead with shared values; state concrete needs.</li>
+        <li>Decrease heat: avoid war metaphors; prefer repair metaphors.</li>
+        <li>Replace absolutes with specifics and evidence.</li>
+        <li>Propose reversible first steps; pre-commit to review.</li>
+        <li>Capture stories; convert into rituals and artefacts.</li>
+      </ul>
+      <div class="foot small">Version: Peace-Lab v2 • Standalone build</div>
+    </section>
+  </div>
+</main>
+
+<script>
+/* ---------- Tab Navigation ---------- */
+const tabs = document.querySelectorAll('nav#tabs button');
+const panes = document.querySelectorAll('.tab');
+tabs.forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    panes.forEach(p=>p.style.display = p.id===btn.dataset.tab ? '' : 'none');
+    window.scrollTo({top:0,behavior:'smooth'});
+  });
+});
+
+/* ---------- Narrative Reframer ---------- */
+const inputText = document.getElementById('inputText');
+const outputText = document.getElementById('outputText');
+const runBtn = document.getElementById('runReframe');
+const copyBtn = document.getElementById('copyOut');
+const diffView = document.getElementById('diffView');
+
+const toggles = {
+  bridge: document.getElementById('toneBridge'),
+  precise: document.getElementById('tonePrecision'),
+  deEsc: document.getElementById('toneDeEscalate'),
+  agency: document.getElementById('toneAgency'),
+};
+
+function reframe(text){
+  let t = " " + text + " ";
+  const swap = [
+    // de-escalation
+    [/(\s)fight(s|ing)?(\s)/gi, "$1work through$3"],
+    [/(\s)destroy(s|ing)?(\s)/gi, "$1dismantle harmful parts of$3"],
+    [/(\s)crush(es|ing)?(\s)/gi, "$1address$3"],
+    [/(\s)enemy(\s)/gi, "$1opponent$2"],
+    [/(\s)attack(s|ed|ing)?(\s)/gi, "$1challenge$3"],
+    [/(\s)war(\s)on(\s)/gi, "$1effort toward reducing$3"],
+    [/(\s)blame(\s)/gi, "$1repair$2"],
+
+    // precision (absolutes → bounded)
+    [/(\s)always(\s)/gi, "$1often$2"],
+    [/(\s)never(\s)/gi, "$1rarely$2"],
+    [/(\s)everyone(\s)/gi, "$1many of us$2"],
+    [/(\s)no one(\s)/gi, "$1few people$2"],
+
+    // agency restoration
+    [/(\s)they are(\s)(the\s)?problem/gi, "$1their choices are contributing; we can co-design a repair"],
+    [/(\s)we have to(\s)/gi, "$1we can choose to$2"],
+    [/(\s)it forces us to(\s)/gi, "$1we feel pressure to$2"],
+
+    // bridge phrases (added at start if missing)
+  ];
+  if (toggles.deEsc.checked) swap.forEach(([re, rep])=>{ t = t.replace(re, rep); });
+  if (toggles.precise.checked){
+    t = t.replace(/\b(100%)\b/gi, "nearly all");
+  }
+  if (toggles.agency.checked){
+    t = t.replace(/\b(can't|cannot|impossible)\b/gi, "is difficult but feasible with constraints");
+  }
+  t = t.trim();
+
+  if (toggles.bridge.checked){
+    const lead = [
+      "I want to start from shared values and work toward a zero-harm path.",
+      "I might be missing context—here’s my current read, open to correction.",
+      "Let’s shift from blame to repair and protect everyone’s dignity.",
+      "My aim here is sovereignty, consent, and practical next steps."
+    ];
+    // Add bridge if the text begins with a hard claim (heuristic)
+    if (!/^(i |we |let’s|lets|my aim|i want)/i.test(t)) {
+      t = lead[Math.floor(Math.random()*lead.length)] + " " + t;
+    }
+  }
+  return t;
+}
+
+function makeDiff(a,b){
+  // very simple token diff
+  const A = a.split(/\s+/), B = b.split(/\s+/);
+  let i=0,j=0, out=[];
+  while(i<A.length || j<B.length){
+    if (A[i]===B[j]){ out.push(A[i]); i++; j++; continue; }
+    if (B.slice(j, j+3).includes(A[i])){ out.push(`<ins>${B[j++]||''}</ins>`); }
+    else { out.push(`<del>${A[i++]||''}</del>`); }
+  }
+  return out.join(' ');
+}
+
+runBtn.addEventListener('click',()=>{
+  const src = inputText.value || "";
+  const out = reframe(src);
+  outputText.value = out;
+  diffView.innerHTML = makeDiff(src, out);
+});
+copyBtn.addEventListener('click', async ()=>{
+  try{ await navigator.clipboard.writeText(outputText.value); copyBtn.textContent="Copied"; setTimeout(()=>copyBtn.textContent="Copy Output",1200);}catch{}
+});
+
+/* ---------- Templates (quick insert) ---------- */
+const TEMPLATES = [
+  {name:"Repair over blame", text:"I acknowledge the impact here. Let’s pause blame and co-design a small, reversible repair with a clear check-in date."},
+  {name:"Shared values first", text:"We both care about safety, dignity, and truthful results. Given that, here’s a path that protects those values while moving forward."},
+  {name:"Precision & consent", text:"Here’s what I know, what I don’t know, and what I need consent for before we proceed."},
+  {name:"Sovereignty guard", text:"Participation is opt-in with a clear exit. No one’s autonomy is collateral for progress."},
+];
+const tmplBox = document.getElementById('templates');
+TEMPLATES.forEach(t=>{
+  const btn = document.createElement('button');
+  btn.className='btn';
+  btn.textContent = t.name;
+  btn.addEventListener('click', ()=>{ inputText.value = (inputText.value? inputText.value+"\n\n":"")+t.text; window.scrollTo({top:0,behavior:'smooth'});});
+  tmplBox.appendChild(btn);
+});
+
+/* ---------- Workplace Kits ---------- */
+const KIT_DB = [
+  {
+    id:"reciprocity-8w",
+    name:"Narrative Quest: Reciprocity (8 weeks)",
+    summary:"Shift meeting language, add gratitude ritual, codify support stories, publish lore.",
+    spec:{
+      weeks:[
+        "Story gathering interviews: when did support change an outcome?",
+        "Map current vs desired narratives; pick 2 language swaps.",
+        "Design artefact (motto/emblem) + 90s gratitude round.",
+        "Pilot ritual; measure linguistic shifts in transcripts.",
+        "Publish 3 micro-stories; recognize exemplars.",
+        "Shadow a peer to spot reciprocity opportunities.",
+        "Mini-retrospective: what stuck, what slipped?",
+        "Org share-out + adopt successful elements."
+      ],
+      measures:["% supportive phrases","instances of blame vs repair","peer appreciation count"],
+      ethics:["opt-in participation","no surveillance scoring","repair channels open"]
+    }
+  },
+  {
+    id:"sovereignty-4w",
+    name:"Sovereignty Sprint (4 weeks)",
+    summary:"Replace coercion with clear consent, reversible steps, and exit hatches.",
+    spec:{
+      weeks:[
+        "Audit consent points; add explicit opt-in/out.",
+        "Rewrite policies for clarity and reversibility.",
+        "Run scenario role-plays; collect friction.",
+        "Publish sovereignty guardrails; get sign-offs."
+      ],
+      measures:["opt-in rate","reported pressure incidents","policy clarity score"],
+      ethics:["no dark patterns","plain-language commitments"]
+    }
+  },
+  {
+    id:"repair-first-6w",
+    name:"Repair-First Pilot (6 weeks)",
+    summary:"From post-mortem blame to fast repair loops with learning artifacts.",
+    spec:{
+      weeks:[
+        "Define harm taxonomy & repair ladder.",
+        "Train repair facilitation (90m).",
+        "Run the ladder on 2 live issues.",
+        "Publish anonymized learnings.",
+        "Embed repair checks in PRDs.",
+        "Review velocity & satisfaction."
+      ],
+      measures:["time-to-repair","repeat incidents","participant satisfaction"],
+      ethics:["no naming/shaming","restorative commitments"]
+    }
+  }
+];
+
+const kitList = document.getElementById('kitList');
+KIT_DB.forEach(k=>{
+  const el = document.createElement('div'); el.className='card';
+  el.innerHTML = `<strong>${k.name}</strong><p class="small">${k.summary}</p>
+  <details class="small"><summary>Spec</summary><pre class="mono">${JSON.stringify(k.spec,null,2)}</pre></details>`;
+  kitList.appendChild(el);
+});
+
+/* Quest generator */
+const questTheme = document.getElementById('questTheme');
+const genQuestBtn = document.getElementById('genQuest');
+const exportQuestBtn = document.getElementById('exportQuest');
+const questOut = document.getElementById('questOut');
+
+function genQuest(theme){
+  const motifs = {
+    reciprocity:["gratitude ritual","peer shadowing","value return ledger"],
+    sovereignty:["explicit consent checkpoints","reversible steps","opt-out clarity"],
+    stewardship:["resource→relationship language","impact logging","repair ladder"],
+    truth:["counter-story forum","assumption audit","evidence threshold cards"],
+    repair:["harm taxonomy","repair protocols","retrospective without blame"]
+  };
+  const weeks = [];
+  for (let i=1;i<=6;i++){
+    const pick = motifs[theme][Math.floor(Math.random()*motifs[theme].length)];
+    weeks.push(`Week ${i}: Implement ${pick}. Measure & share 1 micro-story.`);
+  }
+  const out = {
+    title:`${theme.charAt(0).toUpperCase()+theme.slice(1)} Quest`,
+    duration:"6 weeks",
+    goals:["Shift dominant metaphors","Embed one ritual","Publish lore"],
+    weeks,
+    measures:["language shift","safety pulse","repair velocity"],
+    ethics:["opt-in","no coercion","escape hatch"],
+  };
+  return out;
+}
+genQuestBtn.addEventListener('click',()=>{
+  const q = genQuest(questTheme.value);
+  questOut.value = JSON.stringify(q,null,2);
+});
+exportQuestBtn.addEventListener('click',()=>{
+  const blob = new Blob([questOut.value||"{}"], {type:"application/json"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "quest.json"; a.click();
+});
+
+/* KPIs & Badges (toy) */
+const kpi = id=>document.getElementById(id);
+function randKPI(){ return (60+Math.floor(Math.random()*41)) + "%";}
+function refreshKPIs(){
+  kpi('kpiSafety').textContent = randKPI();
+  kpi('kpiRecip').textContent = randKPI();
+  kpi('kpiHeat').textContent = (100-parseInt(randKPI()))+"%";
+  kpi('kpiRepair').textContent = randKPI();
+}
+refreshKPIs();
+setInterval(refreshKPIs, 15000);
+
+const badgeWall = document.getElementById('badgeWall');
+document.getElementById('awardBadge').addEventListener('click',()=>{
+  const b = document.createElement('div');
+  b.className='badge small';
+  b.innerHTML = '🏅 <span>Repair First</span>';
+  badgeWall.appendChild(b);
+});
+
+/* ---------- RSS Hub ---------- */
+const feedUrl = document.getElementById('feedUrl');
+const feedLabel = document.getElementById('feedLabel');
+const addFeedBtn = document.getElementById('addFeed');
+const refreshFeedsBtn = document.getElementById('refreshFeeds');
+const exportFeedsBtn = document.getElementById('exportFeeds');
+const importFeedsBtn = document.getElementById('importFeedsBtn');
+const importFeedsInput = document.getElementById('importFeeds');
+const feedChips = document.getElementById('feedChips');
+const feedItems = document.getElementById('feedItems');
+const defaultList = document.getElementById('defaultList');
+
+const DEFAULT_FEEDS = [
+  {label:"Aeon Essays", url:"https://aeon.co/feed"},
+  {label:"Behavioral Scientist", url:"https://behavioralscientist.org/feed/"},
+  {label:"MIT Sloan Mgmt Review", url:"https://sloanreview.mit.edu/feed/"},
+  {label:"SSIR (Stanford)", url:"https://ssir.org/site/rss_2.0/"},
+  {label:"Emergence Magazine", url:"https://emergencemagazine.org/feed/"},
+  {label:"PsyArXiv (new)", url:"https://psyarxiv.com/api/v2/preprints/latest.atom"},
+  {label:"HBR Big Ideas", url:"https://hbr.org/feed"},
+  {label:"Cognitive Science (Wiley)", url:"https://onlinelibrary.wiley.com/feed/15516709/most-recent"},
+  {label:"Journal of Org. Behav.", url:"https://onlinelibrary.wiley.com/feed/10991379/most-recent"}
+];
+
+function loadFeeds(){
+  const saved = JSON.parse(localStorage.getItem('labFeeds')||'[]');
+  if(!saved.length){ localStorage.setItem('labFeeds', JSON.stringify(DEFAULT_FEEDS)); return DEFAULT_FEEDS; }
+  return saved;
+}
+function saveFeeds(list){ localStorage.setItem('labFeeds', JSON.stringify(list)); }
+function renderDefaultList(){ defaultList.innerHTML = DEFAULT_FEEDS.map(f=>`<li>${f.label} — <span class="small">${f.url}</span></li>`).join(''); }
+
+let feeds = loadFeeds();
+renderDefaultList();
+renderChips();
+
+addFeedBtn.addEventListener('click',()=>{
+  const url = (feedUrl.value||"").trim();
+  if(!url) return;
+  const label = (feedLabel.value||url.replace(/^https?:\/\//,'')).trim();
+  feeds.push({label,url}); saveFeeds(feeds);
+  feedUrl.value=""; feedLabel.value="";
+  renderChips(); fetchAll();
+});
+
+exportFeedsBtn.addEventListener('click',()=>{
+  const blob = new Blob([JSON.stringify(feeds,null,2)], {type:"application/json"});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "feeds.json"; a.click();
+});
+importFeedsBtn.addEventListener('click',()=>importFeedsInput.click());
+importFeedsInput.addEventListener('change', async e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const text = await file.text();
+  try{ feeds = JSON.parse(text); saveFeeds(feeds); renderChips(); fetchAll(); }catch{}
+});
+
+let activeFilter = null;
+function renderChips(){
+  feedChips.innerHTML = "";
+  const all = document.createElement('button'); all.className='btn'; all.textContent="All"; all.addEventListener('click',()=>{activeFilter=null; fetchAll();}); feedChips.appendChild(all);
+  feeds.forEach((f,i)=>{
+    const chip = document.createElement('button'); chip.className='btn'; chip.textContent = f.label; chip.addEventListener('click',()=>{activeFilter = i; fetchAll();});
+    feedChips.appendChild(chip);
+  });
+}
+
+refreshFeedsBtn.addEventListener('click', fetchAll);
+
+async function fetchFeed(url){
+  // Use Jina Reader to bypass CORS & extract readable content.
+  // For RSS/Atom, we’ll try to fetch raw and heuristically parse titles.
+  const readerURL = `https://r.jina.ai/http://` + url.replace(/^https?:\/\//,'');
+  try{
+    const res = await fetch(readerURL, {mode:'cors'});
+    const text = await res.text();
+    // Heuristic parse: pull lines that look like titles/links
+    const items = [];
+    const parser = new DOMParser();
+    try{
+      const xmlRes = await fetch(url);
+      const xmlTxt = await xmlRes.text();
+      const xml = (new window.DOMParser()).parseFromString(xmlTxt, "text/xml");
+      xml.querySelectorAll("item,entry").forEach(node=>{
+        const title = node.querySelector("title")?.textContent?.trim() || "Untitled";
+        const link = (node.querySelector("link")?.getAttribute("href")) || (node.querySelector("link")?.textContent) || "";
+        const date = node.querySelector("pubDate, updated, published")?.textContent || "";
+        items.push({title, link, date, source:url});
+      });
+      if(items.length) return items.slice(0, 12);
+    }catch(e){}
+    // Fallback: pull top headings and links from reader text
+    const linkRe = /https?:\/\/[^\s)"]+/g; const links = text.match(linkRe)||[];
+    const titles = (text.match(/^#{1,3}\s.+$/gm)||[]).slice(0,12).map(s=>s.replace(/^#{1,3}\s/,'').trim());
+    return titles.map((t,i)=>({title:t, link:links[i]||url, date:"", source:url}));
+  }catch(e){
+    return [{title:"Unable to fetch feed", link:url, date:"", source:url}];
+  }
+}
+
+async function fetchAll(){
+  feedItems.innerHTML = "";
+  const pick = typeof activeFilter==='number' ? [feeds[activeFilter]] : feeds;
+  for (const f of pick){
+    const items = await fetchFeed(f.url);
+    items.forEach(it=>{
+      const card = document.createElement('div'); card.className='card';
+      card.innerHTML = `<strong>${escapeHtml(it.title)}</strong>
+      <p class="small"><a href="${it.link||f.url}" target="_blank" rel="noopener">Open</a> · <span class="muted">${f.label}</span></p>`;
+      feedItems.appendChild(card);
+    });
+  }
+}
+function escapeHtml(s){ return s?.replace?.(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;" }[m])) || s; }
+fetchAll();
+
+/* ---------- Accessibility niceties ---------- */
+document.addEventListener('keydown', e=>{
+  if (e.altKey && e.key>='1' && e.key<='6'){
+    const idx = parseInt(e.key,10)-1;
+    const btn = tabs[idx]; if(btn){ btn.click(); btn.focus(); }
+  }
+});
+
+/* ---------- End ---------- */
+</script>
+</body>
+</html>

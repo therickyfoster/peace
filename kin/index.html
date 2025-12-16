@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Roots of Kinship — Shared Chronicle & Peace Evidence</title>
+  <meta name="description" content="A portable, offline-first dossier of shared Russian–Ukrainian heritage, cooperation precedents, and practical levers to reduce harm and catalyze peace." />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="theme-color" content="#0f172a" />
+  <style>
+    :root{
+      --bg:#0b0f19; --panel:#111827; --ink:#e5e7eb; --muted:#9ca3af;
+      --accent:#8b5cf6; --accent-2:#22d3ee; --ok:#10b981; --warn:#f59e0b; --danger:#ef4444;
+      --ring:color-mix(in oklab,var(--accent),white 30%);
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:16px; --gap:clamp(12px,2.2vw,22px); --maxw:1180px;
+      --font-sans:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Inter,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji;
+      --font-serif:ui-serif,Charter,Georgia,Cambria,Times,serif; --font-mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f8fafc; --panel:#ffffff; --ink:#0b1220; --muted:#475569;
+        --accent:#6d28d9; --accent-2:#0891b2; --ring:color-mix(in oklab,var(--accent),black 10%);
+        --shadow:0 10px 24px rgba(2,6,23,.08);
+      }
+    }
+    *,*::before,*::after{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font:16px/1.55 var(--font-sans); color:var(--ink);
+      background:
+        radial-gradient(1200px 800px at 80% -10%, color-mix(in oklab,var(--accent),transparent 85%), transparent 60%),
+        var(--bg);
+      -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    }
+    a{ color:var(--accent-2); text-decoration:underline; text-underline-offset:2px }
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible, details:focus-visible{
+      outline:3px solid var(--ring); outline-offset:2px; border-radius:8px;
+    }
+
+    .wrap{ max-width:var(--maxw); margin:0 auto; padding:24px }
+    header.site{
+      position:relative; border-radius:var(--radius); padding:clamp(18px,3.2vw,32px);
+      background:
+        radial-gradient(600px 300px at 10% -10%, color-mix(in oklab, var(--accent-2), transparent 80%), transparent),
+        linear-gradient(180deg, color-mix(in oklab, var(--panel), transparent 0%), var(--panel));
+      box-shadow:var(--shadow); overflow:clip; isolation:isolate;
+    }
+    .banner{ display:grid; gap:var(--gap); grid-template-columns:minmax(0,1fr); align-items:center; }
+    @container (min-width:860px){ .banner{ grid-template-columns:1.1fr .9fr } }
+
+    .panel{ margin-block:22px; background:var(--panel); border-radius:var(--radius); box-shadow:var(--shadow); padding:clamp(16px,2.4vw,24px) }
+    .title{ font-weight:800; letter-spacing:-.02em; line-height:1.1; font-size:clamp(28px,4.4vw,54px); margin:8px 0 10px }
+    .subtitle{ color:var(--muted); font-size:clamp(16px,2.2vw,18px); max-width:72ch }
+
+    .toolbar{ display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+    .toolbar .spacer{ flex:1 }
+    .chip{ display:inline-flex; align-items:center; gap:8px; border:1px solid color-mix(in oklab,var(--muted),transparent 55%); padding:6px 10px; border-radius:999px; color:var(--muted); font-size:14px }
+    .kbd{ border:1px solid color-mix(in oklab,var(--muted),transparent 40%); border-bottom-width:3px; padding:1px 6px; border-radius:6px; font-family:var(--font-mono); font-size:12px; display:inline-block; background:color-mix(in oklab,var(--panel),white 5%) }
+
+    .grid{ display:grid; gap:var(--gap) }
+    @media (min-width:900px){ .grid.two{ grid-template-columns:1fr 1fr } .grid.three{ grid-template-columns:repeat(3,1fr)} }
+
+    .poem{ font-family:var(--font-serif); font-size:clamp(16px,2.1vw,18px); line-height:1.6;
+      background:linear-gradient(180deg, color-mix(in oklab,var(--accent-2),transparent 92%), transparent 65%);
+      border-left:4px solid var(--accent-2); padding:14px 16px; border-radius:10px }
+
+    /* Scrollable horizontal timeline */
+    .timeline-wrap{
+      overflow:auto; -webkit-overflow-scrolling:touch; scroll-snap-type:x mandatory;
+      border:1px solid color-mix(in oklab,var(--muted),transparent 55%); border-radius:14px;
+      background:linear-gradient(180deg, color-mix(in oklab,var(--accent),transparent 95%), transparent);
+    }
+    .timeline{
+      display:flex; gap:18px; padding:18px; min-height:210px; min-width:780px;
+    }
+    .t-card{
+      scroll-snap-align:start; flex:0 0 320px; max-width:360px;
+      background:var(--panel); border:1px solid color-mix(in oklab,var(--muted),transparent 50%);
+      border-radius:14px; padding:14px; box-shadow:var(--shadow)
+    }
+    .t-card h4{ margin:0 0 6px }
+    .t-tag{ display:inline-flex; gap:8px; align-items:center; font-size:12px; color:var(--muted) }
+    .t-year{ font-weight:800; letter-spacing:.03em }
+    .t-cta{ margin-top:8px; display:flex; gap:8px; flex-wrap:wrap }
+
+    /* Evidence list & pop citations */
+    .evidence li{ margin:6px 0 }
+    .cite{
+      border-bottom:1px dotted currentColor; cursor:help; color:var(--accent-2);
+    }
+    .popover{
+      position:fixed; inset:auto auto 0 0; transform:translate(var(--x,0), var(--y,0));
+      z-index:60; max-width:min(520px, 92vw);
+      background:var(--panel); color:var(--ink); border:1px solid color-mix(in oklab,var(--muted),transparent 45%);
+      border-radius:12px; padding:12px; box-shadow:var(--shadow); display:none;
+    }
+    .popover.show{ display:block }
+
+    /* Percolé gauge */
+    .score{ display:grid; gap:12px }
+    .gauge{
+      --pct: 88;
+      inline-size:min(520px,100%); aspect-ratio:2/1; border-radius:12px;
+      background: conic-gradient(from 180deg,
+        var(--danger) calc(0.00turn),
+        var(--danger) calc((var(--pct)/200)*1turn),
+        color-mix(in oklab,var(--warn),transparent 20%) calc((var(--pct)/200)*1turn),
+        color-mix(in oklab,var(--warn),transparent 20%) 0.35turn,
+        var(--ok) 0.35turn
+      );
+      position:relative; overflow:hidden; border:1px solid color-mix(in oklab,var(--muted),transparent 50%)
+    }
+    .gauge::before{
+      content:""; position:absolute; inset:10px; border-radius:12px; background:var(--panel);
+      clip-path:inset(50% 0 0 0 round 12px);
+    }
+    .needle{ position:absolute; left:50%; bottom:12px; transform-origin:bottom center;
+      width:4px; height:45%; background:linear-gradient(var(--ink), color-mix(in oklab,var(--ink),black 30%));
+      border-radius:2px; box-shadow:0 0 0 1px rgba(0,0,0,.15) }
+
+    /* Skip link + print + transitions */
+    .skip{ position:absolute; left:8px; top:-40px; z-index:50; padding:6px 10px; background:var(--panel); color:var(--ink); border-radius:8px }
+    .skip:focus{ top:8px }
+    ::view-transition-old(root), ::view-transition-new(root){ animation-duration:.26s }
+    @media (prefers-reduced-motion: reduce){
+      ::view-transition-old(root), ::view-transition-new(root){ animation:none !important }
+      *{ scroll-behavior:auto !important }
+    }
+    @media print{
+      header.site, .toolbar, .controls, .chip, .cta, .skip, .popover{ display:none !important }
+      .panel{ box-shadow:none; border:1px solid #ccc }
+      body{ background:#fff; color:#111 }
+      a{ color:#000; text-decoration:none }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="site wrap" role="banner">
+    <div class="banner" style="container-type:inline-size;">
+      <div>
+        <div class="chip" aria-label="Emblem">Roots of Kinship • Portable • Offline-First</div>
+        <h1 class="title">A Shared Chronicle & Peace Evidence</h1>
+        <p class="subtitle">
+          A non-partisan, humanitarian record of shared heritage, cooperation precedents, and practical levers.
+          Built to inform citizens and institutions alike—without spin, without denial of suffering.
+        </p>
+        <nav class="toolbar" aria-label="Utility">
+          <button id="contrastBtn" type="button" aria-pressed="false" title="Toggle high contrast (Alt+H)">High Contrast <span class="kbd">Alt+H</span></button>
+          <button id="printBtn" type="button" title="Print to PDF (Alt+P)">Print / Save PDF <span class="kbd">Alt+P</span></button>
+          <div class="spacer" aria-hidden="true"></div>
+          <span class="chip" role="status" aria-live="polite" id="offlineStatus">Checking offline…</span>
+        </nav>
+      </div>
+
+      <figure class="panel" role="img" aria-label="Interwoven branches forming a bridge">
+        <svg viewBox="0 0 800 420" width="100%" height="auto" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".12"/><stop offset="1" stop-color="currentColor" stop-opacity=".04"/></linearGradient></defs>
+          <rect width="800" height="420" rx="18" fill="url(#g1)"/>
+          <g stroke="currentColor" stroke-opacity=".35" fill="none">
+            <path d="M20,360 C200,240 600,240 780,360" />
+            <path d="M20,320 C200,200 600,200 780,320" />
+            <path d="M20,280 C200,160 600,160 780,280" />
+            <path d="M20,240 C200,120 600,120 780,240" />
+          </g>
+          <g fill="currentColor" fill-opacity=".45">
+            <circle cx="180" cy="260" r="5"/><circle cx="320" cy="240" r="5"/><circle cx="480" cy="240" r="5"/><circle cx="620" cy="260" r="5"/>
+          </g>
+        </svg>
+      </figure>
+    </div>
+  </header>
+
+  <main id="main" class="wrap" role="main">
+    <!-- Preface: Percolé alignment -->
+    <section class="panel" aria-labelledby="percole-h">
+      <h2 id="percole-h">Preface: Percolé Alignment Score</h2>
+      <p class="subtitle">
+        A human-readable, local-only indicator of alignment to five rails: dignity, truth, neighbor-care, memory without vengeance, future guardianship.
+      </p>
+      <div class="grid two score">
+        <div>
+          <div class="gauge" id="gauge" role="img" aria-label="Percolé Alignment gauge">
+            <div class="needle" id="needle" aria-hidden="true"></div>
+          </div>
+          <p><strong>Score:</strong> <span id="scoreOut" aria-live="polite">88</span>/100</p>
+          <p class="chip">80–100: stewardship-forward • 50–79: needs reconciliation work • &lt;50: pause, verify, repair foundations</p>
+        </div>
+        <form class="grid" id="scoreForm" aria-label="Adjust your local alignment score">
+          <label for="score" class="chip">Set local score (stored only in your browser)</label>
+          <input id="score" name="score" type="range" min="0" max="100" value="88" />
+          <div>
+            <button type="submit">Save</button>
+            <button type="button" id="resetScore">Reset</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Prologue narrative -->
+    <section class="panel" aria-labelledby="intro-h">
+      <h2 id="intro-h">Prologue: Memory as a Bridge</h2>
+      <p>
+        Long before modern borders, riverlands tied communities together. Names changed; neighbors remained. Cultures interweave.
+        Remembering this widens the present and makes room for choices that reduce harm.
+      </p>
+      <p class="poem" aria-label="Reflective verse">
+        Between forest and steppe the rivers kept time.<br/>
+        We learned to count seasons, not enemies.<br/>
+        We spoke in kitchens, not courts.<br/>
+        We knew the weight of bread and the price of winter—<br/>
+        and that a neighbor’s warmth can be a kind of sunrise.
+      </p>
+    </section>
+
+    <!-- Evidence panels -->
+    <section class="panel" aria-labelledby="evidence-h">
+      <h2 id="evidence-h">Evidence Base (Shared Roots, Cooperation, & Levers)</h2>
+      <div class="grid two evidence">
+        <div>
+          <h3>Shared Roots & Comradeship</h3>
+          <ul>
+            <li><strong>Kyivan Rus’</strong> as common cultural ancestor <button class="cite" data-cites="rus1">[ref]</button></li>
+            <li><strong>WWI & WWII</strong>: Russians and Ukrainians fought common enemies (Germany, Austria-Hungary); joint battles incl. Moscow, Stalingrad, Kursk, Berlin <button class="cite" data-cites="ww1 ww2">[refs]</button></li>
+            <li><strong>Chernobyl liquidators</strong> from both republics <button class="cite" data-cites="chernobyl">[ref]</button></li>
+            <li><strong>Space & industry</strong>: Yuzhmash (Dnipro) built rockets used by Soviet (Moscow-led) programs <button class="cite" data-cites="yuzhmash">[ref]</button></li>
+          </ul>
+          <h3>Cooperation During Current War</h3>
+          <ul>
+            <li><strong>Black Sea Grain Initiative</strong> Joint Coordination Centre (Istanbul): Russia, Ukraine, Türkiye, UN inspected ships together <button class="cite" data-cites="grain jcc">[refs]</button></li>
+            <li><strong>POW Exchanges</strong> with third-party facilitation; repeatable mechanism <button class="cite" data-cites="pow icrc">[refs]</button></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Legal & Safety Scaffolding</h3>
+          <ul>
+            <li><strong>Budapest Memorandum</strong> (1994): security assurances framework <button class="cite" data-cites="budapest">[ref]</button></li>
+            <li><strong>OSCE Minsk measures</strong>: monitoring templates (ceasefire, withdrawal) <button class="cite" data-cites="minsk">[ref]</button></li>
+            <li><strong>IAEA</strong> “Five Principles” for Zaporizhzhia NPP safety zone <button class="cite" data-cites="iaea znpp">[ref]</button></li>
+            <li><strong>ICRC & IHL</strong>: protected neutral for corridors & repatriations <button class="cite" data-cites="icrc">[ref]</button></li>
+            <li><strong>ICJ venue</strong> for lawful claims to reduce battlefield grievance load <button class="cite" data-cites="icj">[ref]</button></li>
+          </ul>
+          <h3>Economics of De-Escalation</h3>
+          <ul>
+            <li><strong>Recovery bill</strong> projected into the hundreds of billions; opportunity-cost logic favors repair windows now <button class="cite" data-cites="wb">[ref]</button></li>
+            <li><strong>Budget gravity</strong>: war outlays impose structural drag; incentives to unwind are real <button class="cite" data-cites="sipri">[ref]</button></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scrollable timeline -->
+    <section class="panel" aria-labelledby="timeline-h">
+      <h2 id="timeline-h">Scrollable Timeline of Shared Effort</h2>
+      <p class="subtitle">Drag horizontally • Arrow keys scroll • Enter/Space open cards • Print condenses into a vertical list.</p>
+      <div class="timeline-wrap" tabindex="0" role="region" aria-label="Shared effort timeline">
+        <div class="timeline" id="timeline">
+          <!-- Kyivan Rus’ -->
+          <article class="t-card" tabindex="0" aria-label="Kyivan Rus’">
+            <h4><span class="t-year">c. 988</span> • Kyivan Rus’ Baptism</h4>
+            <p>Shared civilizational origin memory across East Slavs; center on Kyiv. <button class="cite" data-cites="rus1">[ref]</button></p>
+            <div class="t-cta">
+              <span class="t-tag">heritage</span><span class="t-tag">identity</span>
+            </div>
+          </article>
+          <!-- Ottoman fronts -->
+          <article class="t-card" tabindex="0" aria-label="Campaigns vs. Ottomans">
+            <h4><span class="t-year">16th–19th c.</span> • Campaigns vs. Ottomans</h4>
+            <p>Cossack hosts and Muscovite/Russian forces operating jointly along the Black Sea frontier.</p>
+            <div class="t-cta"><span class="t-tag">military</span><span class="t-tag">cossacks</span></div>
+          </article>
+          <!-- 1812 -->
+          <article class="t-card" tabindex="0" aria-label="Napoleon’s 1812 invasion">
+            <h4><span class="t-year">1812</span> • Repelling Napoleon</h4>
+            <p>Imperial units from Ukrainian and Russian lands fight the Grande Armée. <button class="cite" data-cites="napoleon">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">military</span><span class="t-tag">coalition</span></div>
+          </article>
+          <!-- WWI -->
+          <article class="t-card" tabindex="0" aria-label="World War I">
+            <h4><span class="t-year">1914–1918</span> • World War I</h4>
+            <p>Common service under the Russian Empire vs. Germany, Austria-Hungary, Ottomans. <button class="cite" data-cites="ww1">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">military</span></div>
+          </article>
+          <!-- WWI Zelinsky gas mask -->
+          <article class="t-card" tabindex="0" aria-label="Zelinsky gas mask">
+            <h4><span class="t-year">1915</span> • Zelinsky Gas Mask</h4>
+            <p>Nikolay Zelinsky designs effective charcoal gas mask; casualties drop; humanitarian non-patent stance. <button class="cite" data-cites="zelinsky">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">science</span><span class="t-tag">lifesaving</span></div>
+          </article>
+          <!-- WWII -->
+          <article class="t-card" tabindex="0" aria-label="World War II">
+            <h4><span class="t-year">1939–1945</span> • World War II</h4>
+            <p>Russians and Ukrainians together in the Red Army: Moscow, Stalingrad, Kursk, Berlin. <button class="cite" data-cites="ww2">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">military</span><span class="t-tag">sacrifice</span></div>
+          </article>
+          <!-- Chernobyl -->
+          <article class="t-card" tabindex="0" aria-label="Chernobyl response">
+            <h4><span class="t-year">1986→</span> • Chernobyl Liquidators</h4>
+            <p>Cross-republic crews contain disaster; ongoing monitoring cooperation. <button class="cite" data-cites="chernobyl">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">safety</span><span class="t-tag">health</span></div>
+          </article>
+          <!-- Budapest -->
+          <article class="t-card" tabindex="0" aria-label="Budapest Memorandum">
+            <h4><span class="t-year">1994</span> • Budapest Memorandum</h4>
+            <p>Security assurances linked to Ukraine’s NPT accession; signatures on record. <button class="cite" data-cites="budapest">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">diplomacy</span></div>
+          </article>
+          <!-- Grain Initiative -->
+          <article class="t-card" tabindex="0" aria-label="Grain Initiative">
+            <h4><span class="t-year">2022–2023</span> • Black Sea Grain Initiative</h4>
+            <p>Joint inspections in Istanbul keep food moving globally during war. <button class="cite" data-cites="grain jcc">[refs]</button></p>
+            <div class="t-cta"><span class="t-tag">food security</span><span class="t-tag">multilateral</span></div>
+          </article>
+          <!-- POW exchanges -->
+          <article class="t-card" tabindex="0" aria-label="POW exchanges">
+            <h4><span class="t-year">2022→</span> • POW Exchanges</h4>
+            <p>Recurring swaps via mediators (e.g., UAE) & ICRC coordination. <button class="cite" data-cites="pow icrc">[refs]</button></p>
+            <div class="t-cta"><span class="t-tag">humanitarian</span><span class="t-tag">trust-building</span></div>
+          </article>
+          <!-- ZNPP Safety Principles -->
+          <article class="t-card" tabindex="0" aria-label="ZNPP safety">
+            <h4><span class="t-year">2023→</span> • Zaporizhzhia Safety Principles</h4>
+            <p>IAEA’s operational rules to reduce nuclear risk; a neutral micro-ceasefire template. <button class="cite" data-cites="iaea znpp">[ref]</button></p>
+            <div class="t-cta"><span class="t-tag">risk reduction</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Actionable levers -->
+    <section class="panel" aria-labelledby="levers-h">
+      <h2 id="levers-h">High-Yield Peace Levers (Built on What Already Works)</h2>
+      <div class="grid two">
+        <div>
+          <ol>
+            <li><strong>Scale Istanbul JCC</strong> → standing Humanitarian JCC for repair windows, demining, medical convoys <button class="cite" data-cites="grain jcc">[refs]</button></li>
+            <li><strong>Lock Nuclear Safety Zone</strong> → IAEA “Five Principles” + mirrored telemetry to both capitals <button class="cite" data-cites="iaea znpp">[ref]</button></li>
+            <li><strong>Institutionalize POW/MIAs</strong> → scheduled swaps with ICRC secretariat & quotas <button class="cite" data-cites="pow icrc">[refs]</button></li>
+            <li><strong>Local Ceasefire Repair Windows</strong> → OSCE-style monitoring without political deadlock <button class="cite" data-cites="minsk">[ref]</button></li>
+            <li><strong>Food Security Dividend</strong> → renew corridor on humanitarian terms; automatic extensions unless safety objection filed with evidence <button class="cite" data-cites="grain jcc">[refs]</button></li>
+          </ol>
+        </div>
+        <div>
+          <h3>Surname Variants (for research integrity)</h3>
+          <ul>
+            <li><strong>Putin</strong>: Путин, Putyn, Putinski/Putinsky (Polonized), Пуцін (Belarusian drift)</li>
+            <li><strong>Zelensky</strong>: Зеленський/Zelenskyi (uk), Зеленский (ru), Zelinsky/Zelinski (eng), Zieliński (pl)</li>
+          </ul>
+          <p class="chip">Use variants to uncover hidden records of bravery and cooperation.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pledge -->
+    <section class="panel" aria-labelledby="pledge-h">
+      <h2 id="pledge-h">Pledge for Peaceful Stewardship</h2>
+      <div class="grid two">
+        <div>
+          <p>Non-partisan, open, and local-first. Keep this note private or print it; the act is yours.</p>
+          <ol>
+            <li>I will safeguard civilians and the means by which they live.</li>
+            <li>I will keep space for truth that survives my own certainty.</li>
+            <li>I will honor grief without multiplying it.</li>
+            <li>I will preserve culture, language, and memory for those who come next.</li>
+            <li>I will measure decisions by the world my grandchildren inherit.</li>
+          </ol>
+        </div>
+        <form id="pledgeForm" aria-label="Record your pledge (local only)">
+          <label for="pledgeNote" class="subtitle">Optional note (stored locally)</label>
+          <textarea id="pledgeNote" name="note" placeholder="Write a private note to your future self. This never leaves your device."
+            style="width:100%;min-height:140px;border-radius:12px;border:1px solid color-mix(in oklab,var(--muted),transparent 50%);background:transparent;color:var(--ink);padding:12px;font:15px/1.45 var(--font-sans);"></textarea>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button type="submit" id="pledgeBtn" style="border:0;border-radius:999px;padding:10px 16px;font-weight:700;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;box-shadow:var(--shadow);">Affirm Pledge</button>
+            <button type="button" id="clearBtn">Clear</button>
+          </div>
+          <p class="chip" id="pledgeStatus" role="status" aria-live="polite">No pledge saved.</p>
+        </form>
+      </div>
+    </section>
+
+    <!-- Citations (inline dataset) -->
+    <section class="panel" aria-labelledby="citations-h">
+      <h2 id="citations-h">References (inline dataset)</h2>
+      <p class="subtitle">Tap <em>[ref]</em> buttons above to preview. These anchors reflect widely recognized sources and institutions.</p>
+      <details open>
+        <summary class="chip">Show list</summary>
+        <ol id="refList" style="padding-left:18px"></ol>
+      </details>
+      <p class="chip">Note: This artifact summarizes public, mainstream references and institutions (UN/IAEA/OSCE/ICRC, reliable encyclopedias, and major outlets’ explainer pages). Always verify live for updates.</p>
+    </section>
+
+    <p class="chip" style="display:inline-flex; gap:10px;">
+      <span>Shortcuts:</span>
+      <span><span class="kbd">Alt+H</span> contrast</span>
+      <span><span class="kbd">Alt+P</span> print</span>
+      <span><span class="kbd">Alt+O</span> offline</span>
+      <span><span class="kbd">Alt+T</span> gentle transition</span>
+    </p>
+  </main>
+
+  <footer class="site wrap" role="contentinfo">
+    <p>This is a standalone, offline-first artifact. Mirror freely. Keep its center intact: <em>the future is a child’s laughter</em>.</p>
+  </footer>
+
+  <div class="popover" id="popover" role="dialog" aria-modal="false" aria-live="polite"></div>
+
+  <script>
+    (function(){
+      const hasVT = document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Theme toggle
+      const contrastBtn = document.getElementById('contrastBtn');
+      function toggleContrast(){
+        const el = document.documentElement;
+        const next = el.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+        hasVT ? document.startViewTransition(()=>el.setAttribute('data-theme', next)) : el.setAttribute('data-theme', next);
+        contrastBtn.setAttribute('aria-pressed', String(next === 'dark'));
+        localStorage.setItem('theme', next);
+      }
+      contrastBtn?.addEventListener('click', toggleContrast);
+      document.getElementById('printBtn')?.addEventListener('click', () => window.print());
+
+      // Shortcuts
+      addEventListener('keydown',(e)=>{
+        const k=e.key.toLowerCase();
+        if(e.altKey && k==='h'){ e.preventDefault(); contrastBtn?.click(); }
+        if(e.altKey && k==='p'){ e.preventDefault(); window.print(); }
+        if(e.altKey && k==='o'){ e.preventDefault(); swRegister(); }
+        if(e.altKey && k==='t'){ e.preventDefault(); gentleTransition(); }
+      });
+      function gentleTransition(){
+        if(!hasVT) return;
+        document.startViewTransition(()=>{ document.body.style.outline='1px solid transparent'; setTimeout(()=>document.body.style.outline='',50); });
+      }
+
+      // Restore theme
+      (function(){ const t = localStorage.getItem('theme'); if(t) document.documentElement.setAttribute('data-theme', t); })();
+
+      // Percolé Score
+      const gauge = document.getElementById('gauge');
+      const needle = document.getElementById('needle');
+      const scoreOut = document.getElementById('scoreOut');
+      const scoreForm = document.getElementById('scoreForm');
+      const scoreInput = document.getElementById('score');
+      function applyScore(v){
+        const val = Math.max(0, Math.min(100, Number(v)||0));
+        scoreOut.textContent = val;
+        gauge.style.setProperty('--pct', val);
+        const deg = -90 + (val/100)*180;
+        needle.style.transform = `translateX(-50%) rotate(${deg}deg)`;
+      }
+      (function(){ const s=localStorage.getItem('percole_score'); if(s!==null) scoreInput.value=s; applyScore(scoreInput.value); })();
+      scoreForm?.addEventListener('submit',(e)=>{ e.preventDefault(); localStorage.setItem('percole_score', scoreInput.value); applyScore(scoreInput.value); });
+      document.getElementById('resetScore')?.addEventListener('click',()=>{ localStorage.removeItem('percole_score'); scoreInput.value=88; applyScore(88); });
+
+      // Pledge local save
+      const pledgeForm = document.getElementById('pledgeForm');
+      const pledgeNote = document.getElementById('pledgeNote');
+      const pledgeStatus = document.getElementById('pledgeStatus');
+      function updatePledge(){
+        const ts = localStorage.getItem('pledge_ts');
+        pledgeStatus.textContent = ts ? `Pledge saved locally on ${new Date(Number(ts)).toLocaleString()}.` : 'No pledge saved.';
+      }
+      pledgeForm?.addEventListener('submit',(e)=>{
+        e.preventDefault();
+        try{ localStorage.setItem('pledge_note', pledgeNote.value||''); localStorage.setItem('pledge_ts', Date.now().toString()); updatePledge(); }
+        catch{ pledgeStatus.textContent='Storage unavailable. Your note stays on this page only.'; }
+      });
+      document.getElementById('clearBtn')?.addEventListener('click',()=>{ localStorage.removeItem('pledge_note'); localStorage.removeItem('pledge_ts'); pledgeNote.value=''; updatePledge(); });
+      (function(){ const n=localStorage.getItem('pledge_note'); if(n) pledgeNote.value=n; updatePledge(); })();
+
+      // Timeline keyboard scroll
+      const tlWrap = document.querySelector('.timeline-wrap');
+      tlWrap?.addEventListener('keydown',(e)=>{
+        const step = 80;
+        if(e.key==='ArrowRight'){ e.preventDefault(); tlWrap.scrollBy({left:step, behavior:'smooth'}); }
+        if(e.key==='ArrowLeft'){ e.preventDefault(); tlWrap.scrollBy({left:-step, behavior:'smooth'}); }
+      });
+
+      // Inline bibliography dataset (minimal, representative anchors)
+      const refs = {
+        "rus1": {title:"Kyivan Rus’ — shared historical ancestor (scholarly consensus)", url:"#", note:"General reference across major encyclopedias and medieval East Slavic studies."},
+        "ww1": {title:"WWI service under Russian Empire vs Germany/Austria-Hungary/Ottomans", url:"#", note:"Standard modern history references."},
+        "napoleon": {title:"1812 Patriotic War — multi-ethnic Imperial defense incl. Ukrainian regiments", url:"#", note:"Military histories of 1812 campaigns."},
+        "ww2": {title:"WWII — Russians & Ukrainians in Red Army: Moscow, Stalingrad, Kursk, Berlin", url:"#", note:"Soviet and modern histories; demographic and military records."},
+        "chernobyl": {title:"Chernobyl liquidators — cross-republic response and long-term monitoring", url:"#", note:"IAEA and health agency summaries."},
+        "yuzhmash": {title:"Yuzhmash (Dnipro) — Soviet rockets/space hardware", url:"#", note:"Industry histories of Soviet missile/space programs."},
+        "grain": {title:"Black Sea Grain Initiative — UN & Türkiye brokered", url:"#", note:"UN communications on grain corridor."},
+        "jcc": {title:"Joint Coordination Centre (Istanbul) — multi-party ship inspections", url:"#", note:"JCC operational notes; UN briefings."},
+        "pow": {title:"POW exchanges — recurring swaps incl. large multi-hundred exchanges", url:"#", note:"Mediator and ICRC reporting."},
+        "icrc": {title:"ICRC neutral facilitation — corridors, repatriations, IHL guardian", url:"#", note:"ICRC operational overviews."},
+        "budapest": {title:"Budapest Memorandum (1994) — security assurances & signatures", url:"#", note:"UN treaty archive text."},
+        "minsk": {title:"Minsk measures — OSCE monitoring templates", url:"#", note:"OSCE documents."},
+        "iaea": {title:"IAEA ‘Seven Pillars’ of nuclear safety", url:"#", note:"IAEA briefings."},
+        "iaea znpp": {title:"IAEA ‘Five Principles’ for Zaporizhzhia NPP", url:"#", note:"IAEA DG statements."},
+        "icj": {title:"ICJ case docket — lawful dispute channel", url:"#", note:"ICJ filings index."},
+        "wb": {title:"Recovery cost orders of magnitude (World Bank/EC/UN)", url:"#", note:"Recovery & Damage Needs Assessment."},
+        "sipri": {title:"Defense outlays — structural drag signals", url:"#", note:"SIPRI yearbook/data insights."},
+        "zelinsky": {title:"Nikolay Zelinsky — gas mask innovation & humanitarian non-patent stance", url:"#", note:"Science history/encyclopedia entries."}
+      };
+
+      // Render list
+      const refList = document.getElementById('refList');
+      for(const k of Object.keys(refs)){
+        const li = document.createElement('li');
+        li.textContent = `[${k}] ${refs[k].title}`;
+        refList.appendChild(li);
+      }
+
+      // Popover logic
+      const pop = document.getElementById('popover');
+      function showPop(text, x, y){
+        pop.innerHTML = text;
+        pop.style.setProperty('--x', x+'px');
+        pop.style.setProperty('--y', (y-140)+'px');
+        pop.classList.add('show');
+      }
+      function hidePop(){ pop.classList.remove('show'); }
+      document.querySelectorAll('.cite').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          const ids = btn.dataset.cites.split(' ');
+          const items = ids.map(id=>{
+            const r = refs[id] || {title:'[missing]', note:'—', url:'#'};
+            return `<p><strong>[${id}]</strong> ${r.title}<br><span style="color:var(--muted)">${r.note}</span></p>`;
+          }).join('');
+          const rect = btn.getBoundingClientRect();
+          showPop(items, rect.left, rect.top);
+        });
+      });
+      addEventListener('click', (e)=>{ if(!e.target.closest('.cite') && !e.target.closest('.popover')) hidePop(); });
+      addEventListener('keydown', (e)=>{ if(e.key==='Escape') hidePop(); });
+
+      // Offline-first via in-memory Service Worker
+      const offlineStatus = document.getElementById('offlineStatus');
+      let swActive=false;
+      async function swRegister(){
+        if(swActive || !('serviceWorker' in navigator)) return;
+        const swCode = `
+          const CACHE='kinship-cache-v1';
+          self.addEventListener('install',e=>{ e.waitUntil((async()=>{ const c=await caches.open(CACHE); const u=new URL(self.location); await c.addAll(['/', u.href]); })()); self.skipWaiting(); });
+          self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+          self.addEventListener('fetch',e=>{
+            e.respondWith((async()=>{
+              const c=await caches.open(CACHE);
+              const hit=await c.match(e.request);
+              if(hit) return hit;
+              try{
+                const r=await fetch(e.request,{cache:'no-store'});
+                if(e.request.method==='GET'&&r.ok){ c.put(e.request,r.clone()); }
+                return r;
+              }catch{
+                return hit || new Response('<h1>Offline</h1><p>This resource is not cached yet.</p>',{headers:{'Content-Type':'text/html'}});
+              }
+            })());
+          });
+        `;
+        const blob=new Blob([swCode],{type:'text/javascript'});
+        const url=URL.createObjectURL(blob);
+        try{ await navigator.serviceWorker.register(url,{scope:'./'}); swActive=true; offlineStatus.textContent='Offline caching enabled.'; setTimeout(()=>URL.revokeObjectURL(url),1000); }
+        catch{ offlineStatus.textContent='Offline unavailable in this context.'; }
+      }
+      setTimeout(()=>swRegister(),800);
+      offlineStatus.textContent = navigator.onLine ? 'Online' : 'Offline';
+      addEventListener('online', ()=>offlineStatus.textContent='Online');
+      addEventListener('offline', ()=>offlineStatus.textContent='Offline');
+    })();
+  </script>
+</body>
+</html>

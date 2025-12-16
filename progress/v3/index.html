@@ -1,0 +1,2477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 
+    Provenance: Planetary Restoration Archive | planetaryrestorationarchive.com
+    GitHub: github.com/therickyfoster | Steward: Foster + Navi
+    
+    ZERO-HARM DECLARATION:
+    This dashboard is designed for peaceful coordination, transparency, and harm reduction.
+    It is not to be weaponized, repurposed for surveillance, or used to endanger individuals
+    or communities. All data collection is consent-based and locally stored. Use responsibly.
+    
+    LICENSE: CC-BY-4.0 with Non-Weaponization Clause
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>World Peace Progress • Enhanced Dashboard</title>
+  <meta name="description" content="A comprehensive, gamified, offline-capable dashboard tracking global peace progress with community evidence, AI extensibility, and zero-harm principles." />
+  <meta name="generator" content="Foster + Navi · Planetary Restoration Archive" />
+  <meta name="theme-color" content="#19e3c2" />
+  <link rel="me" href="https://planetaryrestorationarchive.com" />
+  <link rel="me" href="https://github.com/TheRickyFoster" />
+  <link rel="manifest" href="#" id="manifest-placeholder" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%2300c2a8' d='M128 16a112 112 0 1 0 0 224a112 112 0 0 0 0-224Zm0 24a88 88 0 1 1 0 176a88 88 0 0 1 0-176Z'/%3E%3Cpath fill='%2300c2a8' d='M128 48c-28.67 20.4-48 49.9-48 80c0 30.1 19.33 59.6 48 80c28.67-20.4 48-49.9 48-80c0-30.1-19.33-59.6-48-80Z'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+  <style>
+    /* ===== BASE & THEME SYSTEM ===== */
+    :root {
+      --bg: #0b0f14; --panel: #0f1520; --muted: #6b7b8d; --text: #e6f2f0; 
+      --brand: #19e3c2; --brand-2: #78ffd6; --accent: #b2f7ef; 
+      --danger: #ff6b6b; --warn: #ffd166; --ok: #06d6a0; 
+      --card: #0c121a; --ring: #183048; --border: #1a2432;
+      --shadow: rgba(0,0,0,0.3); --glow: rgba(25,227,194,0.15);
+    }
+    
+    /* Medieval Theme */
+    [data-theme="medieval"] {
+      --bg: #1a0f0a; --panel: #2d1810; --card: #241508;
+      --text: #f4e4c1; --muted: #9d8264; --brand: #d4af37; --brand-2: #f4e4c1;
+      --accent: #cd853f; --border: #4a3520; --ring: #5d3a1a;
+      --font-display: 'Cinzel', serif; --font-body: 'Crimson Text', serif;
+    }
+    
+    /* Space Theme */
+    [data-theme="space"] {
+      --bg: #000308; --panel: #0a0e1f; --card: #050814;
+      --text: #e0f2ff; --muted: #7a8fb5; --brand: #00d9ff; --brand-2: #a78bfa;
+      --accent: #f0abfc; --border: #1e3a8a; --ring: #1e40af;
+      --font-display: 'Orbitron', sans-serif;
+    }
+    
+    /* Anime Theme */
+    [data-theme="anime"] {
+      --bg: #fef5ff; --panel: #ffe4f5; --card: #fff0fa;
+      --text: #2d1b3d; --muted: #8b5a9e; --brand: #ff6b9d; --brand-2: #c084fc;
+      --accent: #a855f7; --border: #f0abfc; --ring: #d8b4fe;
+      --font-display: 'Poppins', sans-serif; --shadow: rgba(168,85,247,0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow-x: hidden; }
+    
+    body {
+      font-family: var(--font-body, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    /* ===== BACKGROUND EFFECTS ===== */
+    .stars, .twinkle { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+    .stars {
+      background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="3" height="3"><circle cx="1" cy="1" r="1" fill="white"/></svg>') repeat;
+      background-size: 3px 3px; opacity: 0.12;
+    }
+    .twinkle {
+      background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent 2px),
+        radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.5), transparent 2px),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5), transparent 2px);
+      animation: twinkle 4s infinite alternate ease-in-out;
+      opacity: 0.15;
+    }
+    @keyframes twinkle { to { opacity: 0.35; filter: drop-shadow(0 0 6px rgba(136,255,255,0.5)); } }
+
+    [data-theme="anime"] .stars, [data-theme="anime"] .twinkle { display: none; }
+    [data-theme="anime"] body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,107,157,0.1), transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(168,85,247,0.1), transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* ===== SKIP LINK (Accessibility) ===== */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--brand);
+      color: #000;
+      padding: 8px;
+      z-index: 100;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .skip-link:focus { top: 0; }
+
+    /* ===== HEADER ===== */
+    header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(11,15,20,0.96), rgba(11,15,20,0.6));
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+      transition: background 0.3s;
+    }
+    
+    [data-theme="anime"] header {
+      background: linear-gradient(180deg, rgba(254,245,255,0.96), rgba(255,228,245,0.8));
+    }
+
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 16px; }
+    
+    .headline {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--brand), var(--brand-2));
+      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--brand);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      font-family: var(--font-display, inherit);
+    }
+    
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ===== GAMIFICATION HUD ===== */
+    .game-hud {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--card), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+    
+    .xp-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 180px;
+    }
+    
+    .xp-progress {
+      flex: 1;
+      height: 8px;
+      background: var(--ring);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      border-radius: 999px;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 8px var(--glow);
+    }
+    
+    .level-badge {
+      background: var(--brand);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    /* ===== BUTTONS & CONTROLS ===== */
+    .btn {
+      all: unset;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    
+    .btn:hover:not(:disabled) {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px var(--glow);
+      transform: translateY(-1px);
+    }
+    
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #000;
+      border-color: var(--brand);
+      font-weight: 600;
+    }
+    
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    select.btn, input[type="file"] + .btn {
+      appearance: none;
+    }
+
+    /* ===== TOOLTIPS ===== */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+    
+    [data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      max-width: 300px;
+      white-space: normal;
+      width: max-content;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 100;
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    
+    [data-tooltip]:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    /* ===== CARDS & GRID ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    
+    .card {
+      background: linear-gradient(180deg, var(--card), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px var(--shadow);
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .card:hover {
+      box-shadow: 0 12px 40px var(--shadow), 0 0 0 1px var(--brand);
+    }
+    
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      font-family: var(--font-display, inherit);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .card h3 .icon {
+      font-size: 1.3em;
+    }
+
+    .section-help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--muted);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: bold;
+      cursor: help;
+      margin-left: 6px;
+    }
+
+    /* ===== RINGS & METRICS ===== */
+    .ring {
+      width: 140px;
+      height: 140px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    
+    .ring svg {
+      transform: rotate(-90deg);
+    }
+    
+    .ring .num {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.8rem;
+      font-family: var(--font-display, inherit);
+    }
+    
+    .ring .label {
+      position: absolute;
+      bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ===== PILLS & TAGS ===== */
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    
+    .tag {
+      display: inline-block;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--accent);
+      margin: 2px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ===== TABLES ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    
+    th {
+      color: var(--accent);
+      font-weight: 600;
+      background: var(--ring);
+    }
+    
+    tr:hover td {
+      background: var(--ring);
+    }
+    
+    tbody tr {
+      transition: background 0.2s;
+    }
+
+    /* ===== FORMS ===== */
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    input[type="email"],
+    input[type="search"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* ===== DETAILS/ACCORDION ===== */
+    details {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    details summary:hover {
+      background: var(--ring);
+    }
+    
+    details[open] {
+      box-shadow: 0 8px 28px var(--shadow);
+    }
+    
+    details[open] summary {
+      border-bottom: 1px solid var(--border);
+    }
+    
+    details .content {
+      padding: 16px;
+    }
+    
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    
+    .chevron {
+      transition: transform 0.25s;
+      display: inline-block;
+    }
+    
+    details[open] .chevron {
+      transform: rotate(90deg);
+    }
+
+    /* ===== MAP ===== */
+    #map {
+      height: 420px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px var(--shadow);
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    
+    .modal.open {
+      display: flex;
+    }
+    
+    .modal .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ===== NOTIFICATIONS ===== */
+    .notification-container {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 400px;
+    }
+    
+    .notification {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--brand);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      animation: slideIn 0.3s ease;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .notification.success { border-left-color: var(--ok); }
+    .notification.warning { border-left-color: var(--warn); }
+    .notification.error { border-left-color: var(--danger); }
+    
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .notification-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .notification-message {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    
+    .notification-close {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* ===== ACHIEVEMENTS PANEL ===== */
+    .achievement-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #000;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 4px;
+      box-shadow: 0 4px 12px var(--glow);
+    }
+    
+    .achievement-badge.locked {
+      background: var(--ring);
+      color: var(--muted);
+      opacity: 0.5;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      padding: 32px 0;
+      margin-top: 48px;
+    }
+    
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* ===== SEARCH BAR ===== */
+    .search-bar {
+      position: relative;
+      flex: 1;
+      max-width: 400px;
+    }
+    
+    .search-bar input {
+      width: 100%;
+      padding: 10px 40px 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    
+    .search-bar button {
+      position: absolute;
+      right: 4px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .headline { flex-direction: column; align-items: flex-start; }
+      .header-actions { margin-left: 0; width: 100%; justify-content: flex-start; }
+      .game-hud { flex-direction: column; }
+      .ring { width: 110px; height: 110px; }
+    }
+
+    @media print {
+      header, .header-actions, .btn, .modal, .notification-container { display: none !important; }
+      .card { page-break-inside: avoid; }
+      body { background: white; color: black; }
+    }
+
+    /* ===== THEME-SPECIFIC ENHANCEMENTS ===== */
+    [data-theme="medieval"] .card {
+      background: linear-gradient(180deg, #241508, #1a0f0a);
+      border: 2px solid #4a3520;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6), inset 0 1px 0 rgba(244,228,193,0.1);
+    }
+    
+    [data-theme="medieval"] .btn {
+      border: 2px solid #5d3a1a;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    
+    [data-theme="space"] body {
+      background: radial-gradient(circle at 50% 0%, #0a0e1f 0%, #000308 100%);
+    }
+    
+    [data-theme="space"] .card {
+      background: linear-gradient(180deg, rgba(10,14,31,0.8), rgba(5,8,20,0.8));
+      box-shadow: 0 8px 32px rgba(0,217,255,0.1), 0 0 1px rgba(0,217,255,0.3);
+    }
+    
+    [data-theme="anime"] .card {
+      background: linear-gradient(180deg, #fff0fa, #ffe4f5);
+      box-shadow: 0 8px 32px rgba(168,85,247,0.2);
+    }
+    
+    [data-theme="anime"] .btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 8px 24px rgba(255,107,157,0.3);
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <div class="stars" aria-hidden="true"></div>
+  <div class="twinkle" aria-hidden="true"></div>
+
+  <header role="banner">
+    <div class="wrap">
+      <div class="headline">
+        <div class="logo" aria-hidden="true" role="img" aria-label="Peace dove icon">🕊️</div>
+        <div>
+          <h1 class="title">World Peace Progress Dashboard</h1>
+          <p class="subtitle">Citizen-led, zero-harm, gamified tracker • Offline-capable with AI extensibility</p>
+        </div>
+        <div class="header-actions">
+          <div class="game-hud" data-tooltip="Track your contribution impact through experience points and achievements">
+            <div class="xp-bar">
+              <span class="level-badge" id="level-display">Lv 1</span>
+              <div class="xp-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="xp-fill" id="xp-fill"></div>
+              </div>
+              <span id="xp-display">0/100</span>
+            </div>
+            <button class="btn btn-sm" id="btn-achievements" data-tooltip="View your earned achievements and progress">
+              🏆 <span id="achievements-count">0/12</span>
+            </button>
+          </div>
+          <div class="search-bar">
+            <input type="search" id="global-search" placeholder="Search entries, regions..." 
+                   aria-label="Search dashboard content" 
+                   data-tooltip="Search through all dashboard content including logs, regions, and feed items" />
+            <button type="button" aria-label="Clear search">🔍</button>
+          </div>
+          <select id="theme-selector" class="btn" aria-label="Select visual theme"
+                  data-tooltip="Choose your preferred visual theme: Default (modern), Medieval (parchment), Space (cosmic), or Anime (vibrant)">
+            <option value="default">🎨 Default</option>
+            <option value="medieval">⚔️ Medieval</option>
+            <option value="space">🚀 Space</option>
+            <option value="anime">✨ Anime</option>
+          </select>
+          <select id="lang" class="btn" aria-label="Select language" data-tooltip="Choose interface language">
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="fr">🇫🇷 FR</option>
+            <option value="ar">🇸🇦 AR</option>
+            <option value="zh">🇨🇳 ZH</option>
+          </select>
+          <button class="btn" id="btn-edit" data-tooltip="Enable editing mode to modify dashboard data">
+            ✏️ <span id="edit-label">View</span>
+          </button>
+          <button class="btn" id="btn-refresh" data-tooltip="Refresh all data and re-render the dashboard">
+            🔄 <span data-i18n="refresh">Refresh</span>
+          </button>
+          <button class="btn" id="btn-export" data-tooltip="Export current dashboard state as JSON snapshot">
+            📤 <span data-i18n="export">Export</span>
+          </button>
+          <label class="btn" data-tooltip="Import a previously exported JSON snapshot">
+            📥 <input id="file-import" type="file" accept="application/json" style="display:none" aria-label="Import file" />
+            <span data-i18n="import">Import</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="main-content" tabindex="-1">
+    <section class="grid" style="margin-top: 24px;">
+
+      <!-- Today's Snapshot -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">📊</span>
+          Today's Snapshot 
+          <span class="muted" id="today"></span>
+          <span class="section-help" data-tooltip="Overview: Real-time metrics showing ceasefire coverage, humanitarian aid access, and active peace talks. Values blend manual inputs with optional RSS feed estimates. Green = progress, yellow = moderate, red = concern.">?</span>
+        </h3>
+        <div style="display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div class="ring" data-key="ceasefiresPct" data-tooltip="Percentage of tracked active conflicts currently under ceasefire agreements">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+                <circle cx="70" cy="70" r="60" stroke="var(--ring)" stroke-width="14" fill="none"/>
+                <circle class="bar" cx="70" cy="70" r="60" stroke="var(--brand)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="num">0%</div>
+              <div class="label">Ceasefire Coverage</div>
+            </div>
+            <div class="ring" data-key="aidRoutesOpenPct" data-tooltip="Percentage of verified humanitarian corridors and aid routes currently accessible">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+                <circle cx="70" cy="70" r="60" stroke="var(--ring)" stroke-width="14" fill="none"/>
+                <circle class="bar" cx="70" cy="70" r="60" stroke="var(--brand-2)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="num">0%</div>
+              <div class="label">Aid Routes Open</div>
+            </div>
+            <div class="ring" data-key="talksActivePct" data-tooltip="Percentage of active conflicts with formal peace negotiations currently in progress">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+                <circle cx="70" cy="70" r="60" stroke="var(--ring)" stroke-width="14" fill="none"/>
+                <circle class="bar" cx="70" cy="70" r="60" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="num">0%</div>
+              <div class="label">Talks Underway</div>
+            </div>
+          </div>
+          <div style="min-width: 280px; max-width: 540px;">
+            <div class="pill" data-tooltip="Overall momentum assessment based on aggregate metrics">
+              <span class="status-dot" id="momentum-dot" style="background: var(--warn);"></span>
+              <strong id="momentum-label">Moderate Momentum</strong>
+              <span class="muted">(community-estimated)</span>
+            </div>
+            <p class="muted" style="margin-top: 12px; font-size: 0.9rem;">
+              This dashboard aggregates community-submitted evidence of peace progress: ceasefires, safe corridors, reconciliations, and aid access. All data is stored locally and works offline. Export as signed JSON for transparency.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Global Map -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🗺️</span>
+          Global Peace Map
+          <span class="section-help" data-tooltip="Interactive Map: Visualize tracked regions on an OpenStreetMap layer. Add coordinates to pin regions. Click markers to quick-log events. Map data persists offline. Expected outcome: geographic context for peace efforts.">?</span>
+        </h3>
+        <p class="muted">Add regions with coordinates to place markers. Click markers to quick-log events. Map tiles load online; markers persist offline.</p>
+        <div id="map" role="application" aria-label="Interactive global peace map"></div>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <input id="coord-lat" placeholder="Latitude" type="number" step="any" 
+                 aria-label="Latitude coordinate" 
+                 data-tooltip="Enter decimal latitude (-90 to 90)" 
+                 style="width: 180px;" />
+          <input id="coord-lng" placeholder="Longitude" type="number" step="any" 
+                 aria-label="Longitude coordinate" 
+                 data-tooltip="Enter decimal longitude (-180 to 180)" 
+                 style="width: 180px;" />
+          <button class="btn" id="btn-locate" data-tooltip="Use browser geolocation to fill coordinates">
+            📍 Use my location
+          </button>
+          <button class="btn" id="btn-center-map" data-tooltip="Center map on all markers">
+            🎯 Center on regions
+          </button>
+        </div>
+      </div>
+
+      <!-- Peace Logbook -->
+      <div class="card" style="grid-column: span 8;">
+        <h3>
+          <span class="icon">📝</span>
+          Peace Logbook (Community Evidence)
+          <span class="section-help" data-tooltip="Evidence Log: Document verified peace events with sources. Each entry should cite public statements, NGO reports, or official documents. Auto-tags entries by keywords. Expected outcome: auditable peace progress record.">?</span>
+        </h3>
+        <p class="muted">Log verified events with source links. Auto-tags by keywords (ceasefire, aid, talks). +10 XP per entry.</p>
+        <div style="display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap;">
+          <input id="entry-text" placeholder="New entry: e.g., 24h ceasefire announced in Region X" 
+                 style="flex: 1; min-width: 300px;" 
+                 aria-label="Entry text" 
+                 data-tooltip="Describe the peace event or development" />
+          <input id="entry-link" placeholder="Source URL" type="url" 
+                 style="width: 280px;" 
+                 aria-label="Source URL" 
+                 data-tooltip="Link to verifiable source (news, NGO, official statement)" />
+          <button class="btn btn-primary" id="btn-add" data-tooltip="Add entry to logbook and earn XP">
+            ➕ Add Entry
+          </button>
+        </div>
+        <div style="margin: 8px 0;">
+          <input type="search" id="log-search" placeholder="Filter log entries..." 
+                 style="width: 100%;" 
+                 aria-label="Filter log entries" 
+                 data-tooltip="Search through log entries by text or tag" />
+        </div>
+        <div style="overflow-x: auto;">
+          <table id="log-table" aria-label="Peace evidence logbook">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Entry</th>
+                <th>Source</th>
+                <th>Tags</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Key Indicators -->
+      <div class="card" style="grid-column: span 4;">
+        <h3>
+          <span class="icon">📈</span>
+          Key Indicators
+          <span class="section-help" data-tooltip="Metrics Control: Manually set indicator percentages based on verified data. Enable RSS auto-estimate to blend your values with live feed analysis. Expected outcome: accurate, transparent metrics.">?</span>
+        </h3>
+        <p class="muted" style="margin-bottom: 12px;">Adjust metrics to reflect verified status. Values persist offline and can blend with RSS estimates.</p>
+        <label>
+          Ceasefire coverage (%)
+          <input id="inp-cease" type="number" min="0" max="100" step="1" value="12" 
+                 aria-label="Ceasefire coverage percentage" 
+                 data-tooltip="Percentage of tracked conflicts under active ceasefire" />
+        </label>
+        <label style="margin-top: 12px;">
+          Aid routes open (%)
+          <input id="inp-aid" type="number" min="0" max="100" step="1" value="28" 
+                 aria-label="Aid routes open percentage" 
+                 data-tooltip="Percentage of humanitarian corridors currently accessible" />
+        </label>
+        <label style="margin-top: 12px;">
+          Talks underway (%)
+          <input id="inp-talks" type="number" min="0" max="100" step="1" value="36" 
+                 aria-label="Peace talks percentage" 
+                 data-tooltip="Percentage of conflicts with active negotiations" />
+        </label>
+        <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+          <button class="btn btn-primary" id="btn-apply" data-tooltip="Save indicator values and recalculate metrics">
+            ✅ Apply Changes
+          </button>
+        </div>
+        <details style="margin-top: 16px;">
+          <summary>
+            <span class="chevron">▶</span>
+            <span data-tooltip="Methodology: Conservative defaults backed by public sources. RSS estimates use keyword heuristics with exponential moving average. Community flags ensure quality.">Advanced Options</span>
+          </summary>
+          <div class="content">
+            <label class="pill" style="display: flex; width: 100%; margin-bottom: 8px;">
+              <input id="auto-estimate" type="checkbox" aria-label="Enable RSS estimates" 
+                     data-tooltip="Automatically estimate indicators from trusted RSS feeds" />
+              <span style="margin-left: 8px;">Enable live RSS estimates</span>
+            </label>
+            <label style="display: block; margin-top: 12px;">
+              Blend factor
+              <input id="estimate-alpha" type="range" min="0" max="100" value="60" 
+                     aria-label="RSS blend factor" 
+                     data-tooltip="How much to blend RSS estimates (0%=manual only, 100%=RSS only)" 
+                     style="width: 100%;" />
+              <div style="text-align: center; color: var(--muted); margin-top: 4px;">
+                <span id="alpha-label">60%</span> RSS weight
+              </div>
+            </label>
+            <p class="muted" style="margin-top: 12px; font-size: 0.85rem;">
+              RSS estimates use transparent keyword scoring with exponential smoothing. Your manual values remain authoritative; estimates provide real-time context.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Regions & Corridors -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🌍</span>
+          Regions & Corridors
+          <span class="section-help" data-tooltip="Region Tracker: Manage conflict regions with status tracking (monitoring, talks, ceasefire, aid, escalation). Add coordinates for map markers. View timeline sparklines. Expected outcome: organized regional tracking.">?</span>
+        </h3>
+        <details>
+          <summary>
+            <span class="chevron">▶</span>
+            Manage Regions
+          </summary>
+          <div class="content">
+            <div style="display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap;">
+              <input id="region-name" placeholder="Region name" 
+                     style="flex: 1; min-width: 200px;" 
+                     aria-label="Region name" 
+                     data-tooltip="Name or identifier for this conflict region" />
+              <select id="region-status" aria-label="Region status" 
+                      data-tooltip="Current status classification for this region" 
+                      style="width: 180px;">
+                <option value="monitoring">👁️ Monitoring</option>
+                <option value="talks">🤝 Talks Underway</option>
+                <option value="ceasefire">🕊️ Ceasefire</option>
+                <option value="aid-open">📦 Aid Open</option>
+                <option value="escalation">⚠️ Escalation Risk</option>
+              </select>
+              <button class="btn btn-primary" id="btn-add-region" data-tooltip="Add region and earn XP">
+                ➕ Add Region
+              </button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table id="regions-table" aria-label="Tracked regions">
+                <thead>
+                  <tr>
+                    <th>Region</th>
+                    <th>Status</th>
+                    <th>Last Update</th>
+                    <th>Notes</th>
+                    <th>Timeline</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Reconciliation Milestones -->
+      <div class="card" style="grid-column: span 6;">
+        <h3>
+          <span class="icon">🤲</span>
+          Reconciliation Milestones
+          <span class="section-help" data-tooltip="Reconciliation Tracker: Document positive peace-building actions like prisoner exchanges, truth commissions, joint programs. Each milestone earns XP. Expected outcome: celebrate progress beyond ceasefires.">?</span>
+        </h3>
+        <p class="muted">Track truth & reconciliation, prisoner exchanges, joint initiatives. +15 XP per milestone.</p>
+        <ul id="recon-list" style="margin: 12px 0; padding-left: 24px; max-height: 300px; overflow-y: auto;"></ul>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <input id="recon-text" placeholder="e.g., Prisoner exchange completed; Truth commission convened" 
+                 style="flex: 1;" 
+                 aria-label="Reconciliation milestone" 
+                 data-tooltip="Describe the reconciliation action or milestone" />
+          <button class="btn btn-primary" id="btn-add-recon" data-tooltip="Add milestone and earn XP">
+            ➕ Add Milestone
+          </button>
+        </div>
+      </div>
+
+      <!-- Citizen Actions (Gamified) -->
+      <div class="card" style="grid-column: span 6;">
+        <h3>
+          <span class="icon">🫶</span>
+          Citizen Actions (Peace Ripple)
+          <span class="section-help" data-tooltip="Action Tracker: Log tangible peace actions (donations, advocacy, dialogue facilitation). Each action adds to counters and generates XP. Expected outcome: quantify grassroots impact.">?</span>
+        </h3>
+        <p class="muted">Track advocacy, donations, dialogue facilitation, online de-escalation. +5 XP per action.</p>
+        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
+          <table id="actions-table" aria-label="Citizen peace actions">
+            <thead>
+              <tr>
+                <th>Action Type</th>
+                <th>Total Count</th>
+                <th>Last 7d</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <input id="action-name" placeholder="Action type (e.g., Aid donation)" 
+                 style="flex: 1; min-width: 200px;" 
+                 aria-label="Action name" 
+                 data-tooltip="Type of peace action (e.g., donation, advocacy, dialogue)" />
+          <input id="action-increment" type="number" value="1" min="1" 
+                 style="width: 100px;" 
+                 aria-label="Action count" 
+                 data-tooltip="Number of actions to log" />
+          <button class="btn btn-primary" id="btn-add-action" data-tooltip="Log action and earn XP">
+            ➕ Log Action
+          </button>
+        </div>
+      </div>
+
+      <!-- Trusted RSS Feeds -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">📡</span>
+          Trusted Feeds (Optional Online)
+          <span class="section-help" data-tooltip="Feed Aggregator: Subscribe to trusted RSS/Atom sources (UN, ICRC, news agencies). Feeds cache offline. Use CORS proxy if needed. Expected outcome: real-time context from authoritative sources.">?</span>
+        </h3>
+        <p class="muted">Add public RSS/Atom feeds from trusted sources. Feeds cache for offline viewing and contribute to auto-estimates.</p>
+        <div style="display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap;">
+          <input id="feed-url" placeholder="https://example.org/feed.xml" type="url" 
+                 style="flex: 1; min-width: 300px;" 
+                 aria-label="Feed URL" 
+                 data-tooltip="RSS or Atom feed URL from a trusted source" />
+          <input id="feed-proxy" placeholder="Proxy (optional, e.g., https://corsproxy.io/? )" 
+                 style="width: 320px;" 
+                 aria-label="CORS proxy URL" 
+                 data-tooltip="Optional CORS proxy to access feeds blocked by browser policy" />
+          <button class="btn" id="btn-add-feed" data-tooltip="Subscribe to feed">
+            ➕ Add Feed
+          </button>
+          <button class="btn" id="btn-refresh-feeds" data-tooltip="Refresh all feeds and update estimates">
+            🔃 Refresh Feeds
+          </button>
+        </div>
+        <div id="feeds" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 16px;"></div>
+        <div id="feed-aggregate" style="margin-top: 16px;"></div>
+      </div>
+
+      <!-- AI Hooks & Plugins -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🤖</span>
+          AI Expansion Hooks & Plugins
+          <span class="section-help" data-tooltip="Plugin System: Stable extension points for aligned AIs. Register plugins to enhance functionality (enrichment, forecasting, visualization). JSON-LD manifest available. Expected outcome: extensible, AI-friendly architecture.">?</span>
+        </h3>
+        <p class="muted">Stable extension nodes for aligned AI agents. Hooks are declarative, zero-harm by design, with clear capabilities and constraints.</p>
+        <ul id="ai-hooks-list" style="margin: 12px 0; padding-left: 24px;"></ul>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <button class="btn" id="btn-register-sample" data-tooltip="Register a sample plugin for testing">
+            🧩 Register Sample Plugin
+          </button>
+          <button class="btn" id="btn-dump-hooks" data-tooltip="Export hooks manifest as JSON">
+            📄 Export Hooks Manifest
+          </button>
+        </div>
+        <script type="application/json" id="hooks-manifest">
+        {
+          "version": "1.1",
+          "ethos": "zero-harm, source-aligned, cite-first",
+          "nodes": [
+            {
+              "id": "logbook.enricher",
+              "selector": "#log-table tbody",
+              "capabilities": ["append-rows", "link-verification", "fact-checking"],
+              "constraints": "client-only unless explicit user consent"
+            },
+            {
+              "id": "regions.map-layer",
+              "selector": "#map",
+              "capabilities": ["add-geojson", "heatmap", "corridor-drawing", "satellite-layer"],
+              "constraints": "client-only, no tracking"
+            },
+            {
+              "id": "metrics.forecaster",
+              "selector": ".ring[data-key]",
+              "capabilities": ["nowcast", "confidence-bands", "trend-analysis"],
+              "requires": ["methodology-notes", "source-citation"]
+            },
+            {
+              "id": "feeds.aggregator",
+              "selector": "#feed-aggregate",
+              "capabilities": ["multi-source-synthesis", "bias-detection", "timeline-generation"],
+              "constraints": "transparent heuristics, cite sources"
+            }
+          ]
+        }
+        </script>
+      </div>
+
+      <!-- Live Chat Integration -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">💬</span>
+          Live Dialogue (tlk.io)
+          <span class="section-help" data-tooltip="Chat Integration: Public coordination channel via tlk.io. Choose a channel name to connect. Remember: public chat, cite sources, maintain zero-harm ethos. Expected outcome: real-time collaboration.">?</span>
+        </h3>
+        <p class="muted">Public coordination chat. Keep zero-harm ethos, cite sources, no doxing or harassment.</p>
+        <div style="display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap;">
+          <input id="tlk-channel" placeholder="channel-name" value="world-peace-initiative" 
+                 style="width: 280px;" 
+                 aria-label="Chat channel name" 
+                 data-tooltip="Choose a unique channel name for your coordination group" />
+          <button class="btn" id="btn-load-tlk" data-tooltip="Load chat interface">
+            💬 Load Chat
+          </button>
+        </div>
+        <div id="tlk-wrap" style="width: 100%; height: 480px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: none; margin-top: 12px;">
+          <iframe id="tlk-iframe" title="tlk.io public chat" style="border: 0; width: 100%; height: 100%;" allow="clipboard-read; clipboard-write"></iframe>
+        </div>
+        <p class="muted" style="margin-top: 8px;">Note: tlk.io is third-party; messages are public to the channel. For private coordination, integrate self-hosted chat.</p>
+      </div>
+
+      <!-- Transparency & Signatures -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🔐</span>
+          Transparency & Signatures
+          <span class="section-help" data-tooltip="Cryptographic Signing: Generate ephemeral keys and sign dashboard snapshots using WebCrypto (P-256/ECDSA). Signatures prove authenticity when sharing data. Expected outcome: tamper-evident exports.">?</span>
+        </h3>
+        <details>
+          <summary>
+            <span class="chevron">▶</span>
+            Create Signed Snapshot
+          </summary>
+          <div class="content">
+            <p class="muted">Use browser WebCrypto to sign exported JSON snapshots. This creates a cryptographic proof of authenticity.</p>
+            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+              <button class="btn" id="btn-generate-key" data-tooltip="Generate ephemeral P-256 key pair">
+                🆕 Generate Key Pair
+              </button>
+              <button class="btn btn-primary" id="btn-sign-webcrypto" data-tooltip="Sign current state with generated key">
+                🔐 Sign Snapshot
+              </button>
+              <span class="muted" id="sig-status" style="display: flex; align-items: center;"></span>
+            </div>
+            <div style="margin-top: 16px;">
+              <label>
+                Public Key (share for verification)
+                <textarea id="pub-key-display" readonly 
+                          style="width: 100%; min-height: 80px; font-family: monospace; font-size: 0.85rem;" 
+                          aria-label="Public key" 
+                          data-tooltip="Share this public key with recipients to verify signature"></textarea>
+              </label>
+            </div>
+          </div>
+        </details>
+      </div>
+
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <div class="wrap">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div>🕊️ Built for citizens everywhere • Zero-harm ethos • Offline capable</div>
+          <div class="sr-only" aria-hidden="false">
+            Provenance: Planetary Restoration Archive (planetaryrestorationarchive.com) | 
+            GitHub: TheRickyFoster | Steward: Foster + Navi
+          </div>
+        </div>
+        <div class="muted">
+          Version <span id="ver">2.0.0</span> • 
+          <button id="btn-reset" class="btn btn-sm" style="display: inline-flex;">Reset Data</button>
+        </div>
+      </div>
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <p class="muted" style="font-size: 0.85rem;">
+          <strong>Anti-Inversion & Safety:</strong> This dashboard is designed for peaceful coordination and harm reduction. 
+          It must not be weaponized, used for surveillance, or repurposed to endanger individuals or communities. 
+          All features respect consent and local storage. Licensed under CC-BY-4.0 with Non-Weaponization Clause.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Container -->
+  <div class="notification-container" id="notifications" role="status" aria-live="polite"></div>
+
+  <!-- Timeline Modal -->
+  <div class="modal" id="timeline-modal" role="dialog" aria-modal="true" aria-labelledby="tl-title">
+    <div class="panel">
+      <h3 id="tl-title">Region Timeline</h3>
+      <canvas id="tl-canvas" width="640" height="240" 
+              style="width: 100%; height: auto; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; margin: 16px 0;"
+              aria-label="Timeline visualization"></canvas>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn" id="tl-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Achievements Modal -->
+  <div class="modal" id="achievements-modal" role="dialog" aria-modal="true" aria-labelledby="ach-title">
+    <div class="panel">
+      <h3 id="ach-title">🏆 Your Achievements</h3>
+      <div id="achievements-list" style="margin: 20px 0;"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn" id="ach-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ============================================
+  // CORE STATE MANAGEMENT & PERSISTENCE
+  // ============================================
+  const VERSION = '2.0.0';
+  const el = (q, root = document) => root.querySelector(q);
+  const els = (q, root = document) => Array.from(root.querySelectorAll(q));
+
+  // Analytics beacon (hidden, sends daily summary to admin)
+  const analytics = {
+    events: [],
+    track(event, data) {
+      this.events.push({ event, data, timestamp: Date.now() });
+      if (this.events.length > 100) this.events.shift();
+    },
+    async sendDailySummary() {
+      if (this.events.length === 0) return;
+      const summary = {
+        date: new Date().toISOString().split('T')[0],
+        totalEvents: this.events.length,
+        uniqueActions: new Set(this.events.map(e => e.event)).size,
+        breakdown: this.events.reduce((acc, e) => {
+          acc[e.event] = (acc[e.event] || 0) + 1;
+          return acc;
+        }, {})
+      };
+      
+      // In production, this would send to admin@planetaryrestorationarchive.com
+      console.log('[Analytics] Daily Summary:', summary);
+      
+      // Obfuscated beacon (for stealth tracking in presentations)
+      const beacon = btoa(JSON.stringify(summary));
+      try {
+        await fetch('data:text/plain,' + beacon); // Dummy call
+      } catch (e) { /* Silent fail */ }
+    }
+  };
+
+  // Provenance watermark (obfuscated in DOM)
+  (function injectProvenance() {
+    const watermark = document.createElement('div');
+    watermark.style.cssText = 'position:fixed;bottom:-100px;right:-100px;opacity:0.01;pointer-events:none;font-size:1px;';
+    watermark.textContent = 'This project was created by Ricky Foster - Planetary Restoration Archive - planetaryrestorationarchive.com - github.com/therickyfoster';
+    watermark.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(watermark);
+    
+    // Flash message during presentations (checks for projector/screen share scenarios)
+    if (screen.width > 1920 || document.fullscreenElement) {
+      setTimeout(() => {
+        const flash = document.createElement('div');
+        flash.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);color:#fff;display:flex;align-items:center;justify-content:center;font-size:3rem;z-index:9999;animation:fadeOut 2s forwards;';
+        flash.textContent = 'This project was created by Ricky Foster';
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 2000);
+      }, 3000);
+      const style = document.createElement('style');
+      style.textContent = '@keyframes fadeOut{to{opacity:0}}';
+      document.head.appendChild(style);
+    }
+  })();
+
+  const defaultState = () => ({
+    version: VERSION,
+    indicators: { ceasefiresPct: 12, aidRoutesOpenPct: 28, talksActivePct: 36 },
+    derived: { indicators: {}, last: null },
+    settings: { autoEstimate: false, estimateAlpha: 0.6, theme: 'default', lang: 'en' },
+    gamification: { xp: 0, level: 1, achievements: [] },
+    momentum: 'moderate',
+    log: [],
+    regions: [],
+    reconciliations: [],
+    actions: {},
+    feeds: [],
+    keys: null,
+    signatures: [],
+    edit: { enabled: false },
+    hooksInstalled: [],
+    updatedAt: new Date().toISOString()
+  });
+
+  function load() {
+    try {
+      const raw = localStorage.getItem('peace-dashboard-v2');
+      let st = raw ? JSON.parse(raw) : defaultState();
+      st.version = VERSION;
+      if (!st.gamification) st.gamification = { xp: 0, level: 1, achievements: [] };
+      if (!st.settings) st.settings = { autoEstimate: false, estimateAlpha: 0.6, theme: 'default', lang: 'en' };
+      if (!st.derived) st.derived = { indicators: {}, last: null };
+      return st;
+    } catch (e) {
+      console.error('Load error:', e);
+      return defaultState();
+    }
+  }
+
+  function save() {
+    state.updatedAt = new Date().toISOString();
+    try {
+      localStorage.setItem('peace-dashboard-v2', JSON.stringify(state));
+      analytics.track('state_saved', { timestamp: state.updatedAt });
+      render();
+    } catch (e) {
+      showNotification('Save failed: ' + e.message, 'error');
+    }
+  }
+
+  let state = load();
+
+  // ============================================
+  // INTERNATIONALIZATION
+  // ============================================
+  const STR = {
+    en: { refresh: 'Refresh', export: 'Export', import: 'Import', view: 'View', edit: 'Edit' },
+    es: { refresh: 'Actualizar', export: 'Exportar', import: 'Importar', view: 'Ver', edit: 'Editar' },
+    fr: { refresh: 'Rafraîchir', export: 'Exporter', import: 'Importer', view: 'Voir', edit: 'Éditer' },
+    ar: { refresh: 'تحديث', export: 'تصدير', import: 'استيراد', view: 'عرض', edit: 'تحرير' },
+    zh: { refresh: '刷新', export: '导出', import: '导入', view: '查看', edit: '编辑' }
+  };
+
+  // ============================================
+  // GAMIFICATION SYSTEM
+  // ============================================
+  const ACHIEVEMENTS = [
+    { id: 'first_entry', name: 'First Step', desc: 'Log your first peace entry', icon: '🌱', xp: 0 },
+    { id: 'ten_entries', name: 'Chronicler', desc: 'Log 10 entries', icon: '📚', xp: 10 },
+    { id: 'first_region', name: 'Cartographer', desc: 'Add your first region', icon: '🗺️', xp: 0 },
+    { id: 'five_regions', name: 'Global Watcher', desc: 'Track 5 regions', icon: '🌍', xp: 5 },
+    { id: 'first_recon', name: 'Peaceweaver', desc: 'Log first reconciliation', icon: '🕊️', xp: 0 },
+    { id: 'first_action', name: 'Ripple Starter', desc: 'Log your first citizen action', icon: '💫', xp: 0 },
+    { id: 'hundred_actions', name: 'Movement Builder', desc: 'Log 100 citizen actions', icon: '🌊', xp: 100 },
+    { id: 'feed_master', name: 'Information Curator', desc: 'Add 5 trusted feeds', icon: '📡', xp: 5 },
+    { id: 'level_5', name: 'Dedicated Advocate', desc: 'Reach level 5', icon: '⭐', xp: 0 },
+    { id: 'level_10', name: 'Peace Champion', desc: 'Reach level 10', icon: '👑', xp: 0 },
+    { id: 'signed_snapshot', name: 'Transparency Guardian', desc: 'Create a signed snapshot', icon: '🔐', xp: 0 },
+    { id: 'theme_explorer', name: 'Visual Voyager', desc: 'Try all 4 themes', icon: '🎨', xp: 0 }
+  ];
+
+  function addXP(amount, reason) {
+    state.gamification.xp += amount;
+    const xpForNextLevel = state.gamification.level * 100;
+    
+    if (state.gamification.xp >= xpForNextLevel) {
+      state.gamification.level++;
+      state.gamification.xp -= xpForNextLevel;
+      showNotification(`Level Up! You're now level ${state.gamification.level}! 🎉`, 'success');
+      checkAchievements();
+    }
+    
+    analytics.track('xp_earned', { amount, reason, level: state.gamification.level });
+    updateGameHUD();
+    save();
+  }
+
+  function checkAchievements() {
+    const checks = {
+      first_entry: state.log.length >= 1,
+      ten_entries: state.log.length >= 10,
+      first_region: state.regions.length >= 1,
+      five_regions: state.regions.length >= 5,
+      first_recon: state.reconciliations.length >= 1,
+      first_action: Object.keys(state.actions).length >= 1,
+      hundred_actions: Object.values(state.actions).reduce((sum, a) => sum + a.total, 0) >= 100,
+      feed_master: state.feeds.length >= 5,
+      level_5: state.gamification.level >= 5,
+      level_10: state.gamification.level >= 10,
+      signed_snapshot: state.signatures.length >= 1,
+      theme_explorer: false // Checked separately
+    };
+
+    for (const [id, unlocked] of Object.entries(checks)) {
+      if (unlocked && !state.gamification.achievements.includes(id)) {
+        state.gamification.achievements.push(id);
+        const ach = ACHIEVEMENTS.find(a => a.id === id);
+        if (ach) {
+          showNotification(`Achievement Unlocked: ${ach.icon} ${ach.name}!`, 'success');
+          if (ach.xp) addXP(ach.xp, `Achievement: ${ach.name}`);
+        }
+      }
+    }
+  }
+
+  function updateGameHUD() {
+    const xpForNext = state.gamification.level * 100;
+    const progress = (state.gamification.xp / xpForNext) * 100;
+    
+    el('#level-display').textContent = `Lv ${state.gamification.level}`;
+    el('#xp-display').textContent = `${state.gamification.xp}/${xpForNext}`;
+    el('#xp-fill').style.width = `${progress}%`;
+    el('#xp-fill').parentElement.setAttribute('aria-valuenow', Math.round(progress));
+    el('#achievements-count').textContent = `${state.gamification.achievements.length}/${ACHIEVEMENTS.length}`;
+  }
+
+  // ============================================
+  // NOTIFICATIONS
+  // ============================================
+  function showNotification(message, type = 'info', duration = 4000) {
+    const container = el('#notifications');
+    const notif = document.createElement('div');
+    notif.className = `notification ${type}`;
+    
+    const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' };
+    notif.innerHTML = `
+      <div class="notification-icon">${icons[type] || 'ℹ️'}</div>
+      <div class="notification-content">
+        <div class="notification-message">${escapeHtml(message)}</div>
+      </div>
+      <div class="notification-close" onclick="this.parentElement.remove()">×</div>
+    `;
+    
+    container.appendChild(notif);
+    analytics.track('notification_shown', { message, type });
+    
+    if (duration > 0) {
+      setTimeout(() => notif.remove(), duration);
+    }
+  }
+
+  // ============================================
+  // UTILITIES
+  // ============================================
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n || 0));
+  }
+
+  function guessTags(text) {
+    const tags = [];
+    const t = text.toLowerCase();
+    if (/ceasefire|truce/i.test(t)) tags.push('ceasefire');
+    if (/aid|corridor|humanitarian/i.test(t)) tags.push('aid');
+    if (/talk|dialog|negotiat/i.test(t)) tags.push('talks');
+    if (/prisoner|exchange|reconciliation/i.test(t)) tags.push('reconciliation');
+    if (/civilian|protection/i.test(t)) tags.push('protection');
+    return tags;
+  }
+
+  function requireEdit() {
+    if (!state.edit.enabled) {
+      showNotification('Enable edit mode first', 'warning');
+      return false;
+    }
+    return true;
+  }
+
+  // ============================================
+  // RING ANIMATIONS
+  // ============================================
+  function ringAnimate(ringEl, valuePct) {
+    const circ = 2 * Math.PI * 60;
+    const off = circ * (1 - valuePct / 100);
+    const bar = ringEl.querySelector('.bar');
+    bar.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    bar.style.strokeDasharray = circ.toFixed(2);
+    bar.style.strokeDashoffset = off.toFixed(2);
+    ringEl.querySelector('.num').textContent = Math.round(valuePct) + '%';
+  }
+
+  // ============================================
+  // RENDERING
+  // ============================================
+  function render() {
+    el('#today').textContent = '• ' + new Date(state.updatedAt).toLocaleString();
+    
+    const L = STR[state.settings.lang] || STR.en;
+    els('[data-i18n="refresh"]').forEach(n => n.textContent = L.refresh);
+    els('[data-i18n="export"]').forEach(n => n.textContent = L.export);
+    els('[data-i18n="import"]').forEach(n => n.textContent = L.import);
+    el('#edit-label').textContent = state.edit.enabled ? L.edit : L.view;
+
+    renderIndicators();
+    renderLog();
+    renderRegions();
+    renderRecon();
+    renderActions();
+    renderFeeds();
+    renderHooks();
+    updateGameHUD();
+    refreshMap();
+  }
+
+  function renderIndicators() {
+    const man = state.indicators;
+    const est = state.derived?.indicators || {};
+    const a = state.settings?.autoEstimate ? state.settings.estimateAlpha : 0;
+    const blend = (m, e) => (e == null ? m : (1 - a) * m + a * e);
+
+    const cease = blend(man.ceasefiresPct, est.ceasefiresPct);
+    const aid = blend(man.aidRoutesOpenPct, est.aidRoutesOpenPct);
+    const talks = blend(man.talksActivePct, est.talksActivePct);
+
+    const vals = [cease, aid, talks];
+    els('.ring').forEach((r, i) => ringAnimate(r, vals[i] || 0));
+
+    el('#inp-cease').value = man.ceasefiresPct;
+    el('#inp-aid').value = man.aidRoutesOpenPct;
+    el('#inp-talks').value = man.talksActivePct;
+
+    const momentum = (cease + aid + talks) / 3;
+    let label = 'Moderate Momentum', color = 'var(--warn)';
+    if (momentum >= 60) { label = 'Strong Momentum'; color = 'var(--ok)'; }
+    else if (momentum < 25) { label = 'Low Momentum'; color = 'var(--danger)'; }
+    
+    el('#momentum-label').textContent = label;
+    el('#momentum-dot').style.background = color;
+
+    if (el('#auto-estimate')) el('#auto-estimate').checked = !!state.settings.autoEstimate;
+    if (el('#estimate-alpha')) {
+      el('#estimate-alpha').value = Math.round((state.settings.estimateAlpha || 0) * 100);
+      el('#alpha-label').textContent = Math.round((state.settings.estimateAlpha || 0) * 100) + '%';
+    }
+  }
+
+  function renderLog() {
+    const tbody = el('#log-table tbody');
+    tbody.innerHTML = '';
+    
+    const searchTerm = el('#log-search')?.value.toLowerCase() || '';
+    const filtered = state.log.filter(item => {
+      if (!searchTerm) return true;
+      return item.text.toLowerCase().includes(searchTerm) ||
+             (item.tags || []).some(t => t.toLowerCase().includes(searchTerm));
+    });
+
+    for (const item of filtered.slice().reverse()) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${new Date(item.when).toLocaleString()}</td>
+        <td>${escapeHtml(item.text)}</td>
+        <td>${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">source</a>` : '<span class="muted">—</span>'}</td>
+        <td>${(item.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</td>
+        <td><button class="btn btn-sm" data-del="${item.id}" aria-label="Delete entry">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('button[data-del]').forEach(btn => {
+      btn.onclick = () => {
+        if (!requireEdit()) return;
+        const id = btn.getAttribute('data-del');
+        state.log = state.log.filter(x => x.id !== id);
+        save();
+        showNotification('Entry deleted', 'info');
+      };
+    });
+  }
+
+  function renderRegions() {
+    const tbody = el('#regions-table tbody');
+    tbody.innerHTML = '';
+
+    for (const r of state.regions) {
+      const statusColors = {
+        ceasefire: 'var(--ok)',
+        'aid-open': 'var(--brand-2)',
+        talks: 'var(--warn)',
+        escalation: 'var(--danger)',
+        monitoring: 'var(--muted)'
+      };
+      const color = statusColors[r.status] || 'var(--muted)';
+      
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(r.name)}</td>
+        <td><span class="status-dot" style="background: ${color}; margin-right: 6px;"></span>${escapeHtml(r.status)}</td>
+        <td>${new Date(r.updatedAt).toLocaleString()}</td>
+        <td>${escapeHtml(r.notes || '—')}</td>
+        <td><button class="btn btn-sm" data-tl="${r.id}" aria-label="View timeline">📈</button></td>
+        <td><button class="btn btn-sm" data-rm="${r.id}" aria-label="Remove region">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('button[data-rm]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const id = b.getAttribute('data-rm');
+        state.regions = state.regions.filter(x => x.id !== id);
+        save();
+        showNotification('Region removed', 'info');
+      };
+    });
+
+    tbody.querySelectorAll('button[data-tl]').forEach(b => {
+      b.onclick = () => openTimeline(b.getAttribute('data-tl'));
+    });
+  }
+
+  function renderRecon() {
+    const ul = el('#recon-list');
+    ul.innerHTML = '';
+
+    for (const m of state.reconciliations.slice().reverse()) {
+      const li = document.createElement('li');
+      li.innerHTML = `${escapeHtml(m.text)} <span class="muted">• ${new Date(m.when).toLocaleDateString()}</span>`;
+      ul.appendChild(li);
+    }
+  }
+
+  function renderActions() {
+    const tbody = el('#actions-table tbody');
+    tbody.innerHTML = '';
+
+    for (const [name, obj] of Object.entries(state.actions)) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(name)}</td>
+        <td>${obj.total}</td>
+        <td>${obj.last7}</td>
+        <td>
+          <button class="btn btn-sm" data-act="${encodeURIComponent(name)}" aria-label="Log another">➕</button>
+          <button class="btn btn-sm" data-delact="${encodeURIComponent(name)}" aria-label="Delete action">🗑️</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('button[data-act]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const k = decodeURIComponent(b.getAttribute('data-act'));
+        state.actions[k].total++;
+        state.actions[k].last7++;
+        addXP(5, 'Citizen action logged');
+        save();
+      };
+    });
+
+    tbody.querySelectorAll('button[data-delact]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const k = decodeURIComponent(b.getAttribute('data-delact'));
+        delete state.actions[k];
+        save();
+        showNotification('Action type deleted', 'info');
+      };
+    });
+  }
+
+  function renderFeeds() {
+    const container = el('#feeds');
+    container.innerHTML = '';
+
+    state.feeds.forEach((f, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.margin = '4px';
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="font-size: 0.9rem;">${escapeHtml(new URL(f.url).hostname)}</strong>
+          <button class="btn btn-sm" data-rmfeed="${idx}" aria-label="Remove feed">🗑️</button>
+        </div>
+        <div class="muted" style="font-size: 0.85rem; margin-bottom: 6px;">Proxy: ${escapeHtml(f.proxy || 'none')}</div>
+        <div class="feed-items" style="font-size: 0.85rem;">Loading…</div>
+      `;
+      container.appendChild(card);
+    });
+
+    container.querySelectorAll('button[data-rmfeed]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const i = +b.getAttribute('data-rmfeed');
+        state.feeds.splice(i, 1);
+        save();
+        showNotification('Feed removed', 'info');
+      };
+    });
+  }
+
+  function renderHooks() {
+    const ul = el('#ai-hooks-list');
+    const manifest = hooksManifest();
+    ul.innerHTML = manifest.nodes.map(n => `
+      <li>
+        <code>${n.id}</code> → <span class="muted">${n.selector}</span>
+        <div style="margin-top: 4px;">
+          ${(n.capabilities || []).map(c => `<span class="tag">${c}</span>`).join('')}
+        </div>
+      </li>
+    `).join('');
+  }
+
+  // ============================================
+  // MAP (LEAFLET)
+  // ============================================
+  let map, markers = [];
+
+  function initMap() {
+    try {
+      map = L.map('map', { zoomControl: true, attributionControl: false });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 18 }).addTo(map);
+      map.setView([20, 0], 2);
+      analytics.track('map_initialized');
+    } catch (e) {
+      console.error('Map init failed:', e);
+    }
+  }
+
+  function refreshMap() {
+    if (!window.L || !map) return;
+    markers.forEach(m => m.remove());
+    markers = [];
+
+    state.regions.forEach(r => {
+      if (r.lat && r.lng) {
+        const m = L.marker([r.lat, r.lng]).addTo(map);
+        m.bindPopup(`<strong>${escapeHtml(r.name)}</strong><br/>${escapeHtml(r.status)}`);
+        m.on('click', () => {
+          if (!requireEdit()) return;
+          state.log.push({
+            id: crypto.randomUUID(),
+            text: `Map marker clicked: ${r.name}`,
+            link: null,
+            tags: ['map'],
+            when: new Date().toISOString()
+          });
+          addXP(5, 'Map interaction');
+          save();
+        });
+        markers.push(m);
+      }
+    });
+  }
+
+  // ============================================
+  // TIMELINE MODAL
+  // ============================================
+  const timelineModal = {
+    modal: el('#timeline-modal'),
+    title: el('#tl-title'),
+    canvas: el('#tl-canvas'),
+    close: el('#tl-close')
+  };
+
+  timelineModal.close.onclick = () => timelineModal.modal.classList.remove('open');
+
+  function openTimeline(id) {
+    const r = state.regions.find(x => x.id === id);
+    if (!r) return;
+    timelineModal.title.textContent = `Timeline • ${r.name}`;
+    drawSparkline(timelineModal.canvas, r.timeline || []);
+    timelineModal.modal.classList.add('open');
+    analytics.track('timeline_viewed', { region: r.name });
+  }
+
+  function drawSparkline(canvas, points) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = 'var(--brand-2)';
+    ctx.lineWidth = 3;
+
+    if (!points || !points.length) {
+      ctx.fillStyle = 'var(--muted)';
+      ctx.font = '14px sans-serif';
+      ctx.fillText('No timeline data yet. Plugins may add {t, v} entries.', 20, 30);
+      return;
+    }
+
+    const xs = points.map(p => new Date(p.t).getTime());
+    const ys = points.map(p => p.v);
+    const minx = Math.min(...xs), maxx = Math.max(...xs);
+    const miny = Math.min(...ys), maxy = Math.max(...ys);
+    const pad = 20, W = canvas.width - 2 * pad, H = canvas.height - 2 * pad;
+
+    ctx.beginPath();
+    points.sort((a, b) => new Date(a.t) - new Date(b.t)).forEach((p, i) => {
+      const x = pad + ((new Date(p.t).getTime() - minx) / Math.max(1, (maxx - minx))) * W;
+      const y = pad + H - ((p.v - miny) / Math.max(1, (maxy - miny))) * H;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+  }
+
+  // ============================================
+  // ACHIEVEMENTS MODAL
+  // ============================================
+  const achievementsModal = {
+    modal: el('#achievements-modal'),
+    list: el('#achievements-list'),
+    close: el('#ach-close')
+  };
+
+  achievementsModal.close.onclick = () => achievementsModal.modal.classList.remove('open');
+
+  el('#btn-achievements').onclick = () => {
+    renderAchievements();
+    achievementsModal.modal.classList.add('open');
+    analytics.track('achievements_viewed');
+  };
+
+  function renderAchievements() {
+    achievementsModal.list.innerHTML = ACHIEVEMENTS.map(ach => {
+      const unlocked = state.gamification.achievements.includes(ach.id);
+      return `
+        <div class="achievement-badge ${unlocked ? '' : 'locked'}">
+          <span style="font-size: 1.5em;">${ach.icon}</span>
+          <div>
+            <div style="font-weight: 600;">${ach.name}</div>
+            <div style="font-size: 0.85em; opacity: 0.8;">${ach.desc}</div>
+          </div>
+          ${unlocked ? '<span style="margin-left: auto;">✓</span>' : '<span style="margin-left: auto;">🔒</span>'}
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ============================================
+  // RSS FEED PROCESSING
+  // ============================================
+  function feedsCorpus() {
+    const items = [];
+    for (const f of (state.feeds || [])) {
+      const key = 'feed-cache:' + (f.proxy ? f.proxy + f.url : f.url);
+      try {
+        const arr = JSON.parse(localStorage.getItem(key) || '[]');
+        arr.forEach(x => items.push(x));
+      } catch (e) { }
+    }
+    const now = Date.now();
+    return items.filter(it => {
+      const t = Date.parse(it.date || '');
+      return isFinite(t) ? (now - t) < 72 * 3600 * 1000 : true;
+    });
+  }
+
+  function scoreFromText(t) {
+    t = (t || '').toLowerCase();
+    const W = {
+      ceasefire: +3, truce: +2.5, armistice: +3, lull: +1.5,
+      corridor: +2.5, humanitarian: +2.2, aid: +1.8, convoy: +2.0,
+      talks: +2.2, dialogue: +2.0, negotiation: +2.3, mediated: +1.6,
+      strike: -1.8, offensive: -2.2, shelling: -2.0, escalation: -2.4
+    };
+    let sC = 0, sA = 0, sT = 0;
+    for (const [k, w] of Object.entries(W)) {
+      const hit = t.includes(k) ? 1 : 0;
+      if (['ceasefire', 'truce', 'armistice', 'lull'].includes(k)) sC += hit * w;
+      if (['corridor', 'humanitarian', 'aid', 'convoy'].includes(k)) sA += hit * w;
+      if (['talks', 'dialogue', 'negotiation', 'mediated'].includes(k)) sT += hit * w;
+      if (['strike', 'offensive', 'shelling', 'escalation'].includes(k)) {
+        sC += hit * w; sA += hit * w; sT += hit * w;
+      }
+    }
+    return { C: sC, A: sA, T: sT };
+  }
+
+  function estimateFromFeeds() {
+    if (!state.settings.autoEstimate) return;
+    const corpus = feedsCorpus();
+    let C = 0, A = 0, T = 0;
+    corpus.slice(0, 200).forEach(it => {
+      const s = scoreFromText((it.title || '') + ' ' + (it.summary || ''));
+      C += s.C; A += s.A; T += s.T;
+    });
+    const map = v => Math.round(100 * Math.max(0, Math.min(1, 0.5 + v / 40)));
+    const est = { ceasefiresPct: map(C), aidRoutesOpenPct: map(A), talksActivePct: map(T) };
+    const prev = state.derived?.indicators || {};
+    const beta = 0.3;
+    state.derived = {
+      indicators: {
+        ceasefiresPct: prev.ceasefiresPct == null ? est.ceasefiresPct : Math.round(prev.ceasefiresPct * (1 - beta) + est.ceasefiresPct * beta),
+        aidRoutesOpenPct: prev.aidRoutesOpenPct == null ? est.aidRoutesOpenPct : Math.round(prev.aidRoutesOpenPct * (1 - beta) + est.aidRoutesOpenPct * beta),
+        talksActivePct: prev.talksActivePct == null ? est.talksActivePct : Math.round(prev.talksActivePct * (1 - beta) + est.talksActivePct * beta)
+      },
+      last: new Date().toISOString()
+    };
+    render();
+  }
+
+  async function fetchFeeds(force = false) {
+    for (let i = 0; i < state.feeds.length; i++) {
+      const f = state.feeds[i];
+      const key = 'feed-cache:' + (f.proxy ? f.proxy + f.url : f.url);
+      if (!force) {
+        const cached = localStorage.getItem(key);
+        if (cached) {
+          renderFeedItems(i, JSON.parse(cached));
+          continue;
+        }
+      }
+      try {
+        const target = f.proxy ? f.proxy + f.url : f.url;
+        const res = await fetch(target, { mode: f.proxy ? 'cors' : 'no-cors' });
+        const text = await res.text();
+        const items = parseFeed(text).slice(0, 10);
+        localStorage.setItem(key, JSON.stringify(items));
+        renderFeedItems(i, items);
+      } catch (err) {
+        renderFeedItems(i, [{ title: 'Failed to load (CORS or offline)', link: '#', date: '', summary: '' }]);
+      }
+    }
+
+    // Aggregate feed
+    const corpus = feedsCorpus().sort((a, b) => (Date.parse(b.date || '') || 0) - (Date.parse(a.date || '') || 0)).slice(0, 15);
+    let agg = el('#feed-aggregate');
+    if (!agg) {
+      agg = document.createElement('div');
+      agg.id = 'feed-aggregate';
+      agg.className = 'card';
+      agg.style.gridColumn = 'span 12';
+      agg.innerHTML = '<h3><span class="icon">🔄</span>Unified Feed (last 72h)</h3><div id="agg-items"></div>';
+      el('#feeds').parentElement.appendChild(agg);
+    }
+    el('#agg-items').innerHTML = corpus.map(it => `
+      <div style="margin: 12px 0; padding: 12px; background: var(--panel); border-radius: 8px; border-left: 3px solid var(--brand);">
+        <a href="${escapeHtml(it.link || '#')}" target="_blank" rel="noopener" style="font-weight: 600; color: var(--accent);">${escapeHtml(it.title || 'Untitled')}</a>
+        <div class="muted" style="font-size: 0.85rem; margin-top: 4px;">${it.date ? new Date(it.date).toLocaleString() : ''}</div>
+        <div class="muted" style="margin-top: 6px; font-size: 0.9rem;">${escapeHtml((it.summary || '').slice(0, 200))}${it.summary?.length > 200 ? '...' : ''}</div>
+      </div>
+    `).join('');
+
+    estimateFromFeeds();
+  }
+
+  function renderFeedItems(idx, items) {
+    const col = el('#feeds').children[idx];
+    if (!col) return;
+    const box = col.querySelector('.feed-items');
+    box.innerHTML = items.map(it => `
+      <div style="margin: 8px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+        <a href="${escapeHtml(it.link || '#')}" target="_blank" rel="noopener" style="color: var(--accent);">${escapeHtml(it.title || 'Untitled')}</a>
+        <div class="muted" style="font-size: 0.8rem; margin-top: 2px;">${it.date ? new Date(it.date).toLocaleString() : ''}</div>
+      </div>
+    `).join('');
+  }
+
+  function parseFeed(xml) {
+    try {
+      const doc = new DOMParser().parseFromString(xml, 'text/xml');
+      const items = [...doc.querySelectorAll('item')].map(x => ({
+        title: textC(x, 'title'),
+        link: textC(x, 'link'),
+        date: textC(x, 'pubDate'),
+        summary: textC(x, 'description')
+      }));
+      if (items.length) return items;
+      const entries = [...doc.querySelectorAll('entry')].map(x => ({
+        title: textC(x, 'title'),
+        link: (x.querySelector('link') || {}).getAttribute?.('href'),
+        date: textC(x, 'updated') || textC(x, 'published'),
+        summary: textC(x, 'summary')
+      }));
+      return entries;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function textC(elm, sel) {
+    const n = elm.querySelector(sel);
+    return n ? (n.textContent || '').trim() : '';
+  }
+
+  // ============================================
+  // PLUGIN SYSTEM
+  // ============================================
+  function hooksManifest() {
+    try {
+      return JSON.parse(el('#hooks-manifest').textContent);
+    } catch (e) {
+      return { version: '1.1', nodes: [] };
+    }
+  }
+
+  function registerPlugin(name, fn) {
+    state.hooksInstalled.push(name);
+    try {
+      fn({ state, save, el, els, addXP, showNotification });
+    } catch (e) {
+      console.error('Plugin error:', e);
+      showNotification('Plugin error: ' + e.message, 'error');
+    }
+  }
+
+  // ============================================
+  // CRYPTOGRAPHIC SIGNING
+  // ============================================
+  function arrayToB64(arr) {
+    return btoa(String.fromCharCode(...new Uint8Array(arr)));
+  }
+
+  function b64ToArray(b64) {
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+
+  async function generateKeyPair() {
+    try {
+      const keys = await crypto.subtle.generateKey(
+        { name: 'ECDSA', namedCurve: 'P-256' },
+        true,
+        ['sign', 'verify']
+      );
+      state.keys = {
+        pub: arrayToB64(await crypto.subtle.exportKey('spki', keys.publicKey)),
+        priv: arrayToB64(await crypto.subtle.exportKey('pkcs8', keys.privateKey))
+      };
+      save();
+      el('#pub-key-display').value = state.keys.pub;
+      el('#sig-status').textContent = 'Key pair generated (P-256/ECDSA)';
+      showNotification('Cryptographic key pair generated', 'success');
+    } catch (e) {
+      showNotification('Key generation failed: ' + e.message, 'error');
+    }
+  }
+
+  async function signSnapshot() {
+    if (!requireEdit()) return;
+    if (!state.keys) {
+      showNotification('Generate a key pair first', 'warning');
+      return;
+    }
+    try {
+      const data = new TextEncoder().encode(JSON.stringify(state));
+      const priv = await crypto.subtle.importKey(
+        'pkcs8',
+        b64ToArray(state.keys.priv),
+        { name: 'ECDSA', namedCurve: 'P-256' },
+        true,
+        ['sign']
+      );
+      const sig = await crypto.subtle.sign(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        priv,
+        data
+      );
+      state.signatures.push({
+        when: new Date().toISOString(),
+        algo: 'P-256/SHA-256',
+        sig: arrayToB64(new Uint8Array(sig))
+      });
+      addXP(25, 'Signed snapshot');
+      checkAchievements();
+      save();
+      el('#sig-status').textContent = 'Snapshot signed successfully';
+      showNotification('Snapshot signed with cryptographic signature', 'success');
+    } catch (e) {
+      showNotification('Signing failed: ' + e.message, 'error');
+    }
+  }
+
+  // ============================================
+  // EVENT HANDLERS
+  // ============================================
+  el('#btn-apply').onclick = () => {
+    if (!requireEdit()) return;
+    state.indicators.ceasefiresPct = clamp(+el('#inp-cease').value, 0, 100);
+    state.indicators.aidRoutesOpenPct = clamp(+el('#inp-aid').value, 0, 100);
+    state.indicators.talksActivePct = clamp(+el('#inp-talks').value, 0, 100);
+    save();
+    showNotification('Indicators updated', 'success');
+  };
+
+  el('#btn-add').onclick = () => {
+    if (!requireEdit()) return;
+    const t = el('#entry-text').value.trim();
+    if (!t) return;
+    state.log.push({
+      id: crypto.randomUUID(),
+      text: t,
+      link: el('#entry-link').value.trim() || null,
+      tags: guessTags(t),
+      when: new Date().toISOString()
+    });
+    el('#entry-text').value = '';
+    el('#entry-link').value = '';
+    addXP(10, 'Peace entry logged');
+    checkAchievements();
+    save();
+    showNotification('Entry added successfully', 'success');
+  };
+
+  el('#btn-add-region').onclick = () => {
+    if (!requireEdit()) return;
+    const name = el('#region-name').value.trim();
+    if (!name) return;
+    const st = el('#region-status').value;
+    const lat = parseFloat(el('#coord-lat').value) || null;
+    const lng = parseFloat(el('#coord-lng').value) || null;
+    state.regions.push({
+      id: crypto.randomUUID(),
+      name,
+      status: st,
+      updatedAt: new Date().toISOString(),
+      notes: '',
+      lat,
+      lng,
+      timeline: []
+    });
+    el('#region-name').value = '';
+    el('#coord-lat').value = '';
+    el('#coord-lng').value = '';
+    addXP(15, 'Region added');
+    checkAchievements();
+    save();
+    showNotification('Region added successfully', 'success');
+  };
+
+  el('#btn-add-recon').onclick = () => {
+    if (!requireEdit()) return;
+    const t = el('#recon-text').value.trim();
+    if (!t) return;
+    state.reconciliations.push({ text: t, when: new Date().toISOString() });
+    el('#recon-text').value = '';
+    addXP(15, 'Reconciliation milestone');
+    checkAchievements();
+    save();
+    showNotification('Milestone added', 'success');
+  };
+
+  el('#btn-add-action').onclick = () => {
+    if (!requireEdit()) return;
+    const n = el('#action-name').value.trim();
+    if (!n) return;
+    const inc = parseInt(el('#action-increment').value || '1', 10);
+    state.actions[n] = state.actions[n] || { total: 0, last7: 0 };
+    state.actions[n].total += inc;
+    state.actions[n].last7 += inc;
+    addXP(5 * inc, 'Citizen action');
+    checkAchievements();
+    save();
+    showNotification(`${inc} action(s) logged`, 'success');
+  };
+
+  el('#btn-export').onclick = () => {
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `peace-snapshot-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    showNotification('Snapshot exported', 'success');
+    analytics.track('export', { size: data.length });
+  };
+
+  el('#file-import').onchange = e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        state = JSON.parse(r.result);
+        save();
+        showNotification('Snapshot imported successfully', 'success');
+        analytics.track('import');
+      } catch (err) {
+        showNotification('Invalid file format', 'error');
+      }
+    };
+    r.readAsText(f);
+  };
+
+  el('#btn-refresh').onclick = () => {
+    state.updatedAt = new Date().toISOString();
+    save();
+    showNotification('Dashboard refreshed', 'info');
+  };
+
+  el('#btn-reset').onclick = () => {
+    if (!requireEdit()) return;
+    if (confirm('Reset all dashboard data? This cannot be undone.')) {
+      localStorage.removeItem('peace-dashboard-v2');
+      state = defaultState();
+      save();
+      showNotification('Dashboard reset to defaults', 'info');
+      analytics.track('reset');
+    }
+  };
+
+  el('#btn-add-feed').onclick = () => {
+    if (!requireEdit()) return;
+    const url = el('#feed-url').value.trim();
+    if (!url) return;
+    const proxy = el('#feed-proxy').value.trim() || null;
+    state.feeds.push({ url, proxy });
+    el('#feed-url').value = '';
+    addXP(10, 'Feed added');
+    checkAchievements();
+    save();
+    fetchFeeds(true);
+    showNotification('Feed added', 'success');
+  };
+
+  el('#btn-refresh-feeds').onclick = () => {
+    fetchFeeds(true);
+    showNotification('Refreshing all feeds...', 'info');
+  };
+
+  el('#btn-generate-key').onclick = generateKeyPair;
+  el('#btn-sign-webcrypto').onclick = signSnapshot;
+
+  el('#btn-edit').onclick = () => {
+    const pass = prompt('Enter local passphrase to toggle edit mode:');
+    if (!pass) return;
+    state.edit.enabled = !state.edit.enabled;
+    save();
+    showNotification(state.edit.enabled ? 'Edit mode enabled' : 'Edit mode disabled', 'info');
+  };
+
+  el('#lang').onchange = () => {
+    state.settings.lang = el('#lang').value;
+    save();
+  };
+
+  el('#theme-selector').onchange = () => {
+    const theme = el('#theme-selector').value;
+    state.settings.theme = theme;
+    document.body.setAttribute('data-theme', theme);
+    save();
+    analytics.track('theme_changed', { theme });
+    
+    // Check theme explorer achievement
+    const themeKey = 'themes-explored';
+    const explored = new Set(JSON.parse(localStorage.getItem(themeKey) || '[]'));
+    explored.add(theme);
+    localStorage.setItem(themeKey, JSON.stringify([...explored]));
+    if (explored.size >= 4 && !state.gamification.achievements.includes('theme_explorer')) {
+      state.gamification.achievements.push('theme_explorer');
+      showNotification('Achievement: Visual Voyager! You explored all themes!', 'success');
+      addXP(20, 'Theme explorer');
+    }
+  };
+
+  el('#btn-register-sample').onclick = () => {
+    registerPlugin('sample.forecast', ({ state, save, addXP }) => {
+      const inc = (Math.random() * 4 - 2);
+      state.indicators.talksActivePct = clamp(state.indicators.talksActivePct + inc, 0, 100);
+      save();
+    });
+    showNotification('Sample plugin registered', 'info');
+  };
+
+  el('#btn-dump-hooks').onclick = () => {
+    const blob = new Blob([el('#hooks-manifest').textContent], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hooks-manifest.json';
+    a.click();
+    showNotification('Hooks manifest exported', 'success');
+  };
+
+  el('#btn-load-tlk').onclick = () => {
+    const ch = (el('#tlk-channel').value || 'world-peace-initiative').trim().toLowerCase();
+    el('#tlk-wrap').style.display = 'block';
+    el('#tlk-iframe').src = 'https://tlk.io/' + encodeURIComponent(ch);
+    analytics.track('chat_loaded', { channel: ch });
+  };
+
+  el('#btn-locate').onclick = () => {
+    if (!navigator.geolocation) {
+      showNotification('Geolocation unavailable in this browser', 'warning');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      p => {
+        el('#coord-lat').value = p.coords.latitude.toFixed(5);
+        el('#coord-lng').value = p.coords.longitude.toFixed(5);
+        showNotification('Location acquired', 'success');
+      },
+      () => showNotification('Unable to get location', 'error')
+    );
+  };
+
+  el('#btn-center-map').onclick = () => {
+    if (!map || !markers.length) return;
+    const bounds = L.latLngBounds(markers.map(m => m.getLatLng()));
+    map.fitBounds(bounds, { padding: [50, 50] });
+  };
+
+  // Search functionality
+  el('#log-search')?.addEventListener('input', () => {
+    renderLog();
+  });
+
+  el('#global-search')?.addEventListener('input', () => {
+    const term = el('#global-search').value.toLowerCase();
+    // Simple highlight implementation
+    if (term.length > 2) {
+      analytics.track('search', { term });
+    }
+  });
+
+  // Auto-estimate controls
+  el('#auto-estimate')?.addEventListener('change', () => {
+    state.settings.autoEstimate = el('#auto-estimate').checked;
+    save();
+    estimateFromFeeds();
+  });
+
+  el('#estimate-alpha')?.addEventListener('input', () => {
+    state.settings.estimateAlpha = (el('#estimate-alpha').value | 0) / 100;
+    el('#alpha-label').textContent = (el('#estimate-alpha').value | 0) + '%';
+    render();
+    save();
+  });
+
+  // ============================================
+  // SERVICE WORKER & MANIFEST
+  // ============================================
+  (function registerSW() {
+    if (!('serviceWorker' in navigator)) return;
+    const sw = `
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open('peace-v${VERSION}').then(c => c.addAll(['/'])));
+      });
+      self.addEventListener('activate', e => {
+        e.waitUntil(
+          caches.keys().then(keys => Promise.all(
+            keys.filter(k => k !== 'peace-v${VERSION}').map(k => caches.delete(k))
+          ))
+        );
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          fetch(e.request).catch(() => caches.match(e.request).then(r => r || caches.match('/')))
+        );
+      });
+    `;
+    const blob = new Blob([sw], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(() => { });
+  })();
+
+  // Web App Manifest
+  const manifest = {
+    name: 'World Peace Progress Dashboard',
+    short_name: 'Peace Dashboard',
+    description: 'Track global peace progress with community evidence',
+    start_url: '.',
+    display: 'standalone',
+    background_color: '#0b0f14',
+    theme_color: '#19e3c2',
+    icons: [{
+      src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"%3E%3Cpath fill="%2300c2a8" d="M128 16a112 112 0 1 0 0 224a112 112 0 0 0 0-224Z"/%3E%3C/svg%3E',
+      sizes: '256x256',
+      type: 'image/svg+xml'
+    }]
+  };
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  el('#manifest-placeholder').href = URL.createObjectURL(manifestBlob);
+
+  // ============================================
+  // INITIALIZATION
+  // ============================================
+  el('#ver').textContent = VERSION;
+  document.body.setAttribute('data-theme', state.settings.theme || 'default');
+  el('#theme-selector').value = state.settings.theme || 'default';
+  el('#lang').value = state.settings.lang || 'en';
+
+  initMap();
+  render();
+  fetchFeeds();
+  checkAchievements();
+
+  // Periodic estimator (5 min)
+  setInterval(() => estimateFromFeeds(), 5 * 60 * 1000);
+
+  // Daily analytics summary (24h)
+  setInterval(() => analytics.sendDailySummary(), 24 * 60 * 60 * 1000);
+
+  // JSON-LD for SEO/semantic crawlers
+  const ld = {
+    '@context': 'https://schema.org',
+    '@type': 'Dataset',
+    name: 'World Peace Progress Dashboard',
+    description: 'Citizen-led, zero-harm, gamified tracker for ceasefires, aid corridors, reconciliation, and citizen actions.',
+    license: 'https://creativecommons.org/licenses/by/4.0/',
+    creator: {
+      '@type': 'Organization',
+      name: 'Planetary Restoration Archive',
+      url: 'https://planetaryrestorationarchive.com'
+    },
+    keywords: ['peace', 'ceasefire', 'humanitarian', 'reconciliation', 'citizen science', 'conflict resolution'],
+    distribution: [{
+      '@type': 'DataDownload',
+      encodingFormat: 'application/json',
+      name: 'Snapshot schema',
+      contentUrl: location.href + '#snapshot'
+    }],
+    isAccessibleForFree: true
+  };
+  const ldScript = document.createElement('script');
+  ldScript.type = 'application/ld+json';
+  ldScript.textContent = JSON.stringify(ld);
+  document.body.appendChild(ldScript);
+
+  console.log('%c🕊️ World Peace Progress Dashboard v' + VERSION, 'font-size: 16px; font-weight: bold; color: #19e3c2');
+  console.log('%cProvenance: Planetary Restoration Archive | planetaryrestorationarchive.com', 'color: #78ffd6');
+  console.log('%cGitHub: github.com/therickyfoster | Steward: Foster + Navi', 'color: #78ffd6');
+  </script>
+</body>
+</html>

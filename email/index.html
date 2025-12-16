@@ -1,0 +1,399 @@
+# Re-create the file after the state reset
+html = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>72-Hour Switch – Recipient-Specific Email Generator</title>
+<style>
+  :root{
+    --ua-blue:#005BBB;
+    --ua-gold:#FFD700;
+    --ink:#1a1a1a;
+    --muted:#6b7280;
+    --bg:#fafafa;
+    --card:#ffffff;
+    --accent:#0ea5e9;
+  }
+  *{box-sizing:border-box}
+  body{font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--ink); background:var(--bg); margin:0; padding:24px;}
+  .container{max-width:1000px; margin:0 auto;}
+  header{display:flex; align-items:center; justify-content:space-between; margin-bottom:16px}
+  .brand{font-weight:800; color:var(--ua-blue); letter-spacing:.2px}
+  .tag{font-size:12px; color:#334155; background:linear-gradient(135deg, var(--ua-blue), #0369a1); padding:8px 12px; border-radius:999px; color:#fff}
+  .card{background:var(--card); border:1px solid #e5e7eb; border-radius:12px; padding:16px; box-shadow:0 4px 16px rgba(0,0,0,.05); margin-bottom:16px}
+  .grid{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  label{font-size:12px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); display:block; margin-bottom:6px}
+  select, textarea, input[type="text"]{width:100%; padding:10px 12px; border:1px solid #e5e7eb; border-radius:10px; font-size:14px; outline:none}
+  textarea{min-height:160px; resize:vertical}
+  .controls{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+  button{border:0; border-radius:10px; padding:10px 14px; background:var(--ua-blue); color:#fff; font-weight:700; cursor:pointer}
+  button.secondary{background:#111827; color:#fff}
+  button.ghost{background:#fff; color:#111827; border:1px solid #e5e7eb}
+  .pill{display:inline-block; padding:6px 10px; background:#f1f5f9; color:#0f172a; border-radius:999px; font-size:12px; margin-right:6px}
+  .preview{white-space:pre-wrap; font-family:ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; line-height:1.5}
+  .section-title{font-weight:800; color:var(--ua-blue); margin:6px 0 10px 0}
+  .muted{color:var(--muted)}
+  .hr{height:1px; background:#e5e7eb; margin:12px 0}
+  .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+  .footnotes{font-size:12px; color:#374151; margin-top:8px}
+  .success{border:1px solid #86efac; background:#ecfdf5}
+  .warn{border:1px solid #fcd34d; background:#fffbeb}
+  .quote{border-left:4px solid var(--ua-blue); padding-left:10px; color:#0f172a; font-style:italic}
+  .tiny{font-size:12px}
+  .badge{background:linear-gradient(135deg, var(--ua-blue), #147df5); color:#fff; padding:4px 8px; border-radius:6px; font-size:12px}
+  .right{float:right}
+  .qr{display:inline-block; padding:3px 6px; background:#0f172a; color:#fff; font-weight:700; border-radius:4px; font-size:11px}
+  @media (max-width:860px){ .grid{grid-template-columns:1fr} }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <header>
+    <div>
+      <div class="brand">72‑Hour Switch – Email Composer</div>
+      <div class="tiny muted">Context‑aware, recipient‑specific drafts with selectable citation styles</div>
+    </div>
+    <div class="tag">Long‑Form Brief Attached</div>
+  </header>
+
+  <div class="card">
+    <div class="grid">
+      <div>
+        <label for="recipient">Recipient</label>
+        <select id="recipient"></select>
+      </div>
+      <div>
+        <label for="tone">Tone</label>
+        <select id="tone">
+          <option value="diplomatic" selected>Diplomatic (Missions)</option>
+          <option value="humanitarian">Humanitarian (NGOs)</option>
+          <option value="media">Media (Editors/Opinion)</option>
+          <option value="technical">Technical (IAEA/ICRC/OSCE)</option>
+        </select>
+      </div>
+      <div>
+        <label for="citationStyle">Citation Style</label>
+        <select id="citationStyle">
+          <option value="sup" selected>Superscript [1]</option>
+          <option value="sub">Subscript [1]</option>
+          <option value="append">Appended [1]</option>
+          <option value="none">None</option>
+        </select>
+      </div>
+      <div>
+        <label for="subject">Subject</label>
+        <input type="text" id="subject" value="Ukraine Proposes 72‑Hour Humanitarian Switch: Relief Without Concessions" />
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="generate">Generate Draft</button>
+      <button id="refresh" class="secondary">Refresh Variation</button>
+      <button id="copy" class="ghost">Copy Body</button>
+      <button id="gmail" class="ghost">Open in Gmail</button>
+    </div>
+    <div class="hr"></div>
+    <div class="tiny muted">Tips: Send missions individually (personalize greeting). Use Bcc for NGOs/media. Attach <b>72_Hour_Switch_Briefing_LongForm.pdf</b>.</div>
+  </div>
+
+  <div class="card">
+    <div class="row">
+      <div class="section-title">Preview</div>
+      <span class="badge right" id="variantLabel">Variant A</span>
+    </div>
+    <div id="preview" class="preview"></div>
+    <div id="footnotes" class="footnotes"></div>
+  </div>
+
+  <div class="card warn">
+    <div class="section-title">Built‑in Citations / Attestations</div>
+    <div class="tiny">These are used when you choose Superscript/Subscript/Appended styles.</div>
+    <ul class="tiny">
+      <li>[1] UN Charter (Purposes &amp; Principles; territorial integrity)</li>
+      <li>[2] Geneva Conventions III &amp; IV (prisoners and civilian protection)</li>
+      <li>[3] Rome Statute of the ICC (accountability &amp; justice framework)</li>
+      <li>[4] IAEA “Seven Pillars” of Nuclear Safety (applied to ZNPP)</li>
+      <li>[5] 2022 Black Sea Grain Initiative – JCC mechanism (precedent for safeguarded corridors)</li>
+    </ul>
+  </div>
+
+  <div class="card success">
+    <div class="section-title">How it works</div>
+    <ol class="tiny">
+      <li>Select the recipient and tone; choose a citation style.</li>
+      <li>Click <b>Generate Draft</b>. Use <b>Refresh Variation</b> to cycle different openings/closings.</li>
+      <li><b>Copy Body</b> to clipboard or <b>Open in Gmail</b> (subject &amp; body prefilled).</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+// ---------------- Data ----------------
+const recipients = [
+  {label:"Ukraine Mission to the UN", email:"ukraine@un.int", category:"mission"},
+  {label:"UN Secretary‑General’s Office", email:"sgcentral@un.org", category:"un"},
+  {label:"UN OCHA", email:"ochareporting@un.org", category:"un"},
+  {label:"UNICEF HQ", email:"info@unicef.org", category:"ngo"},
+  {label:"IAEA Official", email:"official.mail@iaea.org", category:"technical"},
+  {label:"ICRC Geneva", email:"info@icrc.org", category:"ngo"},
+  {label:"US Mission to the UN", email:"usunpublicaffairs@state.gov", category:"mission"},
+  {label:"EU Mission to the UN", email:"delegation-new-york@eeas.europa.eu", category:"mission"},
+  {label:"UK Mission to the UN", email:"uk@un.int", category:"mission"},
+  {label:"Turkish Mission to the UN", email:"turkey@un.int", category:"mission"},
+  {label:"UAE Mission to the UN", email:"uaemissionny@mofaic.gov.ae", category:"mission"},
+  {label:"Swiss Mission to the UN", email:"mission-newyork@eda.admin.ch", category:"mission"},
+  {label:"BBC World Desk", email:"world@bbc.co.uk", category:"media"},
+  {label:"Reuters Editors", email:"editors@reuters.com", category:"media"},
+  {label:"NYT Foreign Desk", email:"foreign@nytimes.com", category:"media"}
+];
+
+const openings = {
+  diplomatic:[
+    "Excellency,",
+    "Dear Ambassador,",
+    "Dear Mission Colleagues,"
+  ],
+  humanitarian:[
+    "Dear Colleagues,",
+    "Dear Humanitarian Partners,",
+    "Dear Team,"
+  ],
+  media:[
+    "Dear Editor,",
+    "To the International Desk,",
+    "Dear News Team,"
+  ],
+  technical:[
+    "Dear Colleagues,",
+    "Dear Technical Team,",
+    "Dear Secretariat,"
+  ]
+};
+
+const hooks = {
+  diplomatic:[
+    "Please find attached the long‑form executive summary of Ukraine’s proposed <b>72‑Hour Switch Humanitarian Armistice</b>.",
+    "Attached is Ukraine’s <b>72‑Hour Switch</b> proposal—an immediately actionable, time‑bound humanitarian corridor.",
+    "We submit the long‑form brief for the <b>72‑Hour Switch</b>—a rapid humanitarian pause without concessions."
+  ],
+  humanitarian:[
+    "Attached is the long‑form brief for Ukraine’s <b>72‑Hour Switch</b>—a rapid, time‑bound mechanism to reduce harm to civilians.",
+    "We are sharing the long‑form summary of Ukraine’s <b>72‑Hour Switch</b> to accelerate child repatriation and protect essential services.",
+    "Please see the attached long‑form executive summary—Ukraine’s <b>72‑Hour Switch</b>—focused on children, medical personnel, and civilian protections."
+  ],
+  media:[
+    "Attached is a long‑form executive summary of Ukraine’s <b>72‑Hour Switch</b> humanitarian initiative for your review.",
+    "We’re sharing a detailed brief on Ukraine’s proposed <b>72‑Hour Switch</b>—a time‑bound humanitarian mechanism.",
+    "Please find the long‑form briefing on Ukraine’s <b>72‑Hour Switch</b>, designed for immediate humanitarian impact."
+  ],
+  technical:[
+    "Attached is the long‑form brief on Ukraine’s <b>72‑Hour Switch</b>, with mechanisms aligned to established verification and safety protocols.",
+    "Please review the long‑form executive summary—Ukraine’s <b>72‑Hour Switch</b>—with references to monitoring and safeguards implementation.",
+    "We submit the long‑form brief for Ukraine’s <b>72‑Hour Switch</b>, designed to integrate with existing oversight mechanisms."
+  ]
+};
+
+const coreBullets = {
+  base:[
+    "Time‑bound: <b>72 hours</b> for immediate relief; limited, reviewable scope.",
+    "Human‑centered: priority on child repatriation, prisoner exchanges, and protection of nuclear & energy facilities.",
+    "Zero‑concession: maintains territorial integrity and preserves justice tracks."
+  ],
+  mission:[
+    "Seek alignment within WEOG and explore SC/GA support channels.",
+    "Daily public reporting ensures transparent compliance and rapid accountability."
+  ],
+  ngo:[
+    "UNICEF/ICRC‑led operations for children and prisoners.",
+    "Protection of power and water systems to reduce civilian harm."
+  ],
+  media:[
+    "Independent verification and daily public reporting are integral to the proposal.",
+    "Storylines: child protection, nuclear risk reduction, and food/energy security."
+  ],
+  technical:[
+    "Integrates IAEA access at ZNPP per the ‘Seven Pillars’ for nuclear safety.",
+    "Leverages JCC template for safeguarded grain corridors and logistics."
+  ]
+};
+
+const closers = {
+  diplomatic:[
+    "We respectfully request your review and support to advance this within your mandate.",
+    "Grateful for your consideration and guidance on next procedural steps.",
+    "We stand ready to brief at your convenience and coordinate with partners."
+  ],
+  humanitarian:[
+    "Your partnership is pivotal to accelerate safe returns and protect civilians.",
+    "We welcome coordination to activate child and prisoner protection pathways.",
+    "Thank you for your continued leadership on humanitarian protection."
+  ],
+  media:[
+    "Available for background and clarifications. Thank you for your attention.",
+    "We can facilitate briefings and provide updates as needed.",
+    "Thank you for covering humanitarian issues with rigor and care."
+  ],
+  technical:[
+    "We welcome technical consultations to align verification and safety protocols.",
+    "Ready to coordinate operational details with your teams.",
+    "Thank you for your continued diligence on protection standards."
+  ]
+};
+
+// footnote text
+const footnotesText = [
+  "[1] UN Charter – Purposes & Principles; territorial integrity.",
+  "[2] Geneva Conventions III & IV – protection of prisoners and civilians.",
+  "[3] Rome Statute of the ICC – accountability and justice framework.",
+  "[4] IAEA ‘Seven Pillars’ of Nuclear Safety – applied to ZNPP.",
+  "[5] 2022 Black Sea Grain Initiative – JCC as precedent for safeguarded corridors."
+];
+
+// per-category citation mapping
+const citeMap = {
+  mission:[1,2,5],
+  un:[1,2,3,5],
+  ngo:[2,3,5],
+  media:[1,2,5],
+  technical:[1,2,4,5]
+};
+
+// utility
+function randPick(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+// citation injector
+function applyCitations(text, cites, style){
+  if(style==="none" || !cites?.length) return text;
+  let suffix = "";
+  if(style==="append"){
+    suffix = " " + cites.map((n)=>`[${n}]`).join(" ");
+    return text + suffix;
+  }
+  // sup or sub inline after the first sentence end or title phrase
+  const marker = (style==="sup") ? (n)=>`<sup>[${n}]</sup>` : (n)=>`<sub>[${n}]</sub>`;
+  // Append first two references near relevant phrases if possible
+  let t = text
+    .replace("territorial integrity", `territorial integrity ${marker(1)}`)
+    .replace("children", `children ${marker(2)}`)
+    .replace("nuclear", `nuclear ${marker(4)}`)
+    .replace("grain", `grain ${marker(5)}`);
+  // ensure at least the first reference appears
+  if(!t.includes("[1]")) t += " " + marker(1);
+  return t;
+}
+
+// build body
+function buildBody(recipient, tone, style){
+  const openSet = openings[tone] || openings.diplomatic;
+  const hookSet = hooks[tone] || hooks.diplomatic;
+  const closerSet = closers[tone] || closers.diplomatic;
+  const base = coreBullets.base.map(b=>"- "+b);
+  const extra = coreBullets[recipient.category] || coreBullets[tone] || [];
+  const cites = citeMap[recipient.category] || [1,2,5];
+
+  const greet = randPick(openSet);
+  const hook = randPick(hookSet);
+  const close = randPick(closerSet);
+
+  const urgency = `<div class="quote">Every day without action: more deported children, greater nuclear risk, deeper civilian suffering.</div>`;
+
+  let body = `${greet}
+
+${applyCitations(hook, cites, style)}
+
+Key points:
+${[...base, ...extra.map(b=>"- "+b)].join("\n")}
+
+${urgency}
+
+Attached: 72_Hour_Switch_Briefing_LongForm.pdf
+
+With appreciation,
+Ukraine Mission Strategic Planning Office
+Permanent Mission of Ukraine to the United Nations
+UN Headquarters, New York`;
+
+  return body;
+}
+
+// populate recipient select
+const sel = document.getElementById("recipient");
+recipients.forEach(r=>{
+  const opt = document.createElement("option");
+  opt.value = r.email;
+  opt.textContent = `${r.label} — ${r.email}`;
+  opt.dataset.category = r.category;
+  sel.appendChild(opt);
+});
+
+// state
+let variantIndex = 0;
+
+function generate(){
+  const tone = document.getElementById("tone").value;
+  const style = document.getElementById("citationStyle").value;
+  const subject = document.getElementById("subject").value;
+  const opt = sel.options[sel.selectedIndex];
+  const recipient = {
+    label: opt.textContent.split(" — ")[0],
+    email: opt.value,
+    category: opt.dataset.category
+  };
+
+  // switch variation (just toggles random seed)
+  Math.random(); // consume
+  const body = buildBody(recipient, tone, style);
+
+  // render
+  document.getElementById("variantLabel").textContent = "Variant " + String.fromCharCode(65 + (variantIndex % 26));
+  document.getElementById("preview").innerHTML = `<div><span class="pill">To</span> ${recipient.label} &lt;${recipient.email}&gt;</div>
+  <div class="pill">Subject</div> ${subject}
+  <div class="hr"></div>
+  ${body}`;
+
+  // footnotes
+  const cites = citeMap[recipient.category] || [1,2,5];
+  const styleSel = document.getElementById("citationStyle").value;
+  const fn = (styleSel==="none") ? "" : "<b>References / Attestations</b><br>" + cites.map(i=>" "+footnotesText[i-1]).join("<br>");
+  document.getElementById("footnotes").innerHTML = fn;
+
+  // store for actions
+  window._currentDraft = {recipient, subject, body: body.replace(/<div class="quote">/g,"").replace(/<\/div>/g,"")};
+}
+
+document.getElementById("generate").addEventListener("click", ()=>{ variantIndex=0; generate(); });
+document.getElementById("refresh").addEventListener("click", ()=>{ variantIndex++; generate(); });
+
+document.getElementById("copy").addEventListener("click", ()=>{
+  if(!window._currentDraft){ generate(); }
+  navigator.clipboard.writeText(window._currentDraft.body).then(()=>{
+    alert("Email body copied to clipboard.");
+  });
+});
+
+document.getElementById("gmail").addEventListener("click", ()=>{
+  if(!window._currentDraft){ generate(); }
+  const {recipient, subject, body} = window._currentDraft;
+  const url = "https://mail.google.com/mail/?view=cm&fs=1" +
+              "&to=" + encodeURIComponent(recipient.email) +
+              "&su=" + encodeURIComponent(subject) +
+              "&body=" + encodeURIComponent(body);
+  window.open(url, "_blank");
+});
+
+// initial
+generate();
+</script>
+</body>
+</html>
+"""
+path = "/mnt/data/recipient_email_generator.html"
+with open(path, "w", encoding="utf-8") as f:
+    f.write(html)
+
+path
+

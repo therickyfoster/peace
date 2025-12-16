@@ -1,0 +1,1998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- 
+    Provenance: Planetary Restoration Archive | planetaryrestorationarchive.com
+    GitHub: github.com/therickyfoster | Steward: Foster + Navi
+    
+    ZERO-HARM DECLARATION:
+    This dashboard is designed for peaceful coordination, transparency, and harm reduction.
+    It is not to be weaponized, repurposed for surveillance, or used to endanger individuals
+    or communities. All data collection is consent-based and locally stored. Use responsibly.
+    
+    LICENSE: CC-BY-4.0 with Non-Weaponization Clause
+  -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>World Peace Progress • Enhanced Dashboard</title>
+  <meta name="description" content="A comprehensive, gamified, offline-capable dashboard tracking global peace progress with verified multi-source evidence and zero-harm principles." />
+  <meta name="generator" content="Foster + Navi · Planetary Restoration Archive" />
+  <meta name="theme-color" content="#19e3c2" />
+  <link rel="me" href="https://planetaryrestorationarchive.com" />
+  <link rel="me" href="https://github.com/TheRickyFoster" />
+  <link rel="manifest" href="#" id="manifest-placeholder" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%2300c2a8' d='M128 16a112 112 0 1 0 0 224a112 112 0 0 0 0-224Zm0 24a88 88 0 1 1 0 176a88 88 0 0 1 0-176Z'/%3E%3Cpath fill='%2300c2a8' d='M128 48c-28.67 20.4-48 49.9-48 80c0 30.1 19.33 59.6 48 80c28.67-20.4 48-49.9 48-80c0-30.1-19.33-59.6-48-80Z'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous" onerror="window.leafletCSSFailed=true">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous" onerror="window.leafletFailed=true"></script>
+  <style>
+    /* ===== BASE & THEME SYSTEM ===== */
+    :root {
+      --bg: #0b0f14; --panel: #0f1520; --muted: #6b7b8d; --text: #e6f2f0; 
+      --brand: #19e3c2; --brand-2: #78ffd6; --accent: #b2f7ef; 
+      --danger: #ff6b6b; --warn: #ffd166; --ok: #06d6a0; 
+      --card: #0c121a; --ring: #183048; --border: #1a2432;
+      --shadow: rgba(0,0,0,0.3); --glow: rgba(25,227,194,0.15);
+    }
+    
+    /* Medieval Theme */
+    [data-theme="medieval"] {
+      --bg: #1a0f0a; --panel: #2d1810; --card: #241508;
+      --text: #f4e4c1; --muted: #9d8264; --brand: #d4af37; --brand-2: #f4e4c1;
+      --accent: #cd853f; --border: #4a3520; --ring: #5d3a1a;
+    }
+    
+    /* Space Theme */
+    [data-theme="space"] {
+      --bg: #000308; --panel: #0a0e1f; --card: #050814;
+      --text: #e0f2ff; --muted: #7a8fb5; --brand: #00d9ff; --brand-2: #a78bfa;
+      --accent: #f0abfc; --border: #1e3a8a; --ring: #1e40af;
+    }
+    
+    /* Anime Theme */
+    [data-theme="anime"] {
+      --bg: #fef5ff; --panel: #ffe4f5; --card: #fff0fa;
+      --text: #2d1b3d; --muted: #8b5a9e; --brand: #ff6b9d; --brand-2: #c084fc;
+      --accent: #a855f7; --border: #f0abfc; --ring: #d8b4fe;
+      --shadow: rgba(168,85,247,0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow-x: hidden; }
+    
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.5s, color 0.5s;
+    }
+
+    /* ===== BACKGROUND EFFECTS ===== */
+    .stars, .twinkle { position: fixed; inset: 0; pointer-events: none; z-index: -1; }
+    .stars {
+      background: transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="3" height="3"><circle cx="1" cy="1" r="1" fill="white"/></svg>') repeat;
+      background-size: 3px 3px; opacity: 0.12;
+    }
+    .twinkle {
+      background-image: radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.5), transparent 2px),
+        radial-gradient(1px 1px at 90% 30%, rgba(255,255,255,0.5), transparent 2px),
+        radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5), transparent 2px);
+      animation: twinkle 4s infinite alternate ease-in-out;
+      opacity: 0.15;
+    }
+    @keyframes twinkle { to { opacity: 0.35; filter: drop-shadow(0 0 6px rgba(136,255,255,0.5)); } }
+
+    [data-theme="anime"] .stars, [data-theme="anime"] .twinkle { display: none; }
+    [data-theme="anime"] body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,107,157,0.1), transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(168,85,247,0.1), transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* ===== SKIP LINK (Accessibility) ===== */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--brand);
+      color: #000;
+      padding: 8px;
+      z-index: 100;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .skip-link:focus { top: 0; }
+
+    /* ===== HEADER ===== */
+    header {
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, rgba(11,15,20,0.96), rgba(11,15,20,0.6));
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      z-index: 50;
+      transition: background 0.3s;
+    }
+    
+    [data-theme="anime"] header {
+      background: linear-gradient(180deg, rgba(254,245,255,0.96), rgba(255,228,245,0.8));
+    }
+
+    .wrap { max-width: 1400px; margin: 0 auto; padding: 16px; }
+    
+    .headline {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--brand), var(--brand-2));
+      box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--brand);
+      display: grid;
+      place-items: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .header-actions {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ===== GAMIFICATION HUD ===== */
+    .game-hud {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--card), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 0.9rem;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+    
+    .xp-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 180px;
+    }
+    
+    .xp-progress {
+      flex: 1;
+      height: 8px;
+      background: var(--ring);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--brand-2));
+      border-radius: 999px;
+      transition: width 0.6s ease;
+      box-shadow: 0 0 8px var(--glow);
+    }
+    
+    .level-badge {
+      background: var(--brand);
+      color: #000;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-weight: bold;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+
+    /* ===== BUTTONS & CONTROLS ===== */
+    .btn {
+      all: unset;
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+      user-select: none;
+      font-size: 0.9rem;
+      white-space: nowrap;
+    }
+    
+    .btn:hover:not(:disabled) {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px var(--glow);
+      transform: translateY(-1px);
+    }
+    
+    .btn:active:not(:disabled) {
+      transform: translateY(0);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #000;
+      border-color: var(--brand);
+      font-weight: 600;
+    }
+    
+    .btn-sm {
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    select.btn { appearance: none; }
+
+    /* ===== TOOLTIPS ===== */
+    [data-tooltip] {
+      position: relative;
+      cursor: help;
+    }
+    
+    [data-tooltip]::before {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-8px);
+      background: var(--card);
+      color: var(--text);
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      white-space: nowrap;
+      max-width: 300px;
+      white-space: normal;
+      width: max-content;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+      z-index: 100;
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    
+    [data-tooltip]:hover::before {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    /* ===== CARDS & GRID ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+    
+    .card {
+      background: linear-gradient(180deg, var(--card), var(--panel));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 30px var(--shadow);
+      transition: all 0.3s;
+      position: relative;
+    }
+    
+    .card:hover {
+      box-shadow: 0 12px 40px var(--shadow), 0 0 0 1px var(--brand);
+    }
+    
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .card h3 .icon {
+      font-size: 1.3em;
+    }
+
+    .section-help {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--muted);
+      color: var(--bg);
+      font-size: 12px;
+      font-weight: bold;
+      cursor: help;
+      margin-left: 6px;
+    }
+
+    /* ===== RINGS & METRICS ===== */
+    .ring {
+      width: 140px;
+      height: 140px;
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    
+    .ring svg {
+      transform: rotate(-90deg);
+    }
+    
+    .ring .num {
+      position: absolute;
+      font-weight: 700;
+      font-size: 1.8rem;
+    }
+    
+    .ring .label {
+      position: absolute;
+      bottom: 8px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* ===== VERIFICATION BADGES ===== */
+    .verification-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-left: 6px;
+    }
+    
+    .verified {
+      background: var(--ok);
+      color: #000;
+    }
+    
+    .partial {
+      background: var(--warn);
+      color: #000;
+    }
+    
+    .unverified {
+      background: var(--ring);
+      color: var(--muted);
+    }
+
+    /* ===== PILLS & TAGS ===== */
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+    
+    .tag {
+      display: inline-block;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 999px;
+      color: var(--accent);
+      margin: 2px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+    
+    .status-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    /* ===== TABLES ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+    
+    th {
+      color: var(--accent);
+      font-weight: 600;
+      background: var(--ring);
+    }
+    
+    tr:hover td {
+      background: var(--ring);
+    }
+    
+    tbody tr {
+      transition: background 0.2s;
+    }
+
+    /* ===== FORMS ===== */
+    input[type="text"],
+    input[type="number"],
+    input[type="url"],
+    input[type="email"],
+    input[type="search"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    /* ===== DETAILS/ACCORDION ===== */
+    details {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+    
+    details summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    
+    details summary:hover {
+      background: var(--ring);
+    }
+    
+    details[open] {
+      box-shadow: 0 8px 28px var(--shadow);
+    }
+    
+    details[open] summary {
+      border-bottom: 1px solid var(--border);
+    }
+    
+    details .content {
+      padding: 16px;
+    }
+    
+    summary::-webkit-details-marker {
+      display: none;
+    }
+    
+    .chevron {
+      transition: transform 0.25s;
+      display: inline-block;
+    }
+    
+    details[open] .chevron {
+      transform: rotate(90deg);
+    }
+
+    /* ===== MAP ===== */
+    #map {
+      height: 420px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 16px var(--shadow);
+      position: relative;
+    }
+    
+    #map-fallback {
+      width: 100%;
+      height: 420px;
+      background: var(--panel);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    /* ===== MODAL ===== */
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    
+    .modal.open {
+      display: flex;
+    }
+    
+    .modal .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 800px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ===== NOTIFICATIONS ===== */
+    .notification-container {
+      position: fixed;
+      top: 80px;
+      right: 20px;
+      z-index: 90;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 400px;
+    }
+    
+    .notification {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--brand);
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 8px 24px var(--shadow);
+      animation: slideIn 0.3s ease;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    
+    .notification.success { border-left-color: var(--ok); }
+    .notification.warning { border-left-color: var(--warn); }
+    .notification.error { border-left-color: var(--danger); }
+    
+    @keyframes slideIn {
+      from { transform: translateX(120%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .notification-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    
+    .notification-content {
+      flex: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    
+    .notification-message {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+    
+    .notification-close {
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* ===== ACHIEVEMENTS PANEL ===== */
+    .achievement-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--brand), var(--brand-2));
+      color: #000;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin: 4px;
+      box-shadow: 0 4px 12px var(--glow);
+    }
+    
+    .achievement-badge.locked {
+      background: var(--ring);
+      color: var(--muted);
+      opacity: 0.5;
+    }
+
+    /* ===== FOOTER ===== */
+    footer {
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      padding: 32px 0;
+      margin-top: 48px;
+    }
+    
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+      .headline { flex-direction: column; align-items: flex-start; }
+      .header-actions { margin-left: 0; width: 100%; justify-content: flex-start; }
+      .game-hud { flex-direction: column; }
+      .ring { width: 110px; height: 110px; }
+    }
+
+    @media print {
+      header, .header-actions, .btn, .modal, .notification-container { display: none !important; }
+      .card { page-break-inside: avoid; }
+      body { background: white; color: black; }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <div class="stars" aria-hidden="true"></div>
+  <div class="twinkle" aria-hidden="true"></div>
+
+  <header role="banner">
+    <div class="wrap">
+      <div class="headline">
+        <div class="logo" aria-hidden="true" role="img" aria-label="Peace dove icon">🕊️</div>
+        <div>
+          <h1 class="title">World Peace Progress Dashboard</h1>
+          <p class="subtitle">Citizen-led, verified multi-source tracker with zero-harm principles</p>
+        </div>
+        <div class="header-actions">
+          <div class="game-hud" data-tooltip="Track your contribution impact through experience points and achievements">
+            <div class="xp-bar">
+              <span class="level-badge" id="level-display">Lv 1</span>
+              <div class="xp-progress" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <div class="xp-fill" id="xp-fill"></div>
+              </div>
+              <span id="xp-display">0/100</span>
+            </div>
+            <button class="btn btn-sm" id="btn-achievements" data-tooltip="View your earned achievements and progress">
+              🏆 <span id="achievements-count">0/12</span>
+            </button>
+          </div>
+          <select id="theme-selector" class="btn" aria-label="Select visual theme">
+            <option value="default">🎨 Default</option>
+            <option value="medieval">⚔️ Medieval</option>
+            <option value="space">🚀 Space</option>
+            <option value="anime">✨ Anime</option>
+          </select>
+          <select id="lang" class="btn" aria-label="Select language">
+            <option value="en">🇬🇧 EN</option>
+            <option value="es">🇪🇸 ES</option>
+            <option value="fr">🇫🇷 FR</option>
+          </select>
+          <button class="btn" id="btn-edit" data-tooltip="Enable editing mode to modify dashboard data">
+            ✏️ <span id="edit-label">View</span>
+          </button>
+          <button class="btn" id="btn-refresh" data-tooltip="Refresh all data and re-render the dashboard">
+            🔄 <span data-i18n="refresh">Refresh</span>
+          </button>
+          <button class="btn" id="btn-export" data-tooltip="Export current dashboard state as JSON snapshot">
+            📤 <span data-i18n="export">Export</span>
+          </button>
+          <label class="btn" data-tooltip="Import a previously exported JSON snapshot">
+            📥 <input id="file-import" type="file" accept="application/json" style="display:none" aria-label="Import file" />
+            <span data-i18n="import">Import</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="main-content" tabindex="-1">
+    <section class="grid" style="margin-top: 24px;">
+
+      <!-- Today's Snapshot -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">📊</span>
+          Today's Snapshot 
+          <span class="muted" id="today"></span>
+          <span class="section-help" data-tooltip="Overview: Real-time metrics derived from verified, multi-source evidence. Green = verified by multiple independent sources, Yellow = single source, Red = no verification. Metrics update automatically as RSS feeds are processed for corroborating evidence.">?</span>
+        </h3>
+        <div style="display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+          <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <div class="ring" data-key="ceasefiresPct" data-tooltip="Percentage based on verified ceasefire announcements from multiple independent sources">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+                <circle cx="70" cy="70" r="60" stroke="var(--ring)" stroke-width="14" fill="none"/>
+                <circle class="bar" cx="70" cy="70" r="60" stroke="var(--brand)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="num">0%</div>
+              <div class="label">Ceasefire Coverage<span class="verification-badge unverified" id="verify-cease">Unverified</span></div>
+            </div>
+            <div class="ring" data-key="aidRoutesOpenPct" data-tooltip="Percentage based on verified humanitarian corridor reports from trusted NGOs and news sources">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+                <circle cx="70" cy="70" r="60" stroke="var(--ring)" stroke-width="14" fill="none"/>
+                <circle class="bar" cx="70" cy="70" r="60" stroke="var(--brand-2)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="num">0%</div>
+              <div class="label">Aid Routes Open<span class="verification-badge unverified" id="verify-aid">Unverified</span></div>
+            </div>
+            <div class="ring" data-key="talksActivePct" data-tooltip="Percentage based on verified peace negotiation reports from diplomatic sources and reputable media">
+              <svg width="140" height="140" viewBox="0 0 140 140" aria-hidden="true">
+                <circle cx="70" cy="70" r="60" stroke="var(--ring)" stroke-width="14" fill="none"/>
+                <circle class="bar" cx="70" cy="70" r="60" stroke="var(--accent)" stroke-width="14" stroke-linecap="round" fill="none" stroke-dasharray="376.99" stroke-dashoffset="376.99"/>
+              </svg>
+              <div class="num">0%</div>
+              <div class="label">Talks Underway<span class="verification-badge unverified" id="verify-talks">Unverified</span></div>
+            </div>
+          </div>
+          <div style="min-width: 280px; max-width: 540px;">
+            <div class="pill" data-tooltip="Overall momentum based on multi-source verified data">
+              <span class="status-dot" id="momentum-dot" style="background: var(--warn);"></span>
+              <strong id="momentum-label">Moderate Momentum</strong>
+              <span class="muted" id="verification-summary">(0 verified claims)</span>
+            </div>
+            <p class="muted" style="margin-top: 12px; font-size: 0.9rem;">
+              This dashboard uses multi-source verification to ensure factual accuracy. Metrics reflect only claims corroborated by multiple independent, reputable sources including trusted NGOs, verified journalists, and official statements from both parties in conflicts.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Verification Status -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">✓</span>
+          Multi-Source Verification Status
+          <span class="section-help" data-tooltip="Verification Engine: Tracks claims across feeds, identifies corroboration from independent sources, and maintains source credibility scores. Only claims verified by multiple trusted sources impact metrics.">?</span>
+        </h3>
+        <details>
+          <summary>
+            <span class="chevron">▶</span>
+            View Verification Details
+          </summary>
+          <div class="content">
+            <div id="verification-details" style="margin-top: 12px;">
+              <p class="muted">Processing RSS feeds for verifiable claims. Add trusted feeds below to begin verification.</p>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Global Map -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🗺️</span>
+          Global Peace Map
+          <span class="section-help" data-tooltip="Interactive Map: Visualize tracked regions. Add coordinates to pin regions. Map supports offline operation with fallback canvas rendering if Leaflet CDN is unavailable.">?</span>
+        </h3>
+        <p class="muted">Add regions with coordinates to place markers. Map tiles load online with offline fallback.</p>
+        <div id="map" role="application" aria-label="Interactive global peace map"></div>
+        <canvas id="map-fallback" aria-label="Fallback map canvas"></canvas>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <input id="coord-lat" placeholder="Latitude" type="number" step="any" aria-label="Latitude coordinate" style="width: 180px;" />
+          <input id="coord-lng" placeholder="Longitude" type="number" step="any" aria-label="Longitude coordinate" style="width: 180px;" />
+          <button class="btn" id="btn-locate">📍 Use my location</button>
+          <button class="btn" id="btn-center-map">🎯 Center on regions</button>
+        </div>
+      </div>
+
+      <!-- Peace Logbook -->
+      <div class="card" style="grid-column: span 8;">
+        <h3>
+          <span class="icon">📝</span>
+          Peace Logbook (Community Evidence)
+          <span class="section-help" data-tooltip="Evidence Log: Document peace events with sources. Each entry can contribute to verification if corroborated by RSS feeds. +10 XP per entry.">?</span>
+        </h3>
+        <p class="muted">Log events with source links. Entries are cross-referenced with RSS feeds for verification.</p>
+        <div style="display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap;">
+          <input id="entry-text" placeholder="New entry: e.g., 24h ceasefire announced in Region X" style="flex: 1; min-width: 300px;" aria-label="Entry text" />
+          <input id="entry-link" placeholder="Source URL" type="url" style="width: 280px;" aria-label="Source URL" />
+          <button class="btn btn-primary" id="btn-add">➕ Add Entry</button>
+        </div>
+        <div style="margin: 8px 0;">
+          <input type="search" id="log-search" placeholder="Filter log entries..." style="width: 100%;" aria-label="Filter log entries" />
+        </div>
+        <div style="overflow-x: auto;">
+          <table id="log-table" aria-label="Peace evidence logbook">
+            <thead>
+              <tr>
+                <th>When</th>
+                <th>Entry</th>
+                <th>Source</th>
+                <th>Tags</th>
+                <th>Verification</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Source Credibility -->
+      <div class="card" style="grid-column: span 4;">
+        <h3>
+          <span class="icon">📊</span>
+          Source Credibility Tracker
+          <span class="section-help" data-tooltip="Tracks reputation scores for sources based on verification patterns and corroboration with other trusted sources. Higher scores indicate more reliable sources.">?</span>
+        </h3>
+        <p class="muted" style="margin-bottom: 12px;">Track reliability of information sources based on verification history.</p>
+        <div id="source-credibility-list" style="max-height: 350px; overflow-y: auto;">
+          <p class="muted">Add RSS feeds to begin tracking source credibility.</p>
+        </div>
+      </div>
+
+      <!-- Regions & Corridors -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🌍</span>
+          Regions & Corridors
+          <span class="section-help" data-tooltip="Region Tracker: Manage conflict regions with status tracking and coordinates for map markers.">?</span>
+        </h3>
+        <details>
+          <summary>
+            <span class="chevron">▶</span>
+            Manage Regions
+          </summary>
+          <div class="content">
+            <div style="display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap;">
+              <input id="region-name" placeholder="Region name" style="flex: 1; min-width: 200px;" aria-label="Region name" />
+              <select id="region-status" aria-label="Region status" style="width: 180px;">
+                <option value="monitoring">👁️ Monitoring</option>
+                <option value="talks">🤝 Talks Underway</option>
+                <option value="ceasefire">🕊️ Ceasefire</option>
+                <option value="aid-open">📦 Aid Open</option>
+                <option value="escalation">⚠️ Escalation Risk</option>
+              </select>
+              <button class="btn btn-primary" id="btn-add-region">➕ Add Region</button>
+            </div>
+            <div style="overflow-x: auto;">
+              <table id="regions-table" aria-label="Tracked regions">
+                <thead>
+                  <tr>
+                    <th>Region</th>
+                    <th>Status</th>
+                    <th>Last Update</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Reconciliation Milestones -->
+      <div class="card" style="grid-column: span 6;">
+        <h3>
+          <span class="icon">🤲</span>
+          Reconciliation Milestones
+          <span class="section-help" data-tooltip="Track peace-building actions like prisoner exchanges, truth commissions, joint programs. +15 XP per milestone.">?</span>
+        </h3>
+        <p class="muted">Track truth and reconciliation, prisoner exchanges, joint initiatives.</p>
+        <ul id="recon-list" style="margin: 12px 0; padding-left: 24px; max-height: 300px; overflow-y: auto;"></ul>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <input id="recon-text" placeholder="e.g., Prisoner exchange completed; Truth commission convened" style="flex: 1;" aria-label="Reconciliation milestone" />
+          <button class="btn btn-primary" id="btn-add-recon">➕ Add Milestone</button>
+        </div>
+      </div>
+
+      <!-- Citizen Actions -->
+      <div class="card" style="grid-column: span 6;">
+        <h3>
+          <span class="icon">🫶</span>
+          Citizen Actions (Peace Ripple)
+          <span class="section-help" data-tooltip="Log tangible peace actions. Each action adds to counters and generates XP.">?</span>
+        </h3>
+        <p class="muted">Track advocacy, donations, dialogue facilitation, online de-escalation.</p>
+        <div style="overflow-x: auto; max-height: 280px; overflow-y: auto;">
+          <table id="actions-table" aria-label="Citizen peace actions">
+            <thead>
+              <tr>
+                <th>Action Type</th>
+                <th>Total Count</th>
+                <th>Last 7d</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <input id="action-name" placeholder="Action type (e.g., Aid donation)" style="flex: 1; min-width: 200px;" aria-label="Action name" />
+          <input id="action-increment" type="number" value="1" min="1" style="width: 100px;" aria-label="Action count" />
+          <button class="btn btn-primary" id="btn-add-action">➕ Log Action</button>
+        </div>
+      </div>
+
+      <!-- Trusted RSS Feeds -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">📡</span>
+          Trusted Feeds (Multi-Source Verification)
+          <span class="section-help" data-tooltip="Add RSS feeds from trusted sources. The system automatically extracts claims and requires corroboration from multiple independent sources before reflecting in metrics.">?</span>
+        </h3>
+        <p class="muted">Add public RSS/Atom feeds from trusted sources. Claims are extracted and verified across multiple sources.</p>
+        <div style="display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap;">
+          <input id="feed-url" placeholder="https://example.org/feed.xml" type="url" style="flex: 1; min-width: 300px;" aria-label="Feed URL" />
+          <input id="feed-proxy" placeholder="Proxy (optional, e.g., https://corsproxy.io/? )" style="width: 320px;" aria-label="CORS proxy URL" />
+          <button class="btn" id="btn-add-feed">➕ Add Feed</button>
+          <button class="btn" id="btn-refresh-feeds">🔃 Refresh Feeds</button>
+        </div>
+        <div id="feeds" class="grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin-top: 16px;"></div>
+      </div>
+
+      <!-- AI Hooks & Plugins -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🤖</span>
+          AI Expansion Hooks & Plugins
+          <span class="section-help" data-tooltip="Plugin System: Stable extension points for aligned AIs with JSON-LD manifest.">?</span>
+        </h3>
+        <p class="muted">Stable extension nodes for aligned AI agents with zero-harm design.</p>
+        <ul id="ai-hooks-list" style="margin: 12px 0; padding-left: 24px;"></ul>
+        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <button class="btn" id="btn-register-sample">🧩 Register Sample Plugin</button>
+          <button class="btn" id="btn-dump-hooks">📄 Export Hooks Manifest</button>
+        </div>
+        <script type="application/json" id="hooks-manifest">
+        {
+          "version": "2.0",
+          "ethos": "zero-harm, multi-source-verification, cite-all-sources",
+          "nodes": [
+            {
+              "id": "logbook.enricher",
+              "selector": "#log-table tbody",
+              "capabilities": ["append-rows", "link-verification", "cross-reference-feeds"],
+              "constraints": "client-only unless explicit user consent"
+            },
+            {
+              "id": "regions.map-layer",
+              "selector": "#map",
+              "capabilities": ["add-geojson", "heatmap", "corridor-drawing"],
+              "constraints": "client-only, no tracking"
+            },
+            {
+              "id": "verification.analyzer",
+              "selector": "#verification-details",
+              "capabilities": ["claim-extraction", "source-corroboration", "credibility-scoring"],
+              "requires": ["multi-source-validation", "source-citation"]
+            }
+          ]
+        }
+        </script>
+      </div>
+
+      <!-- Live Chat Integration -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">💬</span>
+          Live Dialogue (tlk.io)
+          <span class="section-help" data-tooltip="Public coordination channel. Keep zero-harm ethos and cite sources.">?</span>
+        </h3>
+        <p class="muted">Public coordination chat. Maintain zero-harm ethos and cite sources.</p>
+        <div style="display: flex; gap: 8px; margin: 8px 0; flex-wrap: wrap;">
+          <input id="tlk-channel" placeholder="channel-name" value="world-peace-initiative" style="width: 280px;" aria-label="Chat channel name" />
+          <button class="btn" id="btn-load-tlk">💬 Load Chat</button>
+        </div>
+        <div id="tlk-wrap" style="width: 100%; height: 480px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: none; margin-top: 12px;">
+          <iframe id="tlk-iframe" title="tlk.io public chat" style="border: 0; width: 100%; height: 100%;" allow="clipboard-read; clipboard-write"></iframe>
+        </div>
+      </div>
+
+      <!-- Transparency & Signatures -->
+      <div class="card" style="grid-column: span 12;">
+        <h3>
+          <span class="icon">🔐</span>
+          Transparency & Signatures
+          <span class="section-help" data-tooltip="Cryptographic signing using WebCrypto when in secure context (HTTPS/localhost). Requires secure environment to function.">?</span>
+        </h3>
+        <details>
+          <summary>
+            <span class="chevron">▶</span>
+            Create Signed Snapshot
+          </summary>
+          <div class="content">
+            <div id="crypto-status" style="padding: 12px; background: var(--ring); border-radius: 8px; margin-bottom: 12px;"></div>
+            <p class="muted">Use browser WebCrypto to sign exported JSON snapshots for authenticity verification.</p>
+            <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+              <button class="btn" id="btn-generate-key">🆕 Generate Key Pair</button>
+              <button class="btn btn-primary" id="btn-sign-webcrypto">🔐 Sign Snapshot</button>
+              <span class="muted" id="sig-status" style="display: flex; align-items: center;"></span>
+            </div>
+            <div style="margin-top: 16px;">
+              <label>
+                Public Key (share for verification)
+                <textarea id="pub-key-display" readonly style="width: 100%; min-height: 80px; font-family: monospace; font-size: 0.85rem;" aria-label="Public key"></textarea>
+              </label>
+            </div>
+          </div>
+        </details>
+      </div>
+
+    </section>
+  </main>
+
+  <footer role="contentinfo">
+    <div class="wrap">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+        <div>
+          <div>🕊️ Built for citizens everywhere • Zero-harm ethos • Offline capable</div>
+          <div class="sr-only" aria-hidden="false">
+            Provenance: Planetary Restoration Archive (planetaryrestorationarchive.com) | 
+            GitHub: TheRickyFoster | Steward: Foster + Navi
+          </div>
+        </div>
+        <div class="muted">
+          Version <span id="ver">2.1.0</span> • 
+          <button id="btn-reset" class="btn btn-sm" style="display: inline-flex;">Reset Data</button>
+        </div>
+      </div>
+      <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);">
+        <p class="muted" style="font-size: 0.85rem;">
+          <strong>Anti-Inversion & Safety:</strong> This dashboard is designed for peaceful coordination and harm reduction. 
+          It must not be weaponized, used for surveillance, or repurposed to endanger individuals or communities. 
+          All features respect consent and use IndexedDB for persistent local storage.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Notification Container -->
+  <div class="notification-container" id="notifications" role="status" aria-live="polite"></div>
+
+  <!-- Achievements Modal -->
+  <div class="modal" id="achievements-modal" role="dialog" aria-modal="true" aria-labelledby="ach-title">
+    <div class="panel">
+      <h3 id="ach-title">🏆 Your Achievements</h3>
+      <div id="achievements-list" style="margin: 20px 0;"></div>
+      <div style="display: flex; justify-content: flex-end; gap: 8px;">
+        <button class="btn" id="ach-close">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ============================================
+  // CORE STATE MANAGEMENT WITH INDEXEDDB
+  // ============================================
+  const VERSION = '2.1.0';
+  const DB_NAME = 'PeaceDashboard';
+  const DB_VERSION = 1;
+  const STORE_NAME = 'state';
+
+  let db = null;
+  let state = null;
+
+  // Initialize IndexedDB
+  async function initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, DB_VERSION);
+      
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        db = request.result;
+        resolve(db);
+      };
+      
+      request.onupgradeneeded = (event) => {
+        const database = event.target.result;
+        if (!database.objectStoreNames.contains(STORE_NAME)) {
+          database.createObjectStore(STORE_NAME);
+        }
+      };
+    });
+  }
+
+  // Load state from IndexedDB
+  async function loadState() {
+    if (!db) await initDB();
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readonly');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.get('dashboard-state');
+      
+      request.onsuccess = () => {
+        const data = request.result;
+        resolve(data || defaultState());
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  // Save state to IndexedDB
+  async function saveState() {
+    if (!db) await initDB();
+    state.updatedAt = new Date().toISOString();
+    
+    return new Promise((resolve, reject) => {
+      const transaction = db.transaction([STORE_NAME], 'readwrite');
+      const store = transaction.objectStore(STORE_NAME);
+      const request = store.put(state, 'dashboard-state');
+      
+      request.onsuccess = () => {
+        render();
+        resolve();
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  const el = (q, root = document) => root.querySelector(q);
+  const els = (q, root = document) => Array.from(root.querySelectorAll(q));
+
+  // Provenance watermark (obfuscated)
+  (function injectProvenance() {
+    const watermark = document.createElement('div');
+    watermark.style.cssText = 'position:fixed;bottom:-100px;right:-100px;opacity:0.01;pointer-events:none;font-size:1px;';
+    watermark.textContent = 'This project was created by Ricky Foster - Planetary Restoration Archive - planetaryrestorationarchive.com - github.com/therickyfoster';
+    watermark.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(watermark);
+    
+    // Flash message during presentations
+    if (screen.width > 1920 || document.fullscreenElement) {
+      setTimeout(() => {
+        const flash = document.createElement('div');
+        flash.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.95);color:#fff;display:flex;align-items:center;justify-content:center;font-size:3rem;z-index:9999;animation:fadeOut 2s forwards;';
+        flash.textContent = 'This project was created by Ricky Foster';
+        document.body.appendChild(flash);
+        setTimeout(() => flash.remove(), 2000);
+      }, 3000);
+      const style = document.createElement('style');
+      style.textContent = '@keyframes fadeOut{to{opacity:0}}';
+      document.head.appendChild(style);
+    }
+  })();
+
+  const defaultState = () => ({
+    version: VERSION,
+    indicators: { ceasefiresPct: 0, aidRoutesOpenPct: 0, talksActivePct: 0 },
+    verification: {
+      claims: [],
+      sources: {},
+      verified: { ceasefires: [], aidRoutes: [], talks: [] }
+    },
+    settings: { theme: 'default', lang: 'en' },
+    gamification: { xp: 0, level: 1, achievements: [] },
+    momentum: 'low',
+    log: [],
+    regions: [],
+    reconciliations: [],
+    actions: {},
+    feeds: [],
+    keys: null,
+    signatures: [],
+    edit: { enabled: false },
+    hooksInstalled: [],
+    updatedAt: new Date().toISOString()
+  });
+
+  // ============================================
+  // INTERNATIONALIZATION
+  // ============================================
+  const STR = {
+    en: { refresh: 'Refresh', export: 'Export', import: 'Import', view: 'View', edit: 'Edit' },
+    es: { refresh: 'Actualizar', export: 'Exportar', import: 'Importar', view: 'Ver', edit: 'Editar' },
+    fr: { refresh: 'Rafraîchir', export: 'Exporter', import: 'Importer', view: 'Voir', edit: 'Éditer' }
+  };
+
+  // ============================================
+  // GAMIFICATION SYSTEM
+  // ============================================
+  const ACHIEVEMENTS = [
+    { id: 'first_entry', name: 'First Step', desc: 'Log your first peace entry', icon: '🌱', xp: 0 },
+    { id: 'ten_entries', name: 'Chronicler', desc: 'Log 10 entries', icon: '📚', xp: 10 },
+    { id: 'first_region', name: 'Cartographer', desc: 'Add your first region', icon: '🗺️', xp: 0 },
+    { id: 'five_regions', name: 'Global Watcher', desc: 'Track 5 regions', icon: '🌍', xp: 5 },
+    { id: 'first_recon', name: 'Peaceweaver', desc: 'Log first reconciliation', icon: '🕊️', xp: 0 },
+    { id: 'first_action', name: 'Ripple Starter', desc: 'Log your first citizen action', icon: '💫', xp: 0 },
+    { id: 'hundred_actions', name: 'Movement Builder', desc: 'Log 100 citizen actions', icon: '🌊', xp: 100 },
+    { id: 'feed_master', name: 'Information Curator', desc: 'Add 5 trusted feeds', icon: '📡', xp: 5 },
+    { id: 'level_5', name: 'Dedicated Advocate', desc: 'Reach level 5', icon: '⭐', xp: 0 },
+    { id: 'level_10', name: 'Peace Champion', desc: 'Reach level 10', icon: '👑', xp: 0 },
+    { id: 'signed_snapshot', name: 'Transparency Guardian', desc: 'Create a signed snapshot', icon: '🔐', xp: 0 },
+    { id: 'theme_explorer', name: 'Visual Voyager', desc: 'Try all 4 themes', icon: '🎨', xp: 0 }
+  ];
+
+  function addXP(amount, reason) {
+    state.gamification.xp += amount;
+    const xpForNextLevel = state.gamification.level * 100;
+    
+    if (state.gamification.xp >= xpForNextLevel) {
+      state.gamification.level++;
+      state.gamification.xp -= xpForNextLevel;
+      showNotification(`Level Up! You're now level ${state.gamification.level}!`, 'success');
+      checkAchievements();
+    }
+    
+    updateGameHUD();
+    saveState();
+  }
+
+  function checkAchievements() {
+    const checks = {
+      first_entry: state.log.length >= 1,
+      ten_entries: state.log.length >= 10,
+      first_region: state.regions.length >= 1,
+      five_regions: state.regions.length >= 5,
+      first_recon: state.reconciliations.length >= 1,
+      first_action: Object.keys(state.actions).length >= 1,
+      hundred_actions: Object.values(state.actions).reduce((sum, a) => sum + a.total, 0) >= 100,
+      feed_master: state.feeds.length >= 5,
+      level_5: state.gamification.level >= 5,
+      level_10: state.gamification.level >= 10,
+      signed_snapshot: state.signatures.length >= 1
+    };
+
+    for (const [id, unlocked] of Object.entries(checks)) {
+      if (unlocked && !state.gamification.achievements.includes(id)) {
+        state.gamification.achievements.push(id);
+        const ach = ACHIEVEMENTS.find(a => a.id === id);
+        if (ach) {
+          showNotification(`Achievement Unlocked: ${ach.icon} ${ach.name}!`, 'success');
+          if (ach.xp) addXP(ach.xp, `Achievement: ${ach.name}`);
+        }
+      }
+    }
+  }
+
+  function updateGameHUD() {
+    const xpForNext = state.gamification.level * 100;
+    const progress = (state.gamification.xp / xpForNext) * 100;
+    
+    el('#level-display').textContent = `Lv ${state.gamification.level}`;
+    el('#xp-display').textContent = `${state.gamification.xp}/${xpForNext}`;
+    el('#xp-fill').style.width = `${progress}%`;
+    el('#xp-fill').parentElement.setAttribute('aria-valuenow', Math.round(progress));
+    el('#achievements-count').textContent = `${state.gamification.achievements.length}/${ACHIEVEMENTS.length}`;
+  }
+
+  // ============================================
+  // MULTI-SOURCE VERIFICATION ENGINE
+  // ============================================
+  
+  // Trusted source reputation scores (0-100)
+  const TRUSTED_SOURCES = {
+    'un.org': 95,
+    'icrc.org': 95,
+    'unhcr.org': 95,
+    'unicef.org': 95,
+    'hrw.org': 90,
+    'amnesty.org': 90,
+    'reuters.com': 85,
+    'apnews.com': 85,
+    'bbc.com': 85,
+    'aljazeera.com': 80,
+    'theguardian.com': 80,
+    'nytimes.com': 80,
+    'washingtonpost.com': 80
+  };
+
+  function getSourceCredibility(url) {
+    try {
+      const domain = new URL(url).hostname.replace('www.', '');
+      return TRUSTED_SOURCES[domain] || 50;
+    } catch {
+      return 0;
+    }
+  }
+
+  function extractClaims(feedItem) {
+    const text = `${feedItem.title} ${feedItem.summary}`.toLowerCase();
+    const claims = [];
+    
+    // Extract ceasefire claims
+    if (/ceasefire|truce|armistice/.test(text)) {
+      const region = extractRegion(text);
+      claims.push({
+        type: 'ceasefire',
+        region: region || 'unknown',
+        timestamp: feedItem.date,
+        source: feedItem.source,
+        text: feedItem.title
+      });
+    }
+    
+    // Extract aid corridor claims
+    if (/humanitarian corridor|aid route|convoy access/.test(text)) {
+      const region = extractRegion(text);
+      claims.push({
+        type: 'aid',
+        region: region || 'unknown',
+        timestamp: feedItem.date,
+        source: feedItem.source,
+        text: feedItem.title
+      });
+    }
+    
+    // Extract peace talks claims
+    if (/peace talks|negotiations|dialogue|summit/.test(text)) {
+      const region = extractRegion(text);
+      claims.push({
+        type: 'talks',
+        region: region || 'unknown',
+        timestamp: feedItem.date,
+        source: feedItem.source,
+        text: feedItem.title
+      });
+    }
+    
+    return claims;
+  }
+
+  function extractRegion(text) {
+    const regions = ['ukraine', 'gaza', 'sudan', 'yemen', 'syria', 'ethiopia', 'myanmar', 'haiti'];
+    for (const region of regions) {
+      if (text.includes(region)) return region;
+    }
+    return null;
+  }
+
+  function verifyClaimsAcrossSources() {
+    const claims = state.verification.claims;
+    const verified = { ceasefires: [], aidRoutes: [], talks: [] };
+    
+    // Group claims by type and region
+    const grouped = {};
+    for (const claim of claims) {
+      const key = `${claim.type}:${claim.region}`;
+      if (!grouped[key]) grouped[key] = [];
+      grouped[key].push(claim);
+    }
+    
+    // Verify claims with multiple independent sources
+    for (const [key, claimGroup] of Object.entries(grouped)) {
+      const sources = new Set(claimGroup.map(c => c.source));
+      
+      // Require at least 2 independent sources with credibility > 70
+      const highCredSources = claimGroup.filter(c => getSourceCredibility(c.source) >= 70);
+      const uniqueHighCred = new Set(highCredSources.map(c => c.source));
+      
+      if (uniqueHighCred.size >= 2) {
+        const [type, region] = key.split(':');
+        const verifiedClaim = {
+          type,
+          region,
+          sources: Array.from(uniqueHighCred),
+          count: uniqueHighCred.size,
+          lastVerified: new Date().toISOString()
+        };
+        
+        if (type === 'ceasefire') verified.ceasefires.push(verifiedClaim);
+        else if (type === 'aid') verified.aidRoutes.push(verifiedClaim);
+        else if (type === 'talks') verified.talks.push(verifiedClaim);
+      }
+    }
+    
+    state.verification.verified = verified;
+    updateIndicatorsFromVerification();
+  }
+
+  function updateIndicatorsFromVerification() {
+    const v = state.verification.verified;
+    
+    // Count total unique regions being tracked
+    const allRegions = new Set([
+      ...v.ceasefires.map(c => c.region),
+      ...v.aidRoutes.map(c => c.region),
+      ...v.talks.map(c => c.region)
+    ]);
+    
+    const totalRegions = Math.max(allRegions.size, state.regions.length, 1);
+    
+    // Calculate percentages based on verified claims
+    state.indicators.ceasefiresPct = Math.round((v.ceasefires.length / totalRegions) * 100);
+    state.indicators.aidRoutesOpenPct = Math.round((v.aidRoutes.length / totalRegions) * 100);
+    state.indicators.talksActivePct = Math.round((v.talks.length / totalRegions) * 100);
+    
+    // Update verification badges
+    updateVerificationBadges();
+  }
+
+  function updateVerificationBadges() {
+    const v = state.verification.verified;
+    
+    const updateBadge = (id, count) => {
+      const badge = el(id);
+      if (!badge) return;
+      if (count >= 2) {
+        badge.className = 'verification-badge verified';
+        badge.textContent = `✓ ${count} sources`;
+      } else if (count === 1) {
+        badge.className = 'verification-badge partial';
+        badge.textContent = '⚠ 1 source';
+      } else {
+        badge.className = 'verification-badge unverified';
+        badge.textContent = 'Unverified';
+      }
+    };
+    
+    updateBadge('#verify-cease', v.ceasefires.reduce((sum, c) => sum + c.count, 0));
+    updateBadge('#verify-aid', v.aidRoutes.reduce((sum, c) => sum + c.count, 0));
+    updateBadge('#verify-talks', v.talks.reduce((sum, c) => sum + c.count, 0));
+    
+    // Update verification summary
+    const totalVerified = v.ceasefires.length + v.aidRoutes.length + v.talks.length;
+    el('#verification-summary').textContent = `(${totalVerified} verified claims)`;
+  }
+
+  function renderVerificationDetails() {
+    const container = el('#verification-details');
+    if (!container) return;
+    
+    const v = state.verification.verified;
+    const allVerified = [...v.ceasefires, ...v.aidRoutes, ...v.talks];
+    
+    if (allVerified.length === 0) {
+      container.innerHTML = '<p class="muted">No verified claims yet. Add RSS feeds and refresh to begin multi-source verification.</p>';
+      return;
+    }
+    
+    container.innerHTML = allVerified.map(claim => `
+      <div style="margin: 12px 0; padding: 12px; background: var(--panel); border-radius: 8px; border-left: 3px solid var(--ok);">
+        <div style="font-weight: 600;">${claim.type.toUpperCase()}: ${claim.region}</div>
+        <div class="muted" style="font-size: 0.85rem; margin-top: 4px;">
+          Verified by ${claim.count} independent sources: ${claim.sources.join(', ')}
+        </div>
+        <div class="muted" style="font-size: 0.8rem; margin-top: 4px;">
+          Last verified: ${new Date(claim.lastVerified).toLocaleString()}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderSourceCredibility() {
+    const container = el('#source-credibility-list');
+    if (!container) return;
+    
+    const sources = state.verification.sources;
+    const entries = Object.entries(sources).sort((a, b) => b[1].score - a[1].score);
+    
+    if (entries.length === 0) {
+      container.innerHTML = '<p class="muted">Add RSS feeds to begin tracking source credibility.</p>';
+      return;
+    }
+    
+    container.innerHTML = entries.map(([source, data]) => {
+      const score = data.score;
+      const color = score >= 80 ? 'var(--ok)' : score >= 60 ? 'var(--warn)' : 'var(--danger)';
+      return `
+        <div style="margin: 8px 0; padding: 8px; background: var(--panel); border-radius: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div style="font-size: 0.9rem; font-weight: 500;">${source}</div>
+            <div style="color: ${color}; font-weight: 600;">${score}</div>
+          </div>
+          <div style="margin-top: 4px; height: 4px; background: var(--ring); border-radius: 2px; overflow: hidden;">
+            <div style="width: ${score}%; height: 100%; background: ${color};"></div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ============================================
+  // NOTIFICATIONS
+  // ============================================
+  function showNotification(message, type = 'info', duration = 4000) {
+    const container = el('#notifications');
+    const notif = document.createElement('div');
+    notif.className = `notification ${type}`;
+    
+    const icons = { info: 'ℹ️', success: '✅', warning: '⚠️', error: '❌' };
+    notif.innerHTML = `
+      <div class="notification-icon">${icons[type] || 'ℹ️'}</div>
+      <div class="notification-content">
+        <div class="notification-message">${escapeHtml(message)}</div>
+      </div>
+      <div class="notification-close" onclick="this.parentElement.remove()">×</div>
+    `;
+    
+    container.appendChild(notif);
+    
+    if (duration > 0) {
+      setTimeout(() => notif.remove(), duration);
+    }
+  }
+
+  // ============================================
+  // UTILITIES
+  // ============================================
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[c]));
+  }
+
+  function clamp(n, min, max) {
+    return Math.max(min, Math.min(max, n || 0));
+  }
+
+  function guessTags(text) {
+    const tags = [];
+    const t = text.toLowerCase();
+    if (/ceasefire|truce/i.test(t)) tags.push('ceasefire');
+    if (/aid|corridor|humanitarian/i.test(t)) tags.push('aid');
+    if (/talk|dialog|negotiat/i.test(t)) tags.push('talks');
+    if (/prisoner|exchange|reconciliation/i.test(t)) tags.push('reconciliation');
+    if (/civilian|protection/i.test(t)) tags.push('protection');
+    return tags;
+  }
+
+  function requireEdit() {
+    if (!state.edit.enabled) {
+      showNotification('Enable edit mode first', 'warning');
+      return false;
+    }
+    return true;
+  }
+
+  // ============================================
+  // RING ANIMATIONS
+  // ============================================
+  function ringAnimate(ringEl, valuePct) {
+    const circ = 2 * Math.PI * 60;
+    const off = circ * (1 - valuePct / 100);
+    const bar = ringEl.querySelector('.bar');
+    bar.style.transition = 'stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
+    bar.style.strokeDasharray = circ.toFixed(2);
+    bar.style.strokeDashoffset = off.toFixed(2);
+    ringEl.querySelector('.num').textContent = Math.round(valuePct) + '%';
+  }
+
+  // ============================================
+  // RENDERING
+  // ============================================
+  function render() {
+    if (!state) return;
+    
+    el('#today').textContent = '• ' + new Date(state.updatedAt).toLocaleString();
+    
+    const L = STR[state.settings.lang] || STR.en;
+    els('[data-i18n="refresh"]').forEach(n => n.textContent = L.refresh);
+    els('[data-i18n="export"]').forEach(n => n.textContent = L.export);
+    els('[data-i18n="import"]').forEach(n => n.textContent = L.import);
+    el('#edit-label').textContent = state.edit.enabled ? L.edit : L.view;
+
+    renderIndicators();
+    renderLog();
+    renderRegions();
+    renderRecon();
+    renderActions();
+    renderFeeds();
+    renderHooks();
+    renderVerificationDetails();
+    renderSourceCredibility();
+    updateGameHUD();
+    refreshMap();
+  }
+
+  function renderIndicators() {
+    const ind = state.indicators;
+    const vals = [ind.ceasefiresPct, ind.aidRoutesOpenPct, ind.talksActivePct];
+    els('.ring').forEach((r, i) => ringAnimate(r, vals[i] || 0));
+
+    const momentum = (vals[0] + vals[1] + vals[2]) / 3;
+    let label = 'Low Momentum', color = 'var(--danger)';
+    if (momentum >= 60) { label = 'Strong Momentum'; color = 'var(--ok)'; }
+    else if (momentum >= 25) { label = 'Moderate Momentum'; color = 'var(--warn)'; }
+    
+    el('#momentum-label').textContent = label;
+    el('#momentum-dot').style.background = color;
+  }
+
+  function renderLog() {
+    const tbody = el('#log-table tbody');
+    tbody.innerHTML = '';
+    
+    const searchTerm = el('#log-search')?.value.toLowerCase() || '';
+    const filtered = state.log.filter(item => {
+      if (!searchTerm) return true;
+      return item.text.toLowerCase().includes(searchTerm) ||
+             (item.tags || []).some(t => t.toLowerCase().includes(searchTerm));
+    });
+
+    for (const item of filtered.slice().reverse()) {
+      // Check if this entry is verified by RSS feeds
+      const isVerified = state.verification.claims.some(c => 
+        c.text.toLowerCase().includes(item.text.toLowerCase().slice(0, 20))
+      );
+      
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${new Date(item.when).toLocaleString()}</td>
+        <td>${escapeHtml(item.text)}</td>
+        <td>${item.link ? `<a href="${escapeHtml(item.link)}" target="_blank" rel="noopener">source</a>` : '<span class="muted">—</span>'}</td>
+        <td>${(item.tags || []).map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}</td>
+        <td>${isVerified ? '<span class="verification-badge verified">✓ Verified</span>' : '<span class="verification-badge unverified">Pending</span>'}</td>
+        <td><button class="btn btn-sm" data-del="${item.id}" aria-label="Delete entry">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('button[data-del]').forEach(btn => {
+      btn.onclick = () => {
+        if (!requireEdit()) return;
+        const id = btn.getAttribute('data-del');
+        state.log = state.log.filter(x => x.id !== id);
+        saveState();
+        showNotification('Entry deleted', 'info');
+      };
+    });
+  }
+
+  function renderRegions() {
+    const tbody = el('#regions-table tbody');
+    tbody.innerHTML = '';
+
+    for (const r of state.regions) {
+      const statusColors = {
+        ceasefire: 'var(--ok)',
+        'aid-open': 'var(--brand-2)',
+        talks: 'var(--warn)',
+        escalation: 'var(--danger)',
+        monitoring: 'var(--muted)'
+      };
+      const color = statusColors[r.status] || 'var(--muted)';
+      
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(r.name)}</td>
+        <td><span class="status-dot" style="background: ${color}; margin-right: 6px;"></span>${escapeHtml(r.status)}</td>
+        <td>${new Date(r.updatedAt).toLocaleString()}</td>
+        <td>${escapeHtml(r.notes || '—')}</td>
+        <td><button class="btn btn-sm" data-rm="${r.id}" aria-label="Remove region">🗑️</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('button[data-rm]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const id = b.getAttribute('data-rm');
+        state.regions = state.regions.filter(x => x.id !== id);
+        saveState();
+        showNotification('Region removed', 'info');
+      };
+    });
+  }
+
+  function renderRecon() {
+    const ul = el('#recon-list');
+    ul.innerHTML = '';
+
+    for (const m of state.reconciliations.slice().reverse()) {
+      const li = document.createElement('li');
+      li.innerHTML = `${escapeHtml(m.text)} <span class="muted">• ${new Date(m.when).toLocaleDateString()}</span>`;
+      ul.appendChild(li);
+    }
+  }
+
+  function renderActions() {
+    const tbody = el('#actions-table tbody');
+    tbody.innerHTML = '';
+
+    for (const [name, obj] of Object.entries(state.actions)) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${escapeHtml(name)}</td>
+        <td>${obj.total}</td>
+        <td>${obj.last7}</td>
+        <td>
+          <button class="btn btn-sm" data-act="${encodeURIComponent(name)}" aria-label="Log another">➕</button>
+          <button class="btn btn-sm" data-delact="${encodeURIComponent(name)}" aria-label="Delete action">🗑️</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    tbody.querySelectorAll('button[data-act]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const k = decodeURIComponent(b.getAttribute('data-act'));
+        state.actions[k].total++;
+        state.actions[k].last7++;
+        addXP(5, 'Citizen action logged');
+        saveState();
+      };
+    });
+
+    tbody.querySelectorAll('button[data-delact]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const k = decodeURIComponent(b.getAttribute('data-delact'));
+        delete state.actions[k];
+        saveState();
+        showNotification('Action type deleted', 'info');
+      };
+    });
+  }
+
+  function renderFeeds() {
+    const container = el('#feeds');
+    container.innerHTML = '';
+
+    state.feeds.forEach((f, idx) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.margin = '4px';
+      
+      let hostname = 'Invalid URL';
+      try {
+        hostname = new URL(f.url).hostname;
+      } catch (e) {}
+      
+      card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="font-size: 0.9rem;">${escapeHtml(hostname)}</strong>
+          <button class="btn btn-sm" data-rmfeed="${idx}" aria-label="Remove feed">🗑️</button>
+        </div>
+        <div class="muted" style="font-size: 0.85rem; margin-bottom: 6px;">
+          Credibility: ${getSourceCredibility(f.url)}/100
+        </div>
+        <div class="feed-items" style="font-size: 0.85rem;">Loading…</div>
+      `;
+      container.appendChild(card);
+    });
+
+    container.querySelectorAll('button[data-rmfeed]').forEach(b => {
+      b.onclick = () => {
+        if (!requireEdit()) return;
+        const i = +b.getAttribute('data-rmfeed');
+        state.feeds.splice(i, 1);
+        saveState();
+        showNotification('Feed removed', 'info');
+      };
+    });
+  }
+
+  function renderHooks() {
+    const ul = el('#ai-hooks-list');
+    const manifest = hooksManifest();
+    ul.innerHTML = manifest.nodes.map(n => `
+      <li>
+        <code>${n.id}</code> → <span class="muted">${n.selector}</span>
+        <div style="margin-top: 4px;">
+          ${(n.capabilities || []).map(c => `<span class="tag">${c}</span>`).join('')}
+        </div>
+      </li>
+    `).join('');
+  }
+
+  // ============================================
+  // MAP (LEAFLET WITH FALLBACK)
+  // ============================================
+  let map = null;
+  let markers = [];
+  let mapFallback = null;
+
+  function initMap() {
+    // Check if Leaflet loaded successfully
+    if (typeof L === 'undefined' || window.leafletFailed) {
+      console.warn('Leaflet not available, using fallback canvas map');
+      initFallbackMap();
+      return;
+    }
+    
+    try {
+      map = L.map('map', { zoomControl: true, attributionControl: false });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
+        maxZoom: 18,
+        errorTileUrl: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"%3E%3Crect fill="%23ddd" width="256" height="256"/%3E%3C/svg%3E'
+      }).addTo(map);
+      map.setView([20, 0], 2);
+    } catch (e) {
+      console.error('Map initialization failed:', e);
+      initFallbackMap();
+    }
+  }
+
+  function initFallbackMap() {
+    const mapDiv = el('#map');
+    const canvas = el('#map-fallback');
+    mapDiv.style.display = 'none';
+    canvas.style.display = 'block';
+    mapFallback = canvas;
+    
+    // Simple canvas-based map
+    const ctx = canvas.getContext('2d');
+    canvas.width = canvas.offsetWidth * 2;
+    canvas.height = canvas.offsetHeight * 2;
+    ctx.scale(2, 2);
+    
+    // Draw simple world map outline
+    ctx.fillStyle = '#1a2432';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#78ffd6';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(20, 20, canvas.width/2 - 40, canvas.height/2 - 40);
+    
+    ctx.fillStyle = '#6b7b8d';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Map offline - add regions to track coordinates', canvas.width/4, canvas.height/4);
+  }
+
+  function refreshMap() {
+    if (!map && !mapFallback) return;
+    
+    if (map && typeof L !== 'undefined') {
+      markers.forEach(m => m.remove());
+      markers = [];
+
+      state.regions.forEach(r => {
+        if (r.lat && r.lng) {
+          try {
+            const m = L.marker([r.lat, r.lng]).addTo(map);
+            m.bindPopup(`<strong>${escapeHtml(r.name)}</strong><br/>${escapeHtml(r.status)}`);
+            markers.push(m);
+          } catch (e) {
+            console.error('Marker error:', e);
+          }
+        }
+      });
+    } else if (mapFallback) {
+      // Redraw canvas with markers
+      const ctx = mapFallback.getContext('2d');
+      ctx.clearRect(0, 0, mapFallback.width, mapFallback.height);
+      ctx.fillStyle = '#1a2432';
+      ctx.fillRect(0, 0, mapFallback.width, mapFallback.height);
+      
+      // Draw markers as dots
+      state.regions.forEach(r => {
+        if (r.lat && r.lng) {
+          const x = ((r.lng + 180) / 360) * (mapFallback.width/2 - 40) + 20;
+          const y = ((90 - r.lat) / 180) * (mapFallback.height/2 - 40) + 20;
+          
+          ctx.fillStyle = '#19e3c2';
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fill();
+          
+          ctx.fillStyle = '#e6f2f0';
+          ctx.font = '10px sans-serif';
+          ctx.fillText(r.name, x, y - 8);
+        }
+      });
+    }
+  }
+
+  // ============================================
+  // RSS FEED PROCESSING
+  // ============================================
+  async function fetchFeeds(force = false) {
+    for (let i = 0; i < state.feeds.length; i++) {
+      const f = state.feeds[i];
+      const cacheKey = 'feed-cache:' + (f.proxy ? f.proxy + f.url : f.url);
+      
+      if (!force) {
+        try {
+          const cached = localStorage.getItem(cacheKey);
+          if (cached) {
+            const items = JSON.parse(cached);
+            renderFeedItems(i, items);
+            processFeedForVerification(items, f.url);
+            continue;
+          }
+        } catch (e) {}
+      }
+      
+      try {
+        const target = f.proxy ? f.proxy + f.url : f.url;
+        const res = await fetch(target);
+        const text = await res.text();
+        const items = parseFeed(text, f.url).slice(0, 15);
+        
+        try {
+          localStorage.setItem(cacheKey, JSON.stringify(items));
+        } catch (e) {
+          console.warn('Cache storage failed:', e);
+        }
+        
+        renderFeedItems(i, items);
+        processFeedForVerification(items, f.url);
+      } catch (err) {
+        console.error('Feed fetch failed:', err);
+        renderFeedItems(i, [{ title: 'Failed to load', link: '#', date: '', summary: '' }]);
+      }
+    }
+    
+    verifyClaimsAcrossSources();
+    render();
+    showNotification('Feeds refreshed and verified', 'success');
+  }
+
+  function processFeedForVerification(items, sourceUrl) {
+    const credibility = getSourceCredibility(sourceUrl);
+    
+    // Track source statistics
+    if (!state.verification.sources[sourceUrl]) {
+      state.verification.sources[sourceUrl] = { score: credibility, itemCount: 0 };
+    }
+    state.verification.sources[sourceUrl].itemCount += items.length;
+    
+    // Extract claims from feed items
+    items.forEach(item => {
+      const claims = extractClaims({ ...item, source: sourceUrl });
+      state.verification.claims.push(...claims);
+    });
+  }
+
+  function renderFeedItems(idx, items) {
+    const cards = els('#feeds .card');
+    const card = cards[idx];
+    if (!card) return;
+    
+    const box = card.querySelector('.feed-items');
+    box.innerHTML = items.map(it => `
+      <div style="margin: 8px 0; padding-bottom: 8px; border-bottom: 1px solid var(--border);">
+        <a href="${escapeHtml(it.link || '#')}" target="_blank" rel="noopener" style="color: var(--accent); font-size: 0.85rem;">${escapeHtml(it.title || 'Untitled')}</a>
+        <div class="muted" style="font-size: 0.75rem; margin-top: 2px;">${it.date ? new Date(it.date).toLocaleString

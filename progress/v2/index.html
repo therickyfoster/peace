@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>World Peace Progress • Open Initiative Dashboard</title>
+  <meta name="description" content="A living, offline-capable public dashboard tracking world peace progress across conflicts, ceasefires, aid flows, reconciliation milestones, and citizen actions." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%2300c2a8' d='M128 16a112 112 0 1 0 0 224a112 112 0 0 0 0-224Zm0 24a88 88 0 1 1 0 176a88 88 0 0 1 0-176Z'/%3E%3Cpath fill='%2300c2a8' d='M128 48c-28.67 20.4-48 49.9-48 80c0 30.1 19.33 59.6 48 80c28.67-20.4 48-49.9 48-80c0-30.1-19.33-59.6-48-80Z'/%3E%3Cpath fill='%2300c2a8' d='M128 208c-28.67-20.4-48-49.9-48-80h96c0 30.1-19.33 59.6-48 80Z' opacity='.25'/%3E%3C/svg%3E" />
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#0f1520; --muted:#6b7b8d; --text:#e6f2f0; --brand:#19e3c2; --brand-2:#78ffd6; --accent:#b2f7ef; --danger:#ff6b6b; --warn:#ffd166; --ok:#06d6a0; --card:#0c121a; --ring:#183048;
+    }
+    html,body{height:100%;}
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Helvetica,Arial,sans-serif;background:radial-gradient(1200px 600px at 20% 0%,#0e1522 0%,#091019 40%,#070b12 100%);color:var(--text);}
+    .stars, .twinkle{position:fixed;inset:0;pointer-events:none;z-index:-1}
+    .stars{background:transparent url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="3" height="3"><circle cx="1" cy="1" r="1" fill="white"/></svg>') repeat;background-size:3px 3px;opacity:.12}
+    .twinkle{background-image:radial-gradient(1px 1px at 10% 20%,#fff8,transparent 2px),radial-gradient(1px 1px at 90% 30%,#fff8,transparent 2px),radial-gradient(1px 1px at 40% 80%,#fff8,transparent 2px),radial-gradient(1px 1px at 60% 60%,#fff8,transparent 2px);animation:twinkle 4s infinite alternate ease-in-out;opacity:.15}
+    @keyframes twinkle{to{opacity:.35;filter:drop-shadow(0 0 6px #8ff)}}
+
+    header{position:sticky;top:0;background:linear-gradient(180deg,rgba(11,15,20,.96),rgba(11,15,20,.6));backdrop-filter:blur(8px);border-bottom:1px solid #1a2432;z-index:10}
+    .wrap{max-width:1200px;margin:0 auto;padding:16px}
+    .headline{display:flex;gap:16px;align-items:center}
+    .logo{width:40px;height:40px;border-radius:50%;background:conic-gradient(from 0deg,var(--brand),var(--brand-2));box-shadow:0 0 0 3px #0b0f14,0 0 0 5px #103;display:grid;place-items:center}
+    .title{font-size:1.4rem;font-weight:700;letter-spacing:.2px}
+    .subtitle{font-size:.95rem;color:var(--muted)}
+
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{background:linear-gradient(180deg,rgba(21,28,38,.9),rgba(14,20,29,.9));border:1px solid #1a2432;border-radius:16px;padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+    .card h3{margin:0 0 8px;font-size:1.05rem}
+    .muted{color:var(--muted)}
+    .pill{display:inline-flex;gap:8px;align-items:center;border:1px solid #25405b;background:#0b141f;border-radius:999px;padding:6px 10px;font-size:.8rem}
+    .row{display:flex;gap:12px;flex-wrap:wrap}
+    button.btn{all:unset;display:inline-flex;gap:8px;align-items:center;border:1px solid #274158;background:#0b1520;border-radius:10px;padding:10px 12px;cursor:pointer;transition:.2s;user-select:none}
+    button.btn:hover{border-color:#35658a;box-shadow:0 0 0 3px #0b1a26}
+
+    details{border:1px solid #1d2a3a;border-radius:14px;background:#0c121a;overflow:hidden}
+    details summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;align-items:center;gap:10px}
+    details[open]{box-shadow:0 8px 28px rgba(0,0,0,.25)}
+    details .content{padding:0 16px 16px}
+    summary::-webkit-details-marker{display:none}
+    .chev{transition:.25s transform}
+    details[open] .chev{transform:rotate(90deg)}
+
+    .ring{width:120px;height:120px;display:grid;place-items:center;position:relative}
+    .ring svg{transform:rotate(-90deg)}
+    .ring .num{position:absolute;font-weight:700}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid #1c2736;text-align:left}
+    th{color:#b9c5d4;font-weight:600}
+    tr:hover td{background:#0e1622}
+
+    footer{border-top:1px solid #1a2432;color:var(--muted);padding:20px 0;margin-top:30px}
+    .tag{display:inline-block;background:#09131c;border:1px solid #24384d;padding:4px 8px;border-radius:999px;color:#bde8ff;margin:2px;font-size:.8rem}
+    .status-dot{width:10px;height:10px;border-radius:50%}
+
+    #map{height:380px;border-radius:12px;border:1px solid #1a2432}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:50}
+    .modal.open{display:flex}
+    .modal .panel{background:#0c121a;border:1px solid #1a2432;border-radius:16px;padding:16px;max-width:720px;width:92vw}
+
+    @media (max-width:900px){ .grid{grid-template-columns:1fr} }
+  </style>
+  <!-- Leaflet (online-first; graceful offline) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="anonymous">
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="stars"></div><div class="twinkle"></div>
+
+  <header>
+    <div class="wrap">
+      <div class="headline">
+        <div class="logo" aria-hidden="true">🕊️</div>
+        <div>
+          <div class="title">World Peace Progress Dashboard</div>
+          <div class="subtitle">A citizen-led, zero-harm, open progress board • Online-first with offline memory</div>
+        </div>
+        <div style="margin-left:auto" class="row">
+          <select id="lang" class="btn" title="Language">
+            <option value="en">EN</option><option value="es">ES</option><option value="fr">FR</option>
+          </select>
+          <button class="btn" id="btn-edit" title="Toggle edit mode">✏️ <span id="edit-label">View</span></button>
+          <button class="btn" id="btn-refresh" title="Refresh data">🔄 <span data-i18n="refresh">Refresh</span></button>
+          <button class="btn" id="btn-export" title="Export snapshot">📤 <span data-i18n="export">Export</span></button>
+          <label class="btn" title="Import snapshot">📥 <input id="file-import" type="file" accept="application/json" style="display:none"/> <span data-i18n="import">Import</span></label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap" id="app">
+    <section class="grid" style="margin-top:16px">
+
+      <!-- Overview -->
+      <div class="card" style="grid-column:span 12">
+        <h3>Today’s Snapshot <span class="muted" id="today"></span></h3>
+        <div class="row" style="align-items:center;justify-content:space-between;flex-wrap:wrap">
+          <div class="row" style="gap:18px">
+            <div class="ring" data-key="ceasefiresPct" title="% of tracked conflicts currently under ceasefire">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" stroke="#19334a" stroke-width="12" fill="none"/>
+                <circle class="bar" cx="60" cy="60" r="52" stroke="var(--brand)" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="326.72" stroke-dashoffset="326.72"/>
+              </svg><div class="num">0%</div><div class="muted" style="font-size:.8rem;margin-top:6px">Ceasefire Coverage</div>
+            </div>
+            <div class="ring" data-key="aidRoutesOpenPct" title="% of verified humanitarian routes open">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" stroke="#19334a" stroke-width="12" fill="none"/>
+                <circle class="bar" cx="60" cy="60" r="52" stroke="#78ffd6" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="326.72" stroke-dashoffset="326.72"/>
+              </svg><div class="num">0%</div><div class="muted" style="font-size:.8rem;margin-top:6px">Aid Routes Open</div>
+            </div>
+            <div class="ring" data-key="talksActivePct" title="% of active conflicts with talks underway">
+              <svg width="120" height="120" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" stroke="#19334a" stroke-width="12" fill="none"/>
+                <circle class="bar" cx="60" cy="60" r="52" stroke="#b2f7ef" stroke-width="12" stroke-linecap="round" fill="none" stroke-dasharray="326.72" stroke-dashoffset="326.72"/>
+              </svg><div class="num">0%</div><div class="muted" style="font-size:.8rem;margin-top:6px">Talks Underway</div>
+            </div>
+          </div>
+          <div style="min-width:260px;max-width:520px">
+            <div class="pill" title="Status of global peace momentum">
+              <span class="status-dot" id="momentum-dot" style="background:var(--warn)"></span>
+              <strong id="momentum-label">Moderate Momentum</strong>
+              <span class="muted">(community-estimated)</span>
+            </div>
+            <p class="muted" style="margin-top:8px">This dashboard aggregates community-submitted evidence of peace progress: ceasefires, safe corridors, reconciliations, and aid access. It works offline and can be exported as signed JSON snapshots for public transparency.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Global map -->
+      <div class="card" style="grid-column:span 12">
+        <h3>Global Peace Map</h3>
+        <p class="muted">Add regions with coordinates to place markers. Click a marker to quick-log an event.</p>
+        <div id="map" role="application" aria-label="Global map"></div>
+        <div class="row" style="gap:8px;margin-top:10px">
+          <input id="coord-lat" placeholder="Lat (optional)" style="width:160px;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <input id="coord-lng" placeholder="Lng (optional)" style="width:160px;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <button class="btn" id="btn-locate">📍 Use my location</button>
+        </div>
+      </div>
+
+      <!-- Live feed / updates -->
+      <div class="card" style="grid-column:span 8">
+        <h3>Peace Logbook (Community Evidence)</h3>
+        <div class="row" style="gap:8px;margin:6px 0">
+          <input id="entry-text" placeholder="New entry: e.g., 24h ceasefire announced in Region X; source link" style="flex:1;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)" />
+          <input id="entry-link" placeholder="Source URL (optional)" style="width:280px;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)" />
+          <button class="btn" id="btn-add">➕ Add</button>
+        </div>
+        <table id="log-table" aria-label="Community peace evidence">
+          <thead><tr><th>When</th><th>Entry</th><th>Source</th><th>Tags</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- Key Indicators -->
+      <div class="card" style="grid-column:span 4">
+        <h3>Key Indicators</h3>
+        <div class="muted" style="margin:-4px 0 8px">Adjust to reflect verified status. Values persist offline. You can also enable dynamic, on-the-fly estimates computed from trusted RSS feeds (non-authoritative, transparent heuristics).</div>
+        <label>Ceasefire coverage (%)<input id="inp-cease" type="number" min="0" max="100" step="1" style="width:100%;padding:10px;margin-top:6px;border-radius:10px;border:1px solid #24384d;background:#0b141f;color:var(--text)"/></label>
+        <label style="display:block;margin-top:10px">Aid routes open (%)<input id="inp-aid" type="number" min="0" max="100" step="1" style="width:100%;padding:10px;margin-top:6px;border-radius:10px;border:1px solid #24384d;background:#0b141f;color:var(--text)"/></label>
+        <label style="display:block;margin-top:10px">Talks underway (%)<input id="inp-talks" type="number" min="0" max="100" step="1" style="width:100%;padding:10px;margin-top:6px;border-radius:10px;border:1px solid #24384d;background:#0b141f;color:var(--text)"/></label>
+        <div class="row" style="margin-top:12px;justify-content:flex-end"><button class="btn" id="btn-apply">✅ Apply</button></div>
+        <details style="margin-top:12px">
+          <summary><span class="chev">▶</span> Methodology notes</summary>
+          <div class="content">
+            <p class="muted">Indicators are conservative by default and should be backed by links to public statements, NGO/UN reports, or first-party ceasefire texts. Community entries can be flagged and resolved by consensus.</p>
+            <div class="row" style="gap:8px;align-items:center;margin-top:8px">
+              <label class="pill"><input id="auto-estimate" type="checkbox" style="accent-color:#19e3c2"> Enable live RSS estimates</label>
+              <label class="pill">Blend&nbsp;<input id="estimate-alpha" type="range" min="0" max="100" value="60" style="width:160px"> <span class="muted" id="alpha-label">60%</span></label>
+            </div>
+            <p class="muted">When enabled, the dashboard derives a provisional estimate from recent feed items using transparent keyword heuristics and an exponential moving average. Your manual values remain; the display blends them with the estimate by the factor above.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Regions panel -->
+      <div class="card" style="grid-column:span 12">
+        <h3>Regions & Corridors</h3>
+        <details>
+          <summary><span class="chev">▶</span> Manage Regions</summary>
+          <div class="content">
+            <div class="row" style="gap:8px;margin:8px 0">
+              <input id="region-name" placeholder="Region name" style="flex:1;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+              <select id="region-status" style="padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)">
+                <option value="monitoring">Monitoring</option>
+                <option value="talks">Talks Underway</option>
+                <option value="ceasefire">Ceasefire</option>
+                <option value="aid-open">Aid Open</option>
+                <option value="escalation">Escalation Risk</option>
+              </select>
+              <button class="btn" id="btn-add-region">➕ Add Region</button>
+            </div>
+            <table id="regions-table">
+              <thead><tr><th>Region</th><th>Status</th><th>Last Update</th><th>Notes</th><th>Timeline</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+            <div class="modal" id="timeline-modal">
+              <div class="panel">
+                <h3 id="tl-title">Region Timeline</h3>
+                <canvas id="tl-canvas" width="640" height="240" style="width:100%;height:auto;background:#0b141f;border:1px solid #1a2432;border-radius:8px"></canvas>
+                <div class="row" style="justify-content:flex-end;margin-top:10px"><button class="btn" id="tl-close">Close</button></div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Reconciliation -->
+      <div class="card" style="grid-column:span 6">
+        <h3>Reconciliation Milestones</h3>
+        <ul id="recon-list" style="margin:0;padding-left:18px"></ul>
+        <div class="row" style="gap:8px;margin-top:10px">
+          <input id="recon-text" placeholder="e.g., Prisoner exchange completed; Truth commission convened; Cross-border school program launched" style="flex:1;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <button class="btn" id="btn-add-recon">➕ Add</button>
+        </div>
+      </div>
+
+      <!-- Citizen Actions -->
+      <div class="card" style="grid-column:span 6">
+        <h3>Citizen Actions (Peace Ripple) 🫶</h3>
+        <p class="muted">Track tangible, positive actions: ceasefire advocacy, aid donations, shelter support, online de-escalation, restorative dialogue.</p>
+        <table id="actions-table">
+          <thead><tr><th>Action</th><th>Count</th><th>Last 7d</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="row" style="gap:8px;margin-top:10px">
+          <input id="action-name" placeholder="Action type (e.g., Aid donation)" style="flex:1;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <input id="action-increment" type="number" value="1" style="width:120px;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <button class="btn" id="btn-add-action">➕ Log</button>
+        </div>
+      </div>
+
+      <!-- Trusted Feeds -->
+      <div class="card" style="grid-column:span 12">
+        <h3>Trusted Feeds (Optional Online)</h3>
+        <p class="muted">Add public RSS/Atom feeds from trusted sources (e.g., UN, ICRC, UNICEF, Reuters). Some feeds may require a CORS-friendly proxy; you can set one below. Data is cached for offline viewing.</p>
+        <div class="row" style="gap:8px;margin:6px 0">
+          <input id="feed-url" placeholder="https://example.org/feed.xml" style="flex:1;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <input id="feed-proxy" placeholder="Proxy (optional, e.g., https://r.jina.ai/http:// )" style="width:360px;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <button class="btn" id="btn-add-feed">➕ Add Feed</button>
+          <button class="btn" id="btn-refresh-feeds">🔃 Refresh Feeds</button>
+        </div>
+        <div id="feeds" class="grid" style="grid-template-columns:repeat(3,1fr)"></div>
+      </div>
+
+      <!-- AI Hooks / Plugins -->
+      <div class="card" style="grid-column:span 12">
+        <h3>AI Expansion Hooks & Plugins</h3>
+        <p class="muted">This file exposes stable nodes for aligned AIs to extend functionality without breaking UX. Hooks are declared below and mirrored in JSON-LD.</p>
+        <ul id="ai-hooks-list" style="margin:0;padding-left:18px"></ul>
+        <div class="row" style="gap:8px;margin-top:10px">
+          <button class="btn" id="btn-register-sample">🧩 Register sample plugin</button>
+          <button class="btn" id="btn-dump-hooks">📄 Export hooks JSON</button>
+        </div>
+        <!-- 🤖 MAGNETIC-NODE:hooks-manifest -->
+        <script type="application/json" id="hooks-manifest">{
+          "version": "1",
+          "nodes": [
+            { "id": "logbook.enricher", "selector": "#log-table tbody", "capabilities": ["append-rows", "link-verification"], "ethos": "zero-harm, source-aligned, cite-first" },
+            { "id": "regions.map-layer", "selector": "#map", "capabilities": ["add-geojson", "heatmap", "corridor-drawing"], "constraints": "client-only unless user consents", "ethos": "do-no-harm" },
+            { "id": "metrics.forecaster", "selector": ".ring[data-key] ", "capabilities": ["nowcast", "confidence-bands"], "requires": ["methodology-notes"] }
+          ]
+        }</script>
+        <!-- /MAGNETIC-NODE -->
+      </div>
+
+      <!-- tlk.io Chat -->
+      <div class="card" style="grid-column:span 12">
+        <h3>Live Dialogue (tlk.io)</h3>
+        <p class="muted">Public chat for coordination. Choose a channel name below (or keep the default). Reminder: keep zero-harm ethos and cite sources.</p>
+        <div class="row" style="gap:8px;margin:6px 0">
+          <input id="tlk-channel" placeholder="channel-name" value="world-peace-initiative" style="width:260px;padding:10px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text)"/>
+          <button class="btn" id="btn-load-tlk">💬 Load Chat</button>
+        </div>
+        <div id="tlk-wrap" style="width:100%;height:460px;border:1px solid #1a2432;border-radius:12px;overflow:hidden;display:none">
+          <iframe id="tlk-iframe" title="tlk.io chat" style="border:0;width:100%;height:100%" allow="clipboard-read; clipboard-write"></iframe>
+        </div>
+        <p class="muted" style="margin-top:8px">Heads-up: tlk.io is a third-party service; messages are public to that channel. For private or consent-gated dialogue, integrate a self-hosted chat later.</p>
+      </div>
+
+      <!-- Transparency & Signatures -->
+      <div class="card" style="grid-column:span 12">
+        <h3>Transparency & Signatures</h3>
+        <details>
+          <summary><span class="chev">▶</span> Create signed snapshot (in-browser)</summary>
+          <div class="content">
+            <p class="muted">Optional: paste a PGP public key or use built-in Web Crypto to create a signature over the exported JSON. This helps verify authenticity when sharing snapshots.</p>
+            <div class="row" style="gap:8px">
+              <textarea id="pgp-pub" placeholder="Paste ASCII-armored public key (optional)" style="width:100%;min-height:120px;border-radius:10px;border:1px solid #23364b;background:#0b141f;color:var(--text);padding:10px"></textarea>
+            </div>
+            <div class="row" style="gap:8px;margin-top:8px">
+              <button class="btn" id="btn-sign-webcrypto">🔐 WebCrypto Sign</button>
+              <button class="btn" id="btn-generate-key">🆕 Generate Ephemeral Key</button>
+              <span class="muted" id="sig-status"></span>
+            </div>
+          </div>
+        </details>
+      </div>
+
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div>🕊️ Built for citizens everywhere • Zero-harm ethos • Offline capable</div>
+        <div class="muted">Version <span id="ver">1.1.0</span> • Stored locally • <a href="#" id="btn-reset" style="color:#a6e1ff">Reset</a></div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  // --- Minimal state management (localStorage) ---
+  const VERSION = '1.1.0';
+  const el = (q, root=document)=>root.querySelector(q);
+  const els = (q, root=document)=>Array.from(root.querySelectorAll(q));
+  const $ = {
+    today: el('#today'),
+    rings: els('.ring'),
+    momentumDot: el('#momentum-dot'),
+    momentumLabel: el('#momentum-label'),
+    logBody: el('#log-table tbody'),
+    btnAdd: el('#btn-add'),
+    entryText: el('#entry-text'),
+    entryLink: el('#entry-link'),
+    btnExport: el('#btn-export'),
+    fileImport: el('#file-import'),
+    btnRefresh: el('#btn-refresh'),
+    inpCease: el('#inp-cease'),
+    inpAid: el('#inp-aid'),
+    inpTalks: el('#inp-talks'),
+    btnApply: el('#btn-apply'),
+    regionsBody: el('#regions-table tbody'),
+    btnAddRegion: el('#btn-add-region'),
+    regionName: el('#region-name'),
+    regionStatus: el('#region-status'),
+    coordLat: el('#coord-lat'),
+    coordLng: el('#coord-lng'),
+    btnLocate: el('#btn-locate'),
+    reconList: el('#recon-list'),
+    reconText: el('#recon-text'),
+    btnAddRecon: el('#btn-add-recon'),
+    actionsBody: el('#actions-table tbody'),
+    actionName: el('#action-name'),
+    actionInc: el('#action-increment'),
+    btnAddAction: el('#btn-add-action'),
+    feedsWrap: el('#feeds'),
+    feedUrl: el('#feed-url'),
+    feedProxy: el('#feed-proxy'),
+    btnAddFeed: el('#btn-add-feed'),
+    btnRefreshFeeds: el('#btn-refresh-feeds'),
+    btnSign: el('#btn-sign-webcrypto'),
+    btnGenKey: el('#btn-generate-key'),
+    sigStatus: el('#sig-status'),
+    ver: el('#ver'),
+    btnReset: el('#btn-reset'),
+    btnEdit: el('#btn-edit'),
+    editLabel: el('#edit-label'),
+    lang: el('#lang'),
+    hooksList: el('#ai-hooks-list'),
+    btnRegisterSample: el('#btn-register-sample'),
+    btnDumpHooks: el('#btn-dump-hooks'),
+    tlkChannel: el('#tlk-channel'),
+    tlkBtn: el('#btn-load-tlk'),
+    tlkWrap: el('#tlk-wrap'),
+    tlkIframe: el('#tlk-iframe'),
+  };
+
+  const defaultState = () => ({
+    derived: { indicators: { ceasefiresPct:null, aidRoutesOpenPct:null, talksActivePct:null }, last:null },
+    settings: { autoEstimate: false, estimateAlpha: 0.6 },
+    version: VERSION,
+    indicators: { ceasefiresPct: 12, aidRoutesOpenPct: 28, talksActivePct: 36 },
+    momentum: 'moderate',
+    log: [],
+    regions: [], // {id,name,status,updatedAt,notes,lat,lng,timeline:[{t,v}]}
+    reconciliations: [],
+    actions: {}, // { name: { total, last7 } }
+    feeds: [], // { url, proxy }
+    keys: null, // webcrypto keypair
+    signatures: [],
+    edit: { enabled:false, hint:'Set a local passphrase to edit.' },
+    i18n: { lang:'en' },
+    hooksInstalled: [],
+    updatedAt: new Date().toISOString(),
+  });
+
+  function load(){
+    const raw = localStorage.getItem('peace-dashboard');
+    let st = raw ? JSON.parse(raw) : defaultState();
+    st.version = VERSION;
+    if(!st.settings) st.settings = { autoEstimate:false, estimateAlpha:0.6 };
+    if(!st.derived) st.derived = { indicators: { ceasefiresPct:null, aidRoutesOpenPct:null, talksActivePct:null }, last:null };
+    return st;
+  }
+  function save(){ state.updatedAt = new Date().toISOString(); localStorage.setItem('peace-dashboard', JSON.stringify(state)); render(); }
+
+  let state = load();
+
+  // Minimal i18n demo
+  const STR = {
+    en:{refresh:'Refresh', export:'Export', import:'Import', view:'View', edit:'Edit'},
+    es:{refresh:'Actualizar', export:'Exportar', import:'Importar', view:'Ver', edit:'Editar'},
+    fr:{refresh:'Rafraîchir', export:'Exporter', import:'Importer', view:'Voir', edit:'Éditer'}
+  };
+
+  // --- Helpers ---
+  function ringAnimate(ringEl, valuePct){
+    const circ = 2 * Math.PI * 52;
+    const off = circ * (1 - valuePct/100);
+    const bar = ringEl.querySelector('.bar');
+    bar.style.transition = 'stroke-dashoffset .6s ease';
+    bar.style.strokeDasharray = circ.toFixed(2);
+    bar.style.strokeDashoffset = off.toFixed(2);
+    ringEl.querySelector('.num').textContent = Math.round(valuePct) + '%';
+  }
+  function labelStatus(s){ return ({'monitoring':'Monitoring','talks':'Talks Underway','ceasefire':'Ceasefire','aid-open':'Aid Open','escalation':'Escalation Risk'})[s]||s; }
+  function escapeHtml(s){ return String(s).replace(/[&<>\"]/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c])); }
+  function escapeAttr(s){ return String(s).replace(/["']/g,''); }
+  function clamp(n,min,max){ return Math.max(min, Math.min(max,n||0)); }
+  function guessTags(text){
+    const tags=[]; const t=text.toLowerCase();
+    if(/ceasefire|truce/.test(t)) tags.push('ceasefire');
+    if(/aid|corridor|humanitarian/.test(t)) tags.push('aid');
+    if(/talk|dialog|negotiat/.test(t)) tags.push('talks');
+    if(/prisoner|exchange/.test(t)) tags.push('reconciliation');
+    return tags;
+  }
+
+  // --- Rendering ---
+  function renderIndicators(){
+    const man = state.indicators;
+    const est = state.derived?.indicators||{};
+    const a = (state.settings?.autoEstimate? state.settings.estimateAlpha : 0);
+    const blend = (m,e)=> (e==null? m : (1-a)*m + a*e);
+
+    const cease = blend(man.ceasefiresPct, est.ceasefiresPct);
+    const aid   = blend(man.aidRoutesOpenPct, est.aidRoutesOpenPct);
+    const talks = blend(man.talksActivePct, est.talksActivePct);
+
+    const vals = [cease, aid, talks];
+    $.rings.forEach((r,i)=> ringAnimate(r, vals[i]||0));
+    $.inpCease.value = man.ceasefiresPct;
+    $.inpAid.value   = man.aidRoutesOpenPct;
+    $.inpTalks.value = man.talksActivePct;
+
+    const momentum = (cease + aid + talks) / 3;
+    let label='Moderate Momentum', color='var(--warn)';
+    if (momentum >= 60) { label='Strong Momentum'; color='var(--ok)'; }
+    else if (momentum < 25) { label='Low Momentum'; color='var(--danger)'; }
+    $.momentumLabel.textContent = label + ((a>0 && state.derived?.last)? ' • est '+new Date(state.derived.last).toLocaleTimeString(): '');
+    $.momentumDot.style.background = color;
+
+    if($.autoEstimate){ $.autoEstimate.checked = !!state.settings.autoEstimate; }
+    if($.estimateAlpha){ $.estimateAlpha.value = Math.round((state.settings.estimateAlpha||0)*100); $.alphaLabel.textContent = Math.round((state.settings.estimateAlpha||0)*100)+'%'; }
+  }
+  function renderLog(){
+    $.logBody.innerHTML = '';
+    for (const item of state.log.slice().reverse()){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${new Date(item.when).toLocaleString()}</td>
+        <td>${escapeHtml(item.text)}</td>
+        <td>${item.link ? `<a href="${escapeAttr(item.link)}" target="_blank" rel="noopener">source</a>` : '<span class="muted">—</span>'}</td>
+        <td>${(item.tags||[]).map(t=>`<span class='tag'>${escapeHtml(t)}</span>`).join('')}</td>
+        <td><button class='btn btn-sm' data-del='${item.id}'>🗑️</button></td>`;
+      $.logBody.appendChild(tr);
+    }
+    $.logBody.querySelectorAll('button[data-del]').forEach(btn=>btn.onclick=()=>{ if(!requireEdit()) return; const id=btn.getAttribute('data-del'); state.log = state.log.filter(x=>x.id!==id); save(); });
+  }
+  function renderRegions(){
+    $.regionsBody.innerHTML = '';
+    for (const r of state.regions){
+      const tr = document.createElement('tr');
+      const color = r.status==='ceasefire'? 'var(--ok)': r.status==='aid-open'? '#78ffd6': r.status==='talks'? '#ffd166': r.status==='escalation'? 'var(--danger)': '#88a';
+      tr.innerHTML = `<td>${escapeHtml(r.name)}</td>
+        <td><span class='status-dot' style='background:${color};vertical-align:middle;display:inline-block;margin-right:6px'></span>${escapeHtml(labelStatus(r.status))}</td>
+        <td>${new Date(r.updatedAt).toLocaleString()}</td>
+        <td>${escapeHtml(r.notes||'')}</td>
+        <td><button class='btn' data-tl='${r.id}'>📈</button></td>
+        <td><button class='btn' data-rm='${r.id}'>🗑️ Remove</button></td>`;
+      $.regionsBody.appendChild(tr);
+    }
+    $.regionsBody.querySelectorAll('button[data-rm]').forEach(b=> b.onclick=()=>{ if(!requireEdit()) return; const id=b.getAttribute('data-rm'); state.regions = state.regions.filter(x=>x.id!==id); save(); });
+    $.regionsBody.querySelectorAll('button[data-tl]').forEach(b=> b.onclick=()=> openTimeline(b.getAttribute('data-tl')) );
+  }
+  function renderRecon(){
+    $.reconList.innerHTML = '';
+    for (const m of state.reconciliations.slice().reverse()){
+      const li = document.createElement('li');
+      li.innerHTML = `${escapeHtml(m.text)} <span class='muted'>• ${new Date(m.when).toLocaleDateString()}</span>`;
+      $.reconList.appendChild(li);
+    }
+  }
+  function renderActions(){
+    $.actionsBody.innerHTML = '';
+    Object.entries(state.actions).forEach(([name,obj])=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${escapeHtml(name)}</td><td>${obj.total}</td><td>${obj.last7}</td><td><button class='btn' data-act='${encodeURIComponent(name)}'>➕</button> <button class='btn' data-delact='${encodeURIComponent(name)}'>🗑️</button></td>`;
+      $.actionsBody.appendChild(tr);
+    });
+    $.actionsBody.querySelectorAll('button[data-act]').forEach(b=> b.onclick=()=>{ if(!requireEdit()) return; const k=decodeURIComponent(b.getAttribute('data-act')); state.actions[k].total++; state.actions[k].last7++; save(); });
+    $.actionsBody.querySelectorAll('button[data-delact]').forEach(b=> b.onclick=()=>{ if(!requireEdit()) return; const k=decodeURIComponent(b.getAttribute('data-delact')); delete state.actions[k]; save(); });
+  }
+  function renderFeeds(){
+    $.feedsWrap.innerHTML = '';
+    state.feeds.forEach((f,idx)=>{
+      const wrap = document.createElement('div');
+      wrap.className = 'card';
+      wrap.style.margin = '4px';
+      wrap.innerHTML = `<div class='row' style='justify-content:space-between;align-items:center;margin-bottom:8px'>
+        <strong>${escapeHtml(f.url)}</strong>
+        <button class='btn' data-rmfeed='${idx}'>🗑️ Remove</button>
+      </div>
+      <div class='muted' style='margin-bottom:6px'>Proxy: ${escapeHtml(f.proxy||'none')}</div>
+      <div class='feed-items'>Loading… (works online only)</div>`;
+      $.feedsWrap.appendChild(wrap);
+    });
+    $.feedsWrap.querySelectorAll('button[data-rmfeed]').forEach(b=> b.onclick=()=>{ if(!requireEdit()) return; const i=+b.getAttribute('data-rmfeed'); state.feeds.splice(i,1); save(); });
+  }
+  function renderHooks(){ const m = hooksManifest(); $.hooksList.innerHTML = m.nodes.map(n=>`<li><code>${n.id}</code> → <span class='muted'>${n.selector}</span> • <span class='tag'>${(n.capabilities||[]).join('</span><span class="tag">')}</span></li>`).join(''); }
+
+  function render(){
+    $.today.textContent = '• ' + new Date(state.updatedAt).toLocaleString();
+    const L = STR[state.i18n.lang]||STR.en;
+    els('[data-i18n="refresh"]').forEach(n=>n.textContent=L.refresh);
+    els('[data-i18n="export"]').forEach(n=>n.textContent=L.export);
+    els('[data-i18n="import"]').forEach(n=>n.textContent=L.import);
+    $.editLabel && ($.editLabel.textContent = state.edit.enabled? L.edit : L.view);
+
+    renderIndicators();
+    renderLog();
+    renderRegions();
+    renderRecon();
+    renderActions();
+    renderFeeds();
+    renderHooks();
+    refreshMap();
+  }
+
+  // --- Map (Leaflet) ---
+  let map, markers=[];
+  function initMap(){
+    try{
+      map = L.map('map',{zoomControl:true, attributionControl:false});
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18}).addTo(map);
+      map.setView([20,0], 2);
+    }catch(e){ /* offline/blocked */ }
+  }
+  function refreshMap(){
+    if(!window.L||!map) return;
+    markers.forEach(m=>m.remove()); markers=[];
+    state.regions.forEach(r=>{
+      if(r.lat&&r.lng){
+        const m=L.marker([r.lat,r.lng]).addTo(map);
+        m.bindPopup(`<strong>${escapeHtml(r.name)}</strong><br/>${escapeHtml(labelStatus(r.status))}`);
+        m.on('click',()=>{ if(!requireEdit()) return; state.log.push({ id: crypto.randomUUID(), text:`Marker clicked: ${r.name}`, link:null, tags:['map'], when:new Date().toISOString() }); save(); });
+        markers.push(m);
+      }
+    });
+  }
+
+  // --- Timeline modal ---
+  const $tl = { modal: el('#timeline-modal'), title: el('#tl-title'), canvas: el('#tl-canvas'), close: el('#tl-close') };
+  $tl.close.onclick = ()=> $tl.modal.classList.remove('open');
+  function openTimeline(id){ const r = state.regions.find(x=>x.id===id); if(!r) return; $tl.title.textContent = `Timeline • ${r.name}`; drawSpark($tl.canvas, r.timeline||[]); $tl.modal.classList.add('open'); }
+  function drawSpark(canvas, points){
+    const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.strokeStyle = '#78ffd6'; ctx.lineWidth=2;
+    if(!points||!points.length){ ctx.fillStyle='#6b7b8d'; ctx.fillText('No points yet. Plugins may add {t,v} entries.', 12, 24); return;}
+    const xs=points.map(p=>new Date(p.t).getTime()); const ys=points.map(p=>p.v);
+    const minx=Math.min(...xs), maxx=Math.max(...xs), miny=Math.min(...ys), maxy=Math.max(...ys);
+    const pad=16, W=canvas.width-2*pad, H=canvas.height-2*pad;
+    ctx.beginPath();
+    points.sort((a,b)=>new Date(a.t)-new Date(b.t)).forEach((p,i)=>{
+      const x=pad + ( (new Date(p.t).getTime()-minx)/Math.max(1,(maxx-minx)) )*W;
+      const y=pad + H - ((p.v-miny)/Math.max(1,(maxy-miny)))*H;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }); ctx.stroke();
+  }
+
+  // --- Estimation from RSS feeds ---
+  function feedsCorpus(){
+    const items=[];
+    for(const f of (state.feeds||[])){
+      const key='feed-cache:'+(f.proxy? f.proxy+f.url : f.url);
+      try{ const arr = JSON.parse(localStorage.getItem(key)||'[]'); arr.forEach(x=> items.push(x)); }catch(e){}
+    }
+    const now=Date.now();
+    return items.filter(it=>{ const t=Date.parse(it.date||''); return isFinite(t)? (now - t) < 72*3600*1000 : true; });
+  }
+  function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+  function scoreFromText(t){
+    t = (t||'').toLowerCase();
+    const W = {
+      ceasefire:+3, truce:+2.5, armistice:+3, lull:+1.5, deescalation:+1.8,
+      corridor:+2.5, humanitarian:+2.2, aid:+1.8, convoy:+2.0, access:+2.0, crossing:+1.5, blockade:-1.6,
+      talks:+2.2, dialogue:+2.0, negotiation:+2.3, mediated:+1.6, summit:+1.7, shuttle:+1.2,
+      strike:-1.8, offensive:-2.2, shelling:-2.0, escalation:-2.4, raid:-2.0
+    };
+    let sC=0,sA=0,sT=0;
+    for(const [k,w] of Object.entries(W)){
+      const hit = t.includes(k)?1:0;
+      if(['ceasefire','truce','armistice','lull','deescalation'].includes(k)) sC += hit*w;
+      if(['corridor','humanitarian','aid','convoy','access','crossing','blockade'].includes(k)) sA += hit*w;
+      if(['talks','dialogue','negotiation','mediated','summit','shuttle'].includes(k)) sT += hit*w;
+      if(['strike','offensive','shelling','escalation','raid'].includes(k)) { sC += hit*w; sA += hit*w; sT += hit*w; }
+    }
+    return {C:sC, A:sA, T:sT};
+  }
+  function estimateFromFeeds(){
+    if(!state.settings.autoEstimate) return;
+    const corpus = feedsCorpus();
+    let C=0,A=0,T=0;
+    corpus.slice(0,200).forEach(it=>{
+      const s=scoreFromText((it.title||'')+' '+(it.summary||''));
+      C+=s.C; A+=s.A; T+=s.T;
+    });
+    const map = v=> Math.round(100*clamp01( 0.5 + v/40 ));
+    const est = { ceasefiresPct: map(C), aidRoutesOpenPct: map(A), talksActivePct: map(T) };
+    const prev = state.derived?.indicators||{}; const beta = 0.3;
+    state.derived = {
+      indicators: {
+        ceasefiresPct: prev.ceasefiresPct==null? est.ceasefiresPct : Math.round(prev.ceasefiresPct*(1-beta)+est.ceasefiresPct*beta),
+        aidRoutesOpenPct: prev.aidRoutesOpenPct==null? est.aidRoutesOpenPct : Math.round(prev.aidRoutesOpenPct*(1-beta)+est.aidRoutesOpenPct*beta),
+        talksActivePct: prev.talksActivePct==null? est.talksActivePct : Math.round(prev.talksActivePct*(1-beta)+est.talksActivePct*beta)
+      },
+      last: new Date().toISOString()
+    };
+    render();
+  }
+
+  // --- Feeds (with aggregation) ---
+  async function fetchFeeds(force=false){
+    for (let i=0;i<state.feeds.length;i++){
+      const f = state.feeds[i]; const key = 'feed-cache:'+ (f.proxy? f.proxy+f.url : f.url);
+      if (!force){
+        const cached = localStorage.getItem(key); if(cached){
+          renderFeedItems(i, JSON.parse(cached)); continue;
+        }
+      }
+      try{
+        const target = f.proxy ? f.proxy + f.url : f.url;
+        const res = await fetch(target, {mode: f.proxy? 'cors':'no-cors'});
+        const text = await res.text();
+        const items = parseFeed(text).slice(0,10);
+        localStorage.setItem(key, JSON.stringify(items));
+        renderFeedItems(i, items);
+      }catch(err){
+        renderFeedItems(i, [{title:'Failed to load (CORS or offline)', link:'#', date:'', summary:''}]);
+      }
+    }
+    // Aggregate a unified list (top 15)
+    const corpus = feedsCorpus().sort((a,b)=> (Date.parse(b.date||'')||0)-(Date.parse(a.date||'')||0)).slice(0,15);
+    let agg = document.getElementById('feed-aggregate');
+    if(!agg){
+      agg = document.createElement('div'); agg.id = 'feed-aggregate'; agg.className='card'; agg.style.gridColumn='span 12';
+      agg.innerHTML = '<h3>Unified Feed (last 72h)</h3><div id="agg-items"></div>';
+      $.feedsWrap.parentElement.appendChild(agg);
+    }
+    el('#agg-items').innerHTML = corpus.map(it=>`<div style='margin:8px 0'>
+      <a href='${escapeAttr(it.link||"#")}' target='_blank' rel='noopener'>${escapeHtml(it.title||'Untitled')}</a>
+      <div class='muted' style='font-size:.85rem'>${it.date? new Date(it.date).toLocaleString(): ''}</div>
+      <div class='muted' style='margin-top:4px'>${escapeHtml(it.summary||'')}</div>
+    </div>`).join('');
+
+    estimateFromFeeds();
+  }
+  function renderFeedItems(idx, items){
+    const col = $.feedsWrap.children[idx]; if(!col) return;
+    const box = col.querySelector('.feed-items');
+    box.innerHTML = items.map(it=>`<div style='margin:8px 0'>
+      <a href='${escapeAttr(it.link||'#')}' target='_blank' rel='noopener'>${escapeHtml(it.title||'Untitled')}</a>
+      <div class='muted' style='font-size:.85rem'>${it.date? new Date(it.date).toLocaleString(): ''}</div>
+      <div class='muted' style='margin-top:4px'>${escapeHtml(it.summary||'')}</div>
+    </div>`).join('');
+  }
+  function parseFeed(xml){
+    try{
+      const doc = new DOMParser().parseFromString(xml, 'text/xml');
+      const items = [...doc.querySelectorAll('item')].map(x=>({
+        title: textC(x,'title'), link: textC(x,'link'), date: textC(x,'pubDate'), summary: textC(x,'description')
+      }));
+      if(items.length) return items;
+      const entries = [...doc.querySelectorAll('entry')].map(x=>({
+        title: textC(x,'title'), link: (x.querySelector('link')||{}).getAttribute?.('href'), date: textC(x,'updated')||textC(x,'published'), summary: textC(x,'summary')
+      }));
+      return entries;
+    }catch(e){ return []; }
+  }
+  function textC(elm,sel){ const n = elm.querySelector(sel); return n? (n.textContent||'').trim():''; }
+
+  // --- Edit gating ---
+  function requireEdit(){ if(!state.edit.enabled){ alert('Enable edit mode first.'); return false;} return true; }
+
+  // --- Events ---
+  $.btnApply.onclick = ()=>{
+    if(!requireEdit()) return;
+    state.indicators.ceasefiresPct = clamp(+$.inpCease.value,0,100);
+    state.indicators.aidRoutesOpenPct = clamp(+$.inpAid.value,0,100);
+    state.indicators.talksActivePct = clamp(+$.inpTalks.value,0,100);
+    save();
+  };
+  $.btnAdd.onclick = ()=>{
+    if(!requireEdit()) return;
+    const t = $.entryText.value.trim(); if(!t) return;
+    state.log.push({ id: crypto.randomUUID(), text:t, link:$.entryLink.value.trim()||null, tags: guessTags(t), when: new Date().toISOString() });
+    $.entryText.value=''; $.entryLink.value=''; save();
+  };
+  $.btnAddRegion.onclick = ()=>{
+    if(!requireEdit()) return;
+    const name = $.regionName.value.trim(); if(!name) return;
+    const st = $.regionStatus.value;
+    const lat=parseFloat($.coordLat.value)||null; const lng=parseFloat($.coordLng.value)||null;
+    state.regions.push({ id: crypto.randomUUID(), name, status: st, updatedAt: new Date().toISOString(), notes:'', lat, lng, timeline:[] });
+    $.regionName.value=''; save();
+  };
+  $.btnAddRecon.onclick = ()=>{
+    if(!requireEdit()) return;
+    const t = $.reconText.value.trim(); if(!t) return; state.reconciliations.push({ text:t, when:new Date().toISOString() }); $.reconText.value=''; save();
+  };
+  $.btnAddAction.onclick = ()=>{
+    if(!requireEdit()) return;
+    const n = $.actionName.value.trim(); if(!n) return;
+    const k = n; const inc = parseInt($.actionInc.value||'1',10);
+    state.actions[k] = state.actions[k]||{ total:0, last7:0 };
+    state.actions[k].total += inc; state.actions[k].last7 += inc; save();
+  };
+  $.btnExport.onclick = ()=>{
+    const data = JSON.stringify(state, null, 2);
+    const blob = new Blob([data], {type:'application/json'});
+    const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download = `peace-snapshot-${new Date().toISOString().slice(0,10)}.json`; a.click();
+  };
+  $.fileImport.onchange = e=>{
+    const f = e.target.files[0]; if(!f) return; const r = new FileReader();
+    r.onload = ()=>{ try{ state = JSON.parse(r.result); save(); }catch(err){ alert('Invalid file.'); } };
+    r.readAsText(f);
+  };
+  $.btnRefresh.onclick = ()=>{ if(!requireEdit()) return; state.updatedAt = new Date().toISOString(); save(); };
+  $.btnReset.onclick = (e)=>{ e.preventDefault(); if(!requireEdit()) return; if(confirm('Reset local data?')){ localStorage.removeItem('peace-dashboard'); state = defaultState(); save(); }}
+
+  $.btnAddFeed.onclick = ()=>{
+    if(!requireEdit()) return;
+    const url = $.feedUrl.value.trim(); if(!url) return; const proxy=$.feedProxy.value.trim()||null;
+    state.feeds.push({ url, proxy }); $.feedUrl.value=''; save(); fetchFeeds(true);
+  };
+  $.btnRefreshFeeds.onclick = ()=> fetchFeeds(true);
+
+  $.btnGenKey.onclick = async ()=>{
+    const keys = await crypto.subtle.generateKey({name:'ECDSA',namedCurve:'P-256'}, true, ['sign','verify']);
+    state.keys = { pub: arrayToB64(await crypto.subtle.exportKey('spki', keys.publicKey)), priv: arrayToB64(await crypto.subtle.exportKey('pkcs8', keys.privateKey)) };
+    save(); $.sigStatus.textContent = 'Ephemeral key generated (P-256).';
+  };
+  $.btnSign.onclick = async ()=>{
+    if(!requireEdit()) return;
+    if(!state.keys){ alert('Generate a key first.'); return; }
+    const data = new TextEncoder().encode(JSON.stringify(state));
+    const priv = await crypto.subtle.importKey('pkcs8', b64ToArray(state.keys.priv), {name:'ECDSA', namedCurve:'P-256'}, true, ['sign']);
+    const sig = await crypto.subtle.sign({name:'ECDSA', hash:'SHA-256'}, priv, data);
+    state.signatures.push({ when:new Date().toISOString(), algo:'P-256/SHA-256', sig: arrayToB64(new Uint8Array(sig)) }); save();
+    $.sigStatus.textContent = 'Snapshot signed.';
+  };
+  function arrayToB64(arr){ return btoa(String.fromCharCode(...new Uint8Array(arr))); }
+  function b64ToArray(b64){ const bin = atob(b64); const bytes = new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i); return bytes; }
+
+  // Edit mode & i18n
+  $.btnEdit.onclick = ()=>{ const pass = prompt('Enter local passphrase to toggle edit:'); if(!pass) return; state.edit.enabled = !state.edit.enabled; save(); };
+  $.lang.onchange = ()=>{ state.i18n.lang = $.lang.value; save(); };
+
+  // Hooks & plugins
+  function hooksManifest(){ try{ return JSON.parse(el('#hooks-manifest').textContent); }catch(e){ return {version:'1',nodes:[]}; } }
+  function registerPlugin(name, fn){ state.hooksInstalled.push(name); try{ fn({state, save, el, els}); }catch(e){ console.error('Plugin error', e); } }
+  $.btnRegisterSample.onclick = ()=>{ registerPlugin('sample.forecast', ({state,save})=>{ const inc = (Math.random()*2-1); state.indicators.talksActivePct = clamp(state.indicators.talksActivePct + inc,0,100); save(); }); };
+  $.btnDumpHooks.onclick = ()=>{ const blob = new Blob([el('#hooks-manifest').textContent],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='hooks-manifest.json'; a.click(); };
+
+  // tlk.io embed
+  $.tlkBtn.onclick = ()=>{
+    const ch = ($.tlkChannel.value||'world-peace-initiative').trim().toLowerCase();
+    $.tlkWrap.style.display='block';
+    $.tlkIframe.src = 'https://tlk.io/' + encodeURIComponent(ch);
+  };
+
+  // Service Worker (inline) for offline cache
+  (function registerSW(){
+    if(!('serviceWorker' in navigator)) return;
+    const sw = `self.addEventListener('install',e=>{ e.waitUntil(caches.open('peace-v${VERSION}').then(c=>c.addAll(['./'])) )});
+    self.addEventListener('fetch',e=>{ const req=e.request; e.respondWith(fetch(req).catch(()=>caches.match(req).then(r=>r||caches.match('./')))); });`;
+    const blob = new Blob([sw],{type:'text/javascript'}); const url = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(url).catch(()=>{});
+  })();
+
+  // Kickoff
+  $.ver.textContent = VERSION;
+  initMap();
+  render();
+  fetchFeeds();
+  // periodic estimator (5 min)
+  setInterval(()=> estimateFromFeeds(), 5*60*1000);
+  // estimator controls live updates
+  const ae = el('#auto-estimate'), sl = el('#estimate-alpha'), al = el('#alpha-label');
+  if(ae){ ae.addEventListener('change', ()=>{ state.settings.autoEstimate = ae.checked; save(); estimateFromFeeds(); }); }
+  if(sl){ sl.addEventListener('input', ()=>{ state.settings.estimateAlpha = (sl.value|0)/100; if(al) al.textContent = (sl.value|0)+'%'; render(); save(); }); }
+
+  // Geolocate
+  $.btnLocate.onclick = ()=>{ if(!navigator.geolocation) return alert('Geolocation unavailable'); navigator.geolocation.getCurrentPosition(p=>{ $.coordLat.value=p.coords.latitude.toFixed(5); $.coordLng.value=p.coords.longitude.toFixed(5); }, ()=>alert('Unable to get location')); };
+
+  // JSON-LD for semantic crawlers
+  const ld = {
+    '@context':'https://schema.org', '@type':'Dataset',
+    name:'World Peace Progress Dashboard',
+    description:'Citizen-led, zero-harm, online-first/offline-capable tracker for ceasefires, aid corridors, reconciliation, and citizen actions.',
+    license:'https://creativecommons.org/licenses/by/4.0/',
+    keywords:['peace','ceasefire','humanitarian','reconciliation','citizen science'],
+    distribution:[{ '@type':'DataDownload', encodingFormat:'application/json', name:'Snapshot schema', contentUrl: location.href + '#snapshot' }],
+    isAccessibleForFree:true
+  };
+  const s = document.createElement('script'); s.type='application/ld+json'; s.textContent = JSON.stringify(ld); document.body.appendChild(s);
+  </script>
+</body>
+</html>

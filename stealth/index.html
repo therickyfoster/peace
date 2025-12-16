@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🕊️ Peace Stealth — Standalone</title>
+<style>
+:root{
+  --bg: #0c0e12; --fg:#e8ecf1; --muted:#a9b3c0; --card:#12151b; --acc:#66e2b3; --warn:#ffb86b; --bad:#ff6b6b; --ok:#6bff95;
+  --ring: rgba(102,226,179,0.35);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0; background: radial-gradient(1200px 600px at 70% -10%, #1b2330 0%, #0c0e12 60%), var(--bg);
+  color:var(--fg); font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Inter, "Helvetica Neue", Arial, Apple Color Emoji, Segoe UI Emoji;
+}
+header{
+  position:sticky; top:0; z-index:10; backdrop-filter:saturate(1.2) blur(6px);
+  background:linear-gradient(180deg, rgba(12,14,18,0.85), rgba(12,14,18,0.6));
+  border-bottom:1px solid rgba(102,226,179,0.15);
+}
+.container{max-width:1100px; margin:0 auto; padding:18px}
+h1{margin:0 0 4px 0; font-weight:700; letter-spacing:.2px}
+sub{color:var(--muted)}
+.grid{display:grid; gap:16px}
+@media(min-width:900px){ .grid.cols-2{grid-template-columns:1.1fr .9fr} .grid.cols-3{grid-template-columns:1fr 1fr 1fr}}
+.card{
+  background:linear-gradient(180deg, rgba(18,21,27,0.9), rgba(18,21,27,0.75));
+  border:1px solid rgba(102,226,179,0.12); border-radius:14px; padding:14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,0.02);
+}
+.card h2{margin:0 0 10px 0; font-size:18px}
+label{display:block; margin:8px 0 6px; color:var(--muted)}
+textarea,input,select,button{
+  width:100%; border-radius:10px; border:1px solid rgba(102,226,179,0.18); background: #0f1319; color:var(--fg);
+  padding:10px 12px; outline:none;
+}
+textarea{min-height:120px; resize:vertical}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px var(--ring); border-color:var(--acc)}
+button{
+  cursor:pointer; font-weight:600; letter-spacing:.2px; transition:.15s transform ease, .15s background ease;
+  background:linear-gradient(180deg, #1d2a25, #0f1814);
+}
+button:hover{transform:translateY(-1px)}
+.row{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+.btn{flex:1}
+.tag{display:inline-flex; align-items:center; gap:6px; padding:4px 8px; border-radius:999px; background:#0e1319; border:1px solid rgba(102,226,179,0.2); color:var(--muted); font-size:12px}
+.small{font-size:12px; color:var(--muted)}
+kbd{background:#0a0d11; border:1px solid rgba(255,255,255,0.08); padding:2px 6px; border-radius:6px}
+hr{border:0; height:1px; background:linear-gradient(90deg, transparent, rgba(102,226,179,0.25), transparent); margin:12px 0}
+.monotext{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size:12px; color:#a6eecc}
+.status{display:flex; gap:8px; align-items:center}
+.bad{color:var(--bad)} .ok{color:var(--ok)} .warn{color:var(--warn)}
+.history{max-height:300px; overflow:auto; border-radius:10px; background:#0d1117; border:1px solid rgba(102,226,179,0.15); padding:8px}
+.history .item{padding:8px; border-radius:8px; border:1px solid rgba(102,226,179,0.08); margin:6px 0; background:#0f141b}
+.flex{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+code.inline{background:#0a0d11; padding:2px 6px; border-radius:6px; border:1px solid rgba(255,255,255,.06)}
+footer{opacity:.8; padding:20px 0 40px}
+a{color:var(--acc); text-decoration:none}
+a:hover{text-decoration:underline}
+.notice{padding:10px 12px; border:1px dashed rgba(255,255,255,0.15); border-radius:10px; color:var(--muted)}
+</style>
+</head>
+<body>
+<header>
+  <div class="container">
+    <h1>🕊️ Peace Stealth <sub>/peace/stealth</sub></h1>
+    <div class="flex small">
+      <span class="tag">Standalone • No libs</span>
+      <span class="tag">Local-only storage</span>
+      <span class="tag">Zero-Harm Guardrails</span>
+      <span class="tag">Best-effort Auto-Pulse</span>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="grid cols-2">
+    <section class="card">
+      <h2>1) Input &gt; Reframe</h2>
+      <label for="raw">Paste text or a link (we’ll reframe, de-escalate, and add sovereignty/zero-harm cues):</label>
+      <textarea id="raw" placeholder="Paste anything hostile or fragile here…"></textarea>
+      <div class="row">
+        <button id="btnReframe" class="btn">✨ Reframe</button>
+        <button id="btnClear">Clear</button>
+      </div>
+      <label for="out">Reframed output</label>
+      <textarea id="out" placeholder="Your peace-framed version will appear here…"></textarea>
+      <div class="row">
+        <button id="btnCopy" class="btn">📋 Copy</button>
+        <button id="btnShare" class="btn">📣 System Share</button>
+        <button id="btnBluesky" class="btn">🌌 Bluesky Compose</button>
+        <button id="btnEmail" class="btn">✉️ Email</button>
+      </div>
+      <p class="small notice">
+        Tip: “System Share” uses your device’s native share sheet. Bluesky intent opens a prefilled post composer.
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>2) Discord (optional)</h2>
+      <p class="small">You can try sending to a Discord <b>Incoming Webhook URL</b>. Browsers may block this with CORS (Discord policy). If it fails, use the <i>Power Automate / tiny relay</i> noted below.</p>
+      <label for="hook">Discord Webhook URL</label>
+      <input id="hook" placeholder="https://discord.com/api/webhooks/…">
+      <div class="row">
+        <button id="btnPostDiscord" class="btn">🚀 Post reframed to Discord</button>
+        <span id="statusDiscord" class="small status"></span>
+      </div>
+      <hr>
+      <h3>Server Widget (view-only)</h3>
+      <label for="serverId">Discord Server ID (widget enabled)</label>
+      <input id="serverId" placeholder="000000000000000000">
+      <div class="row">
+        <button id="btnLoadWidget" class="btn">🧩 Load Widget</button>
+        <button id="btnHideWidget">Hide</button>
+      </div>
+      <div id="widgetWrap" style="margin-top:10px; display:none;">
+        <iframe id="widget" title="Discord Widget" width="100%" height="350" allowtransparency="true" frameborder="0"
+          sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
+          src="">
+        </iframe>
+      </div>
+      <p class="small notice">
+        To enable the official widget: Server Settings → Widget → “Enable Server Widget” → copy Server ID here.
+      </p>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>3) Queue & Auto-Pulse (best effort)</h2>
+    <div class="grid cols-3">
+      <div>
+        <label for="queueIn">Add to queue (one per line)</label>
+        <textarea id="queueIn" placeholder="Paste multiple items here…"></textarea>
+        <button id="btnQueueAdd" class="btn">➕ Add to Queue</button>
+      </div>
+      <div>
+        <label>Queue</label>
+        <div id="queue" class="history" aria-live="polite"></div>
+        <div class="row">
+          <button id="btnQueueClear">🧹 Clear Queue</button>
+          <button id="btnQueueReframeAll" class="btn">✨ Reframe All (preview)</button>
+        </div>
+      </div>
+      <div>
+        <label for="pulseMin">Auto-pulse every (minutes)</label>
+        <input id="pulseMin" type="number" min="1" value="30">
+        <div class="row">
+          <button id="btnPulseStart" class="btn">▶ Start Auto-Pulse</button>
+          <button id="btnPulseStop">⏸ Stop</button>
+        </div>
+        <p class="small">Auto-pulse will reframe the next queued item and attempt: Discord → Share Sheet (if supported). Background tabs may be throttled by your browser/iOS.</p>
+        <div class="small" id="pulseStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>4) History & Export</h2>
+    <div class="row">
+      <button id="btnExport" class="btn">⬇ Export CSV</button>
+      <button id="btnClearHistory">🗑 Clear History</button>
+    </div>
+    <div id="history" class="history" aria-live="polite"></div>
+  </section>
+
+  <section class="card">
+    <h2>Help • Guardrails • Relays</h2>
+    <ul class="small">
+      <li><b>Discord in an iframe?</b> Not possible: Discord blocks full-client embeds. Use the <i>official widget</i> (view-only) shown above.</li>
+      <li><b>Webhook CORS?</b> If <code class="inline">Post reframed to Discord</code> fails: route through Power Automate or a tiny HTTPS relay you control.</li>
+      <li><b>Zero-Harm:</b> The reframer removes absolutist language, suggests needs-based phrasing, and adds a sovereignty clause.</li>
+      <li><b>Privacy:</b> Everything stays in your browser’s <code class="inline">localStorage</code>. Clear anytime.</li>
+    </ul>
+    <details>
+      <summary class="small">Show Power Automate (relay) outline</summary>
+      <pre class="monotext">
+Trigger: When an HTTP request is received
+Action: Post a JSON payload {content: "..."} to Discord Webhook (server-side, no CORS)
+Response: 200 OK to the browser
+      </pre>
+    </details>
+  </section>
+</main>
+
+<footer class="container small">
+  Made with calm hands. Peace prefers the patient.
+</footer>
+
+<script>
+/* -------- Utilities -------- */
+const $ = sel => document.querySelector(sel);
+const nowISO = () => new Date().toISOString();
+const store = {
+  get key(){ return "peace_stealth_v1"; },
+  read(){ try{ return JSON.parse(localStorage.getItem(this.key) || "{}"); } catch{ return {}; } },
+  write(obj){ localStorage.setItem(this.key, JSON.stringify(obj)); }
+};
+function initState(){
+  const d = store.read();
+  return Object.assign({
+    history: [],        // {ts, raw, out}
+    queue: [],          // [ strings ]
+    webhook: "",
+    serverId: "",
+    pulseMin: 30,
+    pulsing: false
+  }, d);
+}
+let state = initState();
+
+/* -------- Reframer (heuristic, client-side) -------- */
+function softReframe(text){
+  if(!text) return "";
+  let t = " " + text + " ";
+  const replaceMap = [
+    // soften absolutist language
+    [/\b(always|never|everyone|no one|nothing|everything)\b/gi, "often/sometimes"],
+    // reduce polarizing terms
+    [/\b(hate|enemy|traitor|crush|destroy|annihilate|humiliate)\b/gi, "harm/retaliation"],
+    // dial down certainty
+    [/\b(obviously|clearly|undeniably|without question)\b/gi, "it appears / evidence suggests"],
+  ];
+  replaceMap.forEach(([re,sub]) => t = t.replace(re, sub));
+  t = t.replace(/\s+/g," ").trim();
+
+  const addendum =
+    " • Reframe: honor dignity, clarify needs, and propose one small next step.\n" +
+    " • Sovereignty clause: consent, no coercion, zero-harm first.\n" +
+    " • De-escalation: pause 90s; ask a clarifying question before replying.";
+  let out = `${t}\n${addendum}`;
+
+  // keep under social limits where possible (best-effort)
+  if(out.length > 900){ out = out.slice(0, 897) + "…"; }
+  return out;
+}
+
+/* -------- History & Queue -------- */
+function renderHistory(){
+  const box = $("#history");
+  box.innerHTML = "";
+  state.history.slice().reverse().forEach(item=>{
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<div class="small">${item.ts}</div>
+      <div class="monotext">${escapeHtml(item.out).replace(/\n/g,"<br>")}</div>`;
+    box.appendChild(div);
+  });
+}
+function renderQueue(){
+  const box = $("#queue");
+  box.innerHTML = "";
+  state.queue.forEach((q, i)=>{
+    const div = document.createElement("div");
+    div.className = "item";
+    div.innerHTML = `<div class="small">#${i+1}</div>
+      <div>${escapeHtml(q)}</div>
+      <div class="row" style="margin-top:6px">
+        <button data-i="${i}" class="btnQueueUse">Use</button>
+        <button data-i="${i}" class="btnQueueDel">Delete</button>
+      </div>`;
+    box.appendChild(div);
+  });
+}
+function pushHistory(raw, out){
+  state.history.push({ts: nowISO(), raw, out});
+  persist();
+  renderHistory();
+}
+function persist(){
+  store.write({
+    history: state.history,
+    queue: state.queue,
+    webhook: state.webhook,
+    serverId: state.serverId,
+    pulseMin: state.pulseMin,
+    pulsing: state.pulsing
+  });
+}
+
+/* -------- Export CSV -------- */
+function toCSV(rows){
+  const esc = v => `"${String(v).replace(/"/g,'""')}"`;
+  const header = ["ts","raw","out"];
+  const body = rows.map(r=>[r.ts, r.raw, r.out].map(esc).join(",")).join("\n");
+  return header.join(",") + "\n" + body;
+}
+function download(filename, text){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], {type:"text/csv"}));
+  a.download = filename;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+}
+
+/* -------- Sharing -------- */
+async function copyToClipboard(text){
+  try{ await navigator.clipboard.writeText(text); return true; }catch{ return false; }
+}
+function blueskyIntent(text){
+  const u = new URL("https://bsky.app/intent/compose");
+  u.searchParams.set("text", text);
+  window.open(u.toString(), "_blank");
+}
+function emailIntent(text){
+  const u = new URL("mailto:");
+  u.searchParams.set("subject","Peace Reframe");
+  u.searchParams.set("body", text);
+  window.location.href = u.toString();
+}
+
+/* -------- Discord Webhook (may CORS-fail) -------- */
+async function postDiscord(webhook, content){
+  // Discord webhooks typically lack CORS headers; browsers may block the request.
+  // We still try; UI explains outcome.
+  const res = await fetch(webhook, {
+    method:"POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({content})
+  });
+  return res.ok;
+}
+
+/* -------- Widget -------- */
+function loadWidget(id){
+  const wrap = $("#widgetWrap");
+  const f = $("#widget");
+  if(!id){ wrap.style.display="none"; return; }
+  f.src = `https://discord.com/widget?id=${encodeURIComponent(id)}&theme=dark`;
+  wrap.style.display = "block";
+}
+
+/* -------- Helpers -------- */
+function escapeHtml(s){ return s.replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;" }[m])); }
+
+/* -------- Wire up UI -------- */
+function boot(){
+  // Restore persisted fields
+  $("#hook").value = state.webhook || "";
+  $("#serverId").value = state.serverId || "";
+  $("#pulseMin").value = state.pulseMin || 30;
+  renderHistory(); renderQueue();
+  if(state.serverId) loadWidget(state.serverId);
+
+  $("#btnReframe").onclick = ()=>{
+    const raw = $("#raw").value.trim();
+    const out = softReframe(raw);
+    $("#out").value = out;
+    if(out) pushHistory(raw, out);
+  };
+  $("#btnClear").onclick = ()=>{ $("#raw").value=""; $("#out").value=""; };
+
+  $("#btnCopy").onclick = async ()=>{
+    const ok = await copyToClipboard($("#out").value);
+    alert(ok ? "Copied to clipboard." : "Copy failed. Select text and press Ctrl/Cmd+C.");
+  };
+  $("#btnShare").onclick = async ()=>{
+    const text = $("#out").value;
+    if(navigator.share){
+      try{ await navigator.share({text}); } catch(e){}
+    } else {
+      alert("System Share not supported. Use Copy/Bluesky/Email.");
+    }
+  };
+  $("#btnBluesky").onclick = ()=>blueskyIntent($("#out").value);
+  $("#btnEmail").onclick = ()=>emailIntent($("#out").value);
+
+  $("#btnPostDiscord").onclick = async ()=>{
+    const hook = $("#hook").value.trim();
+    state.webhook = hook; persist();
+    const content = $("#out").value.trim();
+    if(!hook || !content){ $("#statusDiscord").innerHTML = `<span class="bad">Need webhook + content.</span>`; return; }
+    $("#statusDiscord").innerHTML = `<span class="warn">Posting…</span>`;
+    try{
+      const ok = await postDiscord(hook, content);
+      $("#statusDiscord").innerHTML = ok ? `<span class="ok">Posted (if CORS permitted)</span>` : `<span class="bad">Request failed (server said no)</span>`;
+    }catch(e){
+      $("#statusDiscord").innerHTML = `<span class="bad">Blocked by browser (CORS). Use the relay noted below.</span>`;
+    }
+  };
+
+  $("#btnLoadWidget").onclick = ()=>{
+    const id = $("#serverId").value.trim();
+    state.serverId = id; persist();
+    loadWidget(id);
+  };
+  $("#btnHideWidget").onclick = ()=>{ $("#widgetWrap").style.display="none"; };
+
+  $("#btnQueueAdd").onclick = ()=>{
+    const lines = $("#queueIn").value.split("\n").map(s=>s.trim()).filter(Boolean);
+    state.queue.push(...lines); $("#queueIn").value=""; persist(); renderQueue();
+  };
+  $("#btnQueueClear").onclick = ()=>{ state.queue = []; persist(); renderQueue(); };
+  $("#queue").addEventListener("click",(e)=>{
+    const i = e.target.getAttribute("data-i");
+    if(i==null) return;
+    if(e.target.classList.contains("btnQueueDel")){
+      state.queue.splice(Number(i),1); persist(); renderQueue();
+    } else if(e.target.classList.contains("btnQueueUse")){
+      $("#raw").value = state.queue[Number(i)];
+      document.getElementById("btnReframe").click();
+    }
+  });
+  $("#btnQueueReframeAll").onclick = ()=>{
+    if(!state.queue.length){ alert("Queue is empty."); return; }
+    state.queue.forEach(q=>{
+      const out = softReframe(q);
+      pushHistory(q, out);
+    });
+    alert("Queued items reframed into history for sharing.");
+  };
+
+  let pulseTimer = null;
+  function updatePulseStatus(){
+    $("#pulseStatus").textContent = state.pulsing ? `Auto-pulse running every ${state.pulseMin} min.` : "Auto-pulse stopped.";
+  }
+  $("#btnPulseStart").onclick = ()=>{
+    const mins = parseInt($("#pulseMin").value || "30", 10);
+    state.pulseMin = Math.max(1, mins);
+    state.pulsing = true; persist(); updatePulseStatus();
+    if(pulseTimer) clearInterval(pulseTimer);
+    const run = async ()=>{
+      if(!state.queue.length){ return; }
+      const next = state.queue.shift();
+      persist(); renderQueue();
+      const out = softReframe(next);
+      $("#out").value = out; pushHistory(next, out);
+      // Try Discord first, then offer share sheet
+      const hook = $("#hook").value.trim();
+      if(hook){
+        try{ await postDiscord(hook, out); }catch(_){}
+      }
+      if(navigator.share){
+        try{ await navigator.share({text: out}); } catch(_){}
+      }
+    };
+    run(); // fire immediately
+    pulseTimer = setInterval(run, state.pulseMin*60*1000);
+  };
+  $("#btnPulseStop").onclick = ()=>{
+    state.pulsing = false; persist(); updatePulseStatus();
+    if(pulseTimer) clearInterval(pulseTimer);
+  };
+  updatePulseStatus();
+
+  $("#btnExport").onclick = ()=>{
+    if(!state.history.length){ alert("No history yet."); return; }
+    download(`peace_log_${new Date().toISOString().slice(0,10)}.csv`, toCSV(state.history));
+  };
+  $("#btnClearHistory").onclick = ()=>{
+    if(confirm("Clear all history?")){ state.history = []; persist(); renderHistory(); }
+  };
+}
+document.addEventListener("DOMContentLoaded", boot);
+</script>
+</body>
+</html>

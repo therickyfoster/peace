@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Peace Regardless — A Nonpartisan Calm Kit</title>
+<meta name="description" content="A lightweight, offline-first page to help communities de-escalate, fact-check, and coordinate peaceful action regardless of politics." />
+<style>
+  :root{
+    --bg: #0f1117;
+    --card:#151826;
+    --ink:#e6e6ea;
+    --muted:#aab0c0;
+    --accent:#67e8f9;
+    --good:#7ee787;
+    --warn:#ffd166;
+    --bad:#ff6b6b;
+    --link:#76c7ff;
+    --border:#2a2f45;
+    --shadow: 0 6px 24px rgba(0,0,0,0.25);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f7f7fb; --card:#ffffff; --ink:#1d2330; --muted:#5b6477; --accent:#0ea5e9;
+      --border:#e6e8ef; --shadow: 0 6px 24px rgba(14,165,233,0.10);
+      color-scheme: light;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; font:16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+    background:radial-gradient(1200px 700px at 10% -10%, rgba(103,232,249,0.12), transparent 60%),
+               radial-gradient(800px 600px at 90% 110%, rgba(126,231,135,0.10), transparent 60%),
+               var(--bg);
+    color:var(--ink);
+  }
+  header{
+    padding:28px 18px 16px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; backdrop-filter:saturate(1.1) blur(8px); background:color-mix(in oklab, var(--bg) 85%, transparent);
+    z-index:5;
+  }
+  .wrap{max-width:1100px; margin:0 auto; padding:0 10px}
+  h1{font-size:1.6rem; margin:0 0 6px}
+  .tag{display:inline-block; padding:6px 10px; border:1px solid var(--border); border-radius:999px; color:var(--muted); font-size:.9rem}
+  nav{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px}
+  nav a{color:var(--link); text-decoration:none; border:1px solid var(--border); padding:8px 10px; border-radius:8px}
+  main{padding:18px}
+  section{background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; margin:14px 0; box-shadow:var(--shadow)}
+  section h2{margin:0 0 10px; font-size:1.25rem}
+  p, li{color:var(--muted)}
+  .grid{display:grid; gap:14px}
+  @media(min-width:920px){ .grid{grid-template-columns:1fr 1fr} }
+  .btn{appearance:none; border:1px solid var(--border); padding:10px 14px; border-radius:10px; color:var(--ink); background:transparent; cursor:pointer}
+  .btn.primary{border-color:color-mix(in oklab, var(--accent) 40%, var(--border)); background:color-mix(in oklab, var(--accent) 18%, transparent)}
+  .row{display:flex; gap:10px; flex-wrap:wrap}
+  textarea, input, select{
+    width:100%; background:#0b0e16; color:var(--ink); border:1px solid var(--border);
+    border-radius:10px; padding:10px; font:inherit;
+  }
+  @media (prefers-color-scheme: light){
+    textarea, input, select{background:#fff}
+  }
+  .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border:1px dashed var(--border); border-radius:999px; font-size:.9rem}
+  .badge{padding:2px 8px; border-radius:6px; background:#0b0e16; border:1px solid var(--border)}
+  .good{color:var(--good)} .warn{color:var(--warn)} .bad{color:var(--bad)}
+  .small{font-size:.92rem}
+  footer{padding:28px 18px; color:var(--muted); text-align:center}
+  .right{margin-left:auto}
+  .kbd{padding:2px 6px; border:1px solid var(--border); border-radius:6px; font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace}
+  .notice{background:linear-gradient(90deg, rgba(103,232,249,.12), transparent 60%); border-left:3px solid var(--accent); padding:12px 14px; border-radius:10px}
+  .list-tight li{margin:6px 0}
+  .timer{font-variant-numeric:tabular-nums; font-size:2rem; margin:8px 0 0}
+  .print-only{display:none}
+  @media print{
+    header, nav, .no-print{display:none !important}
+    .print-only{display:block}
+    body{background:white; color:black}
+    section{break-inside:avoid; box-shadow:none; border-color:#ddd}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="row" style="align-items:center">
+      <h1>Peace Regardless</h1>
+      <span class="tag">Nonpartisan De-escalation Kit</span>
+      <span class="pill right"><span class="badge">Offline</span> Works without internet</span>
+    </div>
+    <nav class="no-print">
+      <a href="#one-minute">1-Minute Calm</a>
+      <a href="#reframe">Reframe Tool</a>
+      <a href="#rumor">Rumor Control</a>
+      <a href="#dialogue">Bridge Scripts</a>
+      <a href="#map">Conflict Map</a>
+      <a href="#mutual-aid">Mutual Aid</a>
+      <a href="#export">Export/Print</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="intro">
+    <h2>Purpose</h2>
+    <p>
+      Politics will wobble. Our duty is steadier: reduce harm, preserve dignity, and keep neighbors talking.
+      This page gives you quick, practical moves to cool things down—no matter who said what on any stage.
+    </p>
+    <div class="notice small">
+      Principles: <strong>Peace first</strong>, <strong>unity of peoples</strong>, <strong>sovereignty guard</strong>, and <strong>tech as adaptation</strong>.
+      In plain language: protect life, refuse dehumanization, respect agency, use tools to heal not to harm.
+    </div>
+  </section>
+
+  <section id="one-minute" class="grid">
+    <div>
+      <h2>1-Minute Calm Protocol</h2>
+      <ol class="list-tight">
+        <li><strong>Press Pause (10s):</strong> Drop shoulders. Unclench jaw. Name what you feel (e.g., “angry & afraid”).</li>
+        <li><strong>Box Breathe (30s):</strong> In 4s • Hold 4s • Out 4s • Hold 4s. Repeat 3×. <span class="kbd">Start</span> the timer.</li>
+        <li><strong>Re-aim (20s):</strong> Ask: “What outcome reduces harm in the next hour?” Choose one micro-action below.</li>
+      </ol>
+      <div class="row">
+        <button class="btn primary" id="startBreath">Start 60s Timer</button>
+        <div class="timer" id="timer">60</div>
+      </div>
+      <p class="small">Tip: standing? Place one palm on your sternum and one on your belly to anchor attention.</p>
+    </div>
+    <div>
+      <h2>Choose a Micro-Action</h2>
+      <ul class="list-tight">
+        <li>Send a <em>bridge text</em> (“I want us safe; can we talk after we both cool off?”).</li>
+        <li>Post a <em>de-escalation cue</em> (“I’ll verify before I amplify. No insults here.”).</li>
+        <li>Start a <em>neighbor check-in</em> for elders or folks without transport.</li>
+        <li>Open the <a href="#reframe">Reframe Tool</a> before you reply to hot content.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="reframe">
+    <h2>Narrative Reframe Tool</h2>
+    <p>Paste what you’re about to post. This reshapes it toward dignity, clarity, and de-escalation.</p>
+    <textarea id="reframeIn" rows="6" placeholder="Paste the heated message or your draft reply here…"></textarea>
+    <div class="row">
+      <select id="tone">
+        <option value="calm">Calm & Respectful</option>
+        <option value="firm">Firm & Boundaried</option>
+        <option value="bridge">Bridge-Building</option>
+        <option value="apology">Repair & Apology</option>
+      </select>
+      <button class="btn primary" id="reframeBtn">Reframe</button>
+      <button class="btn" id="copyOut">Copy Output</button>
+    </div>
+    <textarea id="reframeOut" rows="6" placeholder="Reframed text will appear here…" aria-label="Reframed text"></textarea>
+    <p class="small">Heuristics used: lower heat, remove labels, state shared values, ask one genuine question, propose a next step.</p>
+  </section>
+
+  <section id="rumor" class="grid">
+    <div>
+      <h2>Rumor Control Checklist</h2>
+      <ul class="list-tight">
+        <li><strong>Source?</strong> Who said it first? Is there primary footage/doc?</li>
+        <li><strong>Context?</strong> 10s clip or full segment? Any edits?</li>
+        <li><strong>Corroboration?</strong> Two independent confirmations?</li>
+        <li><strong>Motive?</strong> Who benefits if I believe/share this?</li>
+        <li><strong>Time?</strong> When was it recorded vs. posted?</li>
+        <li><strong>Harm?</strong> Could sharing increase danger to anyone? If yes, slow down.</li>
+      </ul>
+      <p class="small">Mantra: <em>Verify before you amplify.</em> Screenshots lie; patterns over moments.</p>
+    </div>
+    <div>
+      <h2>Neutral Summary Builder</h2>
+      <textarea id="summaryIn" rows="5" placeholder="Paste a claim. We’ll strip spin and extract verifiable pieces."></textarea>
+      <div class="row">
+        <button class="btn primary" id="summarizeBtn">Build Neutral Summary</button>
+        <button class="btn" id="copySum">Copy Summary</button>
+      </div>
+      <textarea id="summaryOut" rows="5" placeholder="Neutral summary will appear here…"></textarea>
+    </div>
+  </section>
+
+  <section id="dialogue" class="grid">
+    <div>
+      <h2>Bridge Scripts (Pick & Use)</h2>
+      <ul class="list-tight">
+        <li><strong>De-heat:</strong> “I want safety and fairness for everyone here. Can we slow this down 10%?”</li>
+        <li><strong>Boundaries:</strong> “I’ll continue if we avoid labels. I’ll go first: here’s my concern in one sentence…”</li>
+        <li><strong>Common ground:</strong> “What outcome would make you feel less worried <em>this week</em>?”</li>
+        <li><strong>Repair:</strong> “I was heated and that wasn’t fair. Here’s my revised point, shorter and kinder…”</li>
+        <li><strong>Exit safely:</strong> “We’re looping. I’m pausing for now and open to revisit tomorrow.”</li>
+      </ul>
+    </div>
+    <div>
+      <h2>De-escalation Do/Don’t</h2>
+      <ul class="list-tight">
+        <li class="good">Do: Ask, paraphrase, and check you got it right.</li>
+        <li class="good">Do: Speak in specifics (“this policy at 2:14”) not tribes.</li>
+        <li class="warn">Caution: Sarcasm online reads as contempt.</li>
+        <li class="bad">Avoid: Dehumanizing labels or threats (always unacceptable).</li>
+      </ul>
+      <p class="small">Rule of thumb: aim for future-tense proposals, not past-tense punishments.</p>
+    </div>
+  </section>
+
+  <section id="map">
+    <h2>Conflict Map (Local)</h2>
+    <p>Use this to track tensions and needs. Stored in your browser only.</p>
+    <div class="grid">
+      <div>
+        <label>Issue / Flashpoint <input id="m_issue" placeholder="e.g., protest at Main & 5th" /></label>
+      </div>
+      <div>
+        <label>Who’s affected? <input id="m_people" placeholder="e.g., residents, shop owners, students" /></label>
+      </div>
+      <div>
+        <label>Risks <input id="m_risks" placeholder="e.g., traffic conflict, misinformation, agitation" /></label>
+      </div>
+      <div>
+        <label>Needs <input id="m_needs" placeholder="e.g., water, mediators, clear info, quiet zone" /></label>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="addMap">Add Item</button>
+      <button class="btn" id="clearMap">Clear All</button>
+      <button class="btn" id="exportMap">Export JSON</button>
+    </div>
+    <div id="mapList" style="margin-top:10px"></div>
+  </section>
+
+  <section id="mutual-aid" class="grid">
+    <div>
+      <h2>Mutual Aid Board</h2>
+      <p>Offer/Request support without politics attached.</p>
+      <div class="grid">
+        <input id="aid_item" placeholder="Offer or need (e.g., rides to polling place / earplugs / tea)" />
+        <input id="aid_contact" placeholder="Contact (only what you’re ok sharing)" />
+      </div>
+      <div class="row" style="margin-top:10px">
+        <select id="aid_type">
+          <option>Offer</option>
+          <option>Request</option>
+        </select>
+        <button class="btn primary" id="aid_add">Post</button>
+        <button class="btn" id="aid_clear">Clear</button>
+      </div>
+      <div id="aid_list" style="margin-top:10px"></div>
+    </div>
+    <div>
+      <h2>Safety & Well-Being</h2>
+      <ul class="list-tight">
+        <li>Designate a <em>calm buddy</em> to text before posting hot takes.</li>
+        <li>Set a <em>curfew</em> for doomscrolling. Sleep is peace infrastructure.</li>
+        <li>Keep a <em>quiet kit</em>: earplugs, water, snack, phone charger.</li>
+        <li>If gathering publicly: agree on a <em>non-engagement rule</em> with provokers.</li>
+      </ul>
+      <p class="small">Emergencies: follow local laws and contact relevant services. De-escalation never justifies ignoring safety.</p>
+    </div>
+  </section>
+
+  <section id="export">
+    <h2>Export & Share (Local-Only)</h2>
+    <div class="row">
+      <button class="btn" id="saveState">Save State</button>
+      <button class="btn" id="loadState">Load State</button>
+      <button class="btn" id="downloadTxt">Download One-Pager</button>
+      <button class="btn" onclick="window.print()">Print</button>
+    </div>
+    <p class="small">No servers. Your data stays in this browser unless you export it.</p>
+    <div class="print-only">
+      <h3>Print Summary</h3>
+      <ul>
+        <li>Calm Protocol, Reframe heuristics, Rumor Checklist</li>
+        <li>Bridge Scripts & Do/Don’t</li>
+        <li>Conflict Map & Mutual Aid entries (if any)</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="ethos">
+    <h2>Ethos</h2>
+    <p>
+      We are many lineages, one neighborhood. Let our speech lower fear, our checks catch errors, our hands help nearby.
+      Peace is not permission; it’s strategy. De-escalation preserves the field where truth can be found.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  Built for tense moments when headlines spike noise. You control the signal.
+</footer>
+
+<script>
+  // --- 1-Minute Timer (Box breathing) ---
+  const timerEl = document.getElementById('timer');
+  document.getElementById('startBreath').addEventListener('click', () => {
+    let t = 60;
+    timerEl.textContent = t;
+    clearInterval(window.__peaceTimer);
+    announcePhase(t);
+    window.__peaceTimer = setInterval(()=>{
+      t--; timerEl.textContent = t;
+      if([45,30,15].includes(t)) announcePhase(t); // cue phases each 15s
+      if(t<=0){ clearInterval(window.__peaceTimer); timerEl.textContent = "Done"; speak("Nice work. Choose one micro-action."); }
+    },1000);
+  });
+  function announcePhase(t){
+    const idx = Math.floor((60 - t)/15)%4;
+    const phases = ["In… two… three… four… Hold…","Out… two… three… four… Hold…","In… two… three… four… Hold…","Out… two… three… four… Hold…"];
+    speak(phases[idx]);
+  }
+  function speak(text){
+    try{
+      const s = new SpeechSynthesisUtterance(text);
+      s.rate = 0.95; s.pitch = 1;
+      window.speechSynthesis.cancel(); window.speechSynthesis.speak(s);
+    }catch{}
+  }
+
+  // --- Reframe Tool ---
+  const heuristics = {
+    calm: ["Remove labels and name the behavior, not the person.",
+           "Add one shared value (safety, fairness, dignity).",
+           "Replace multiple claims with one checkable claim and one question.",
+           "Offer a next step (pause, source, time to revisit)."],
+    firm: ["State boundary without insult.",
+           "Use first-person specifics: 'When X, I feel Y because Z.'",
+           "One clear request.",
+           "Define consequence that is safe & proportionate (mute/step away)."],
+    bridge: ["Lead with steel-man: summarize their best point fairly.",
+             "Name overlapping concern.",
+             "Invite co-verification of one fact.",
+             "Propose a small joint action."],
+    apology: ["Name what you did without excuses.",
+              "Name the impact you think it had.",
+              "State what you’ll do differently next time.",
+              "Ask if there’s anything else you missed."]
+  };
+  function reframe(text, mode){
+    // 1) Strip ALL CAPS & exclamations density; 2) remove labels; 3) structure by heuristic
+    const clean = text
+      .replace(/\b(them|those people|idiots|traitors|sheep|bots)\b/gi,"")
+      .replace(/[!?]{2,}/g,".")
+      .replace(/\s{2,}/g," ")
+      .trim();
+    const steps = heuristics[mode] || heuristics.calm;
+    const scaffold = {
+      calm: v => `I care about safety and dignity for everyone here. ${v}\n\nHere’s the specific point I’m focused on: [state one checkable claim]. Could we verify this together and keep labels out of it?`,
+      firm: v => `I want a constructive exchange. ${v}\n\nI won’t continue if there are insults or threats. If we keep it specific and civil, I’m in.`,
+      bridge: v => `I can see the concern you’re raising. The strongest version I hear is: [steel-man it in one line]. ${v}\n\nShared aim: keep people safe and informed. How about we fact-check one source together?`,
+      apology: v => `You’re right to flag my tone earlier. ${v}\n\nI’m sorry for my part. I’m rewriting for clarity and respect. If you’re open, I’d like to try again.`
+    }[mode];
+    return scaffold(clean);
+  }
+  document.getElementById('reframeBtn').addEventListener('click', ()=>{
+    const input = document.getElementById('reframeIn').value;
+    const mode = document.getElementById('tone').value;
+    document.getElementById('reframeOut').value = reframe(input, mode);
+  });
+  document.getElementById('copyOut').addEventListener('click', ()=>copy('reframeOut'));
+
+  // --- Neutral Summary Builder ---
+  document.getElementById('summarizeBtn').addEventListener('click', ()=>{
+    const txt = (document.getElementById('summaryIn').value || "").trim();
+    const lines = txt.split(/[\n\.]+/).map(s=>s.trim()).filter(Boolean);
+    const facts = [];
+    lines.forEach(l=>{
+      // Extract tentative claim skeletons (very naive, offline rule-based)
+      const m = l.match(/(on|at|in)\s+(\w.*?)(,|\s|$)/i);
+      const when = (m && m[2] && m[2].length<60) ? m[2] : "time unclear";
+      facts.push(`• Claim: "${l.slice(0,140)}"${l.length>140?'…':''} — time: ${when}, source: [unverified]`);
+    });
+    const neutral = [
+      "NEUTRAL SUMMARY",
+      "— What is claimed:",
+      ...facts,
+      "— Unknowns: original source, full context length, independent corroboration.",
+      "— Next steps: find primary source, confirm time recorded vs time posted, seek 2 independent confirmations."
+    ].join("\n");
+    document.getElementById('summaryOut').value = neutral;
+  });
+  document.getElementById('copySum').addEventListener('click', ()=>copy('summaryOut'));
+
+  function copy(id){
+    const el = document.getElementById(id);
+    el.select(); el.setSelectionRange(0,99999);
+    document.execCommand('copy');
+  }
+
+  // --- Conflict Map (LocalStorage) ---
+  const mapKey = 'peace.conflict.map.v1';
+  const mapList = document.getElementById('mapList');
+  function renderMap(){
+    const data = JSON.parse(localStorage.getItem(mapKey)||'[]');
+    if(!data.length){ mapList.innerHTML = '<p class="small">No items yet.</p>'; return; }
+    mapList.innerHTML = data.map((x,i)=>`
+      <div style="border:1px solid var(--border); border-radius:10px; padding:10px; margin:8px 0">
+        <div><strong>${escapeHtml(x.issue)}</strong></div>
+        <div class="small">People: ${escapeHtml(x.people)}</div>
+        <div class="small">Risks: ${escapeHtml(x.risks)}</div>
+        <div class="small">Needs: ${escapeHtml(x.needs)}</div>
+        <div class="row" style="margin-top:8px">
+          <button class="btn" onclick="delMap(${i})">Remove</button>
+        </div>
+      </div>`).join('');
+  }
+  function delMap(i){
+    const data = JSON.parse(localStorage.getItem(mapKey)||'[]');
+    data.splice(i,1); localStorage.setItem(mapKey, JSON.stringify(data)); renderMap();
+  }
+  document.getElementById('addMap').addEventListener('click', ()=>{
+    const obj = {
+      issue: document.getElementById('m_issue').value,
+      people: document.getElementById('m_people').value,
+      risks: document.getElementById('m_risks').value,
+      needs: document.getElementById('m_needs').value
+    };
+    if(!obj.issue.trim()) return alert("Add an issue/flashpoint.");
+    const data = JSON.parse(localStorage.getItem(mapKey)||'[]'); data.push(obj);
+    localStorage.setItem(mapKey, JSON.stringify(data)); renderMap();
+    ['m_issue','m_people','m_risks','m_needs'].forEach(id=>document.getElementById(id).value="");
+  });
+  document.getElementById('clearMap').addEventListener('click', ()=>{
+    if(confirm("Clear all conflict map items?")){ localStorage.removeItem(mapKey); renderMap(); }
+  });
+  document.getElementById('exportMap').addEventListener('click', ()=>{
+    const blob = new Blob([localStorage.getItem(mapKey)||'[]'], {type:"application/json"});
+    download(blob, "conflict-map.json");
+  });
+  renderMap();
+
+  // --- Mutual Aid (LocalStorage) ---
+  const aidKey = 'peace.mutual.aid.v1'; const aidList = document.getElementById('aid_list');
+  function renderAid(){
+    const data = JSON.parse(localStorage.getItem(aidKey)||'[]');
+    if(!data.length){ aidList.innerHTML = '<p class="small">Nothing posted yet.</p>'; return; }
+    aidList.innerHTML = data.map((x,i)=>`
+      <div style="border:1px solid var(--border); border-radius:10px; padding:10px; margin:8px 0">
+        <div><span class="badge">${x.type}</span> ${escapeHtml(x.item)}</div>
+        <div class="small">${escapeHtml(x.contact||'')}</div>
+        <div class="row" style="margin-top:8px"><button class="btn" onclick="delAid(${i})">Remove</button></div>
+      </div>`).join('');
+  }
+  function delAid(i){
+    const data = JSON.parse(localStorage.getItem(aidKey)||'[]');
+    data.splice(i,1); localStorage.setItem(aidKey, JSON.stringify(data)); renderAid();
+  }
+  document.getElementById('aid_add').addEventListener('click', ()=>{
+    const item = document.getElementById('aid_item').value.trim();
+    if(!item) return alert("Add an offer or request.");
+    const entry = {
+      item, contact: document.getElementById('aid_contact').value.trim(),
+      type: document.getElementById('aid_type').value
+    };
+    const data = JSON.parse(localStorage.getItem(aidKey)||'[]'); data.push(entry);
+    localStorage.setItem(aidKey, JSON.stringify(data)); renderAid();
+    ['aid_item','aid_contact'].forEach(id=>document.getElementById(id).value="");
+  });
+  document.getElementById('aid_clear').addEventListener('click', ()=>{
+    if(confirm("Clear all mutual aid posts?")){ localStorage.removeItem(aidKey); renderAid(); }
+  });
+  renderAid();
+
+  // --- Save/Load/Export ---
+  const stateKeys = ['reframeIn','reframeOut','summaryIn','summaryOut'];
+  document.getElementById('saveState').addEventListener('click', ()=>{
+    const state = Object.fromEntries(stateKeys.map(id=>[id, document.getElementById(id).value]));
+    state[mapKey] = localStorage.getItem(mapKey)||'[]';
+    state[aidKey] = localStorage.getItem(aidKey)||'[]';
+    localStorage.setItem('peace.state.v1', JSON.stringify(state));
+    alert("Saved locally.");
+  });
+  document.getElementById('loadState').addEventListener('click', ()=>{
+    const raw = localStorage.getItem('peace.state.v1'); if(!raw) return alert("No saved state found.");
+    const state = JSON.parse(raw);
+    stateKeys.forEach(id=>{ if(state[id]!==undefined) document.getElementById(id).value = state[id]; });
+    if(state[mapKey]) localStorage.setItem(mapKey, state[mapKey]); renderMap();
+    if(state[aidKey]) localStorage.setItem(aidKey, state[aidKey]); renderAid();
+    alert("Loaded.");
+  });
+  document.getElementById('downloadTxt').addEventListener('click', ()=>{
+    const lines = [];
+    lines.push("# Peace Regardless — One-Pager\n");
+    lines.push("## Calm Protocol\n- Box breathe 60s\n- Choose one micro-action\n");
+    lines.push("## Reframe Heuristics\n- Lower heat, state value, ask a question, offer next step\n");
+    const reOut = document.getElementById('reframeOut').value.trim();
+    if(reOut) lines.push("## Your Reframed Text\n" + reOut + "\n");
+    const sumOut = document.getElementById('summaryOut').value.trim();
+    if(sumOut) lines.push("## Neutral Summary\n" + sumOut + "\n");
+    const map = JSON.parse(localStorage.getItem(mapKey)||'[]');
+    if(map.length){
+      lines.push("## Conflict Map");
+      map.forEach((m,i)=> lines.push(`- ${i+1}. ${m.issue} | People: ${m.people} | Risks: ${m.risks} | Needs: ${m.needs}`));
+      lines.push("");
+    }
+    const aid = JSON.parse(localStorage.getItem(aidKey)||'[]');
+    if(aid.length){
+      lines.push("## Mutual Aid");
+      aid.forEach((a,i)=> lines.push(`- ${i+1}. [${a.type}] ${a.item} — ${a.contact||''}`));
+      lines.push("");
+    }
+    const blob = new Blob([lines.join("\n")], {type:"text/plain"});
+    download(blob, "peace-regardless.txt");
+  });
+
+  // --- Helpers ---
+  function escapeHtml(s){ return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])); }
+  function download(blob, filename){
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+  }
+</script>
+</body>
+</html>

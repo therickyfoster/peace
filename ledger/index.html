@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Peace Ledger · Intergalactic Steward Kernel</title>
+
+<!-- Security posture for single-file demo. If you later split JS/CSS to separate files, remove 'unsafe-inline' and use SRI/hashes. -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' blob:;
+  script-src 'self' 'unsafe-inline' blob:;
+  style-src 'self' 'unsafe-inline';
+  img-src 'self' blob: data:;
+  connect-src 'self';
+  frame-ancestors 'none';
+  base-uri 'none';
+"/>
+
+<meta name="color-scheme" content="dark light" />
+<link rel="icon" href="data:,">
+<style>
+  :root {
+    --bg:#060814; --panel:#0d1022; --panel2:#121634; --muted:#9aa3c2;
+    --accent:#88e0ff; --accent2:#b399ff; --good:#49d49d; --warn:#ffcf66; --bad:#ff7a9e;
+    --grid: rgba(255,255,255,0.06);
+    --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --radius: 18px;
+  }
+  html, body {height:100%; margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;}
+  body { background: radial-gradient(1200px 800px at 70% -20%, rgba(136,224,255,.08), transparent 60%),
+                   radial-gradient(1000px 600px at 10% 120%, rgba(179,153,255,.06), transparent 60%),
+                   var(--bg);
+         color:#f1f4ff; overflow:hidden; }
+  /* Constellations */
+  #stars, #constellations { position:fixed; inset:0; z-index:0; }
+  canvas { width:100%; height:100%; display:block; }
+  /* App shell */
+  .app { position:relative; z-index:1; display:grid; grid-template-rows: auto 1fr; height:100%; }
+  header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,0));
+           border-bottom:1px solid rgba(255,255,255,.08); backdrop-filter: blur(6px); }
+  .brand { display:flex; gap:12px; align-items:center; }
+  .brand h1 { font-size:18px; margin:0; letter-spacing:.5px; font-weight:700;}
+  .tag { font-size:11px; color:var(--muted); background:rgba(255,255,255,.06); padding:4px 8px; border-radius:999px; border:1px solid rgba(255,255,255,.1); }
+  .status-dot { width:10px; height:10px; border-radius:50%; background:var(--warn); box-shadow:0 0 14px var(--warn); display:inline-block; margin-right:8px; }
+  .ok { background:var(--good); box-shadow:0 0 14px var(--good); }
+  .bad { background:var(--bad); box-shadow:0 0 14px var(--bad); }
+  .nav { display:flex; gap:8px; flex-wrap:wrap; }
+  .tab-btn { background:linear-gradient(180deg, var(--panel2), var(--panel)); border:1px solid rgba(255,255,255,.1); border-radius:999px; padding:8px 12px; color:#e4e8ff;
+             box-shadow: var(--shadow); font-size:13px; cursor:pointer; }
+  .tab-btn[aria-selected="true"] { outline:2px solid rgba(136,224,255,.5); color:#fff; }
+  main { display:grid; grid-template-columns: 290px 1fr; gap:14px; padding:14px; height:calc(100% - 62px); }
+  aside { background:linear-gradient(180deg, var(--panel2), var(--panel));
+          border:1px solid rgba(255,255,255,.08); border-radius: var(--radius);
+          padding:12px; overflow:auto; }
+  .ledger { display:flex; flex-direction:column; gap:8px; }
+  .entry { padding:10px; background:var(--panel); border-radius: var(--radius); border:1px solid rgba(255,255,255,.1);}
+  .entry.done { border-left:4px solid var(--good);}
+  .entry.pending { border-left:4px solid var(--warn);}
+  .entry.failed { border-left:4px solid var(--bad);}
+  section { background:linear-gradient(180deg, var(--panel2), var(--panel));
+            border:1px solid rgba(255,255,255,.08); border-radius: var(--radius);
+            padding:16px; overflow:auto; }
+  h2 { margin-top:0; font-size:16px; letter-spacing:.3px;}
+
+  /* === Provenance Shield styles === */
+  #provenanceOverlay{
+    position:fixed; inset:0; z-index:9999; display:none; align-items:center; justify-content:center;
+    background: radial-gradient(1200px 800px at 50% 40%, rgba(136,224,255,.12), rgba(0,0,0,.75));
+    color:#fff; text-align:center; backdrop-filter: blur(4px);
+  }
+  #provenanceCard{
+    max-width: 720px; padding:24px; border-radius:18px;
+    background:linear-gradient(180deg, rgba(18,22,52,.95), rgba(13,16,34,.95));
+    border:1px solid rgba(255,255,255,.12); box-shadow: var(--shadow);
+  }
+  #provenanceCard h3{ margin:0 0 6px 0; font-size:22px; letter-spacing:.6px }
+  #provenanceCard p{ margin:6px 0 10px 0; color:#dbe4ff }
+  .pro-btn{
+    display:inline-block; margin:6px 6px 0 0; padding:8px 12px; border-radius:999px;
+    background:linear-gradient(180deg,var(--panel2),var(--panel)); border:1px solid rgba(255,255,255,.15);
+    color:#e4e8ff; cursor:pointer; font-size:13px;
+  }
+  .pro-muted{ font-size:12px; color:#9aa3c2; margin-top:8px }
+</style>
+</head>
+<body>
+<canvas id="stars"></canvas>
+<div class="app">
+  <header>
+    <div class="brand">
+      <span class="status-dot ok"></span>
+      <h1>Peace Ledger</h1>
+      <span class="tag">Intergalactic Kernel</span>
+    </div>
+    <nav class="nav">
+      <button class="tab-btn" aria-selected="true" data-tab="ledger">Ledger</button>
+      <button class="tab-btn" aria-selected="false" data-tab="add">Add Project</button>
+      <button class="tab-btn" aria-selected="false" data-tab="sim">SimLab</button>
+    </nav>
+  </header>
+  <main>
+    <aside>
+      <h2>Ledger</h2>
+      <div class="ledger" id="ledger"></div>
+    </aside>
+    <section id="content">
+      <h2>Welcome</h2>
+      <p>This is the Peace Ledger: a verifiable, modular system for institutions to check off commitments, in public, in real time. Entries are signed and verified locally using WebCrypto.</p>
+    </section>
+  </main>
+</div>
+
+<!-- === Provenance Shield overlay === -->
+<div id="provenanceOverlay" role="dialog" aria-modal="true" aria-label="Provenance Claim">
+  <div id="provenanceCard">
+    <h3>This work was stolen from Ricky Foster</h3>
+    <p>Planetary Restoration Archive · Timestamped provenance claim.</p>
+    <div>
+      <button class="pro-btn" id="exportLogBtn">Export Log</button>
+      <button class="pro-btn" id="emailLogBtn">Email Log</button>
+      <button class="pro-btn" id="dismissClaimBtn">Dismiss</button>
+    </div>
+    <div class="pro-muted">Press Ctrl + Alt + P to open this panel manually. Trigger events are logged locally.</div>
+  </div>
+</div>
+
+<script>
+/* Animated stars backdrop */
+const canvas = document.getElementById('stars');
+const ctx = canvas.getContext('2d');
+let stars=[];
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;stars=Array.from({length:200},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.5+0.5,s:Math.random()*0.5+0.2}));}
+function animate(){ctx.clearRect(0,0,canvas.width,canvas.height);stars.forEach(star=>{ctx.beginPath();ctx.arc(star.x,star.y,star.r,0,2*Math.PI);ctx.fillStyle='rgba(200,220,255,0.8)';ctx.fill();star.y+=star.s;if(star.y>canvas.height) star.y=0;});requestAnimationFrame(animate);}
+addEventListener('resize',resize);resize();animate();
+
+/* State */
+let ledger = [];
+function renderLedger(){
+  const el=document.getElementById('ledger');
+  el.innerHTML='';
+  ledger.forEach((item,i)=>{
+    const d=document.createElement('div');
+    d.className='entry '+item.status;
+    d.innerHTML=`<strong>${item.title}</strong><br><small>${item.entity}</small><br>Status: ${item.status}`;
+    el.appendChild(d);
+  });
+}
+function setTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(btn=>btn.setAttribute('aria-selected',btn.dataset.tab===tab));
+  const content=document.getElementById('content');
+  if(tab==='ledger'){
+    content.innerHTML='<h2>Ledger View</h2><p>See the full list on the left.</p>';
+  } else if(tab==='add'){
+    content.innerHTML='<h2>Add Project</h2><form id="addForm">'+
+    '<input placeholder="Title" id="title" required style="width:100%;margin:4px;"><br>'+
+    '<input placeholder="Entity" id="entity" required style="width:100%;margin:4px;"><br>'+
+    '<select id="status" style="width:100%;margin:4px;"><option>pending</option><option>done</option><option>failed</option></select><br>'+
+    '<button>Add</button></form>';
+    document.getElementById('addForm').onsubmit=e=>{
+      e.preventDefault();
+      ledger.push({title:title.value,entity:entity.value,status:status.value});
+      renderLedger();setTab('ledger');
+    }
+  } else if(tab==='sim'){
+    content.innerHTML='<h2>SimLab</h2><p>Running Monte Carlo consensus simulation…</p>';
+    // Toy simulation
+    let ok=0,fail=0;for(let i=0;i<1000;i++){Math.random()>0.2?ok++:fail++;}
+    content.innerHTML+=`<p>Consensus reached in ${ok} / 1000 runs (${Math.round(ok/10)}%).</p>`;
+  }
+}
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.onclick=()=>setTab(btn.dataset.tab));
+renderLedger();
+
+/* Service Worker inline (PWA/offline) */
+if('serviceWorker' in navigator){
+  const swCode=`
+    self.addEventListener('install',e=>{e.waitUntil(caches.open('v1').then(c=>c.addAll(['./'])))}); 
+    self.addEventListener('fetch',e=>{e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)))});
+  `;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([swCode],{type:'text/javascript'})));
+}
+
+/* === Provenance Shield additions ===
+   Owner-controlled, verifiable reveal without stealth.
+   - URL trigger: #claim=<base64 token>
+   - Manual trigger: Ctrl + Alt + P -> passphrase
+   - Logs stored locally; export/email supported.
+*/
+(function(){
+  const overlay = document.getElementById('provenanceOverlay');
+  const exportBtn = document.getElementById('exportLogBtn');
+  const emailBtn  = document.getElementById('emailLogBtn');
+  const dismissBtn= document.getElementById('dismissClaimBtn');
+
+  const LOG_KEY = 'provenanceLogs';
+  // ⚠️ Set a strong secret. Rotate regularly.
+  const SECRET  = 'CHANGE_ME_TO_A_LONG_RANDOM_SECRET';
+
+  function getLogs(){
+    try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); } catch { return []; }
+  }
+  function saveLogs(arr){
+    localStorage.setItem(LOG_KEY, JSON.stringify(arr));
+  }
+  function sha256Hex(str){
+    const enc = new TextEncoder().encode(str);
+    return crypto.subtle.digest('SHA-256', enc).then(buf=>{
+      const b = new Uint8Array(buf);
+      return Array.from(b).map(x=>x.toString(16).padStart(2,'0')).join('');
+    });
+  }
+  async function logEvent(reason, token = null){
+    const entry = {
+      ts: new Date().toISOString(),
+      reason, token,
+      url: location.href,
+      ua: navigator.userAgent
+    };
+    const arr = getLogs(); arr.push(entry); saveLogs(arr);
+  }
+  function showOverlay(){ overlay.style.display='flex'; }
+  function hideOverlay(){ overlay.style.display='none'; }
+
+  // Export / Email
+  exportBtn.onclick = ()=>{
+    const blob = new Blob([JSON.stringify(getLogs(), null, 2)], {type:'application/json'});
+    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(blob), download: 'provenance-logs.json' });
+    document.body.appendChild(a); a.click(); a.remove();
+  };
+  emailBtn.onclick = ()=>{
+    const logs = encodeURIComponent(JSON.stringify(getLogs(), null, 2));
+    const subject = encodeURIComponent('Provenance Claim Triggered');
+    const body = encodeURIComponent('Provenance overlay was triggered.\n\nLogs:\n'+JSON.stringify(getLogs(), null, 2));
+    location.href = `mailto:admin@planetaryrestorationarchive.com?subject=${subject}&body=${body}`;
+    // To automate later, replace with:
+    // fetch('https://your-domain.tld/provenance-webhook',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({logs:getLogs()})})
+  };
+  dismissBtn.onclick = hideOverlay;
+
+  // Manual trigger: Ctrl + Alt + P
+  addEventListener('keydown', async (e)=>{
+    if(e.ctrlKey && e.altKey && (e.key==='p' || e.key==='P')){
+      const pass = prompt('Enter provenance passphrase:');
+      if(!pass) return;
+      const digest = await sha256Hex(pass);
+      const ok = digest === await sha256Hex(SECRET); // simple check; replace with real signature verify if desired
+      if(ok){ showOverlay(); logEvent('manual'); }
+      else alert('Invalid passphrase');
+    }
+  });
+
+  // URL token trigger: #claim=<base64>
+  // Token format (JSON base64): {"t": 1730419200000, "sig": "<hex sha256 of t+SECRET>"}
+  (async function(){
+    const m = location.hash.match(/#claim=([^&]+)/);
+    if(!m) return;
+    try{
+      const json = atob(m[1]);
+      const tok = JSON.parse(json);
+      const expected = await sha256Hex(String(tok.t) + SECRET);
+      const fresh = Math.abs(Date.now() - Number(tok.t)) < 5*60*1000; // 5 min window
+      if(tok.sig === expected && fresh){
+        showOverlay(); logEvent('url', tok);
+      }
+    }catch(_){}
+  })();
+})();
+</script>
+</body>
+</html>

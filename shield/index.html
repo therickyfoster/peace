@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<!-- Provenance: Planetary Restoration Archive | planetaryrestorationarchive.com -->
+<!-- GitHub: github.com/therickyfoster | Steward: Foster + Navi -->
+<!-- Zero-Harm Intent: This tool is designed for peace-building, transparency, and ecological restoration. -->
+<!-- It may not be weaponized, used for surveillance, exclusion, or harm to people or biosphere. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content="Foster + Navi · Planetary Restoration Archive" />
+  <meta name="description" content="Self-defending public commitments with cryptographic verification and mycelial decision paths" />
+  <link rel="me" href="https://planetaryrestorationarchive.com" />
+  <link rel="me" href="https://github.com/TheRickyFoster" />
+  <link rel="manifest" href="#" id="manifestLink" />
+  <title>Peace Narrative Shield Kit • Mycelial Commitments</title>
+  <style>
+    /* ═══════════════════════════════════════════════════════════
+       THEME VARIABLES
+       ═══════════════════════════════════════════════════════════ */
+    :root {
+      --bg: #0b0f14;
+      --bg-secondary: #111823;
+      --panel: #1a2332;
+      --ink: #e7f0ff;
+      --muted: #9db0c7;
+      --brand: #6ee7ff;
+      --brand-glow: rgba(110, 231, 255, 0.3);
+      --ok: #5cff9b;
+      --warn: #ffd166;
+      --bad: #ff6b6b;
+      --particle-color: rgba(110, 231, 255, 0.6);
+      --glow: 0 0 20px rgba(110, 231, 255, 0.15), 0 10px 40px rgba(110, 231, 255, 0.08);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    [data-theme="medieval"] {
+      --bg: #1a1410;
+      --bg-secondary: #2a1f18;
+      --panel: #3d2d20;
+      --ink: #f4e4d4;
+      --muted: #b8a890;
+      --brand: #d4a574;
+      --brand-glow: rgba(212, 165, 116, 0.3);
+      --particle-color: rgba(212, 165, 116, 0.6);
+    }
+
+    [data-theme="space"] {
+      --bg: #000000;
+      --bg-secondary: #0a0a1a;
+      --panel: #1a1a2e;
+      --ink: #ffffff;
+      --muted: #a0a0c0;
+      --brand: #b967ff;
+      --brand-glow: rgba(185, 103, 255, 0.3);
+      --particle-color: rgba(185, 103, 255, 0.6);
+    }
+
+    [data-theme="anime"] {
+      --bg: #ffe5f5;
+      --bg-secondary: #ffd1ed;
+      --panel: #ffb8e0;
+      --ink: #2d0a1e;
+      --muted: #7d3d5f;
+      --brand: #ff1493;
+      --brand-glow: rgba(255, 20, 147, 0.3);
+      --particle-color: rgba(255, 20, 147, 0.6);
+    }
+
+    [data-theme="forest"] {
+      --bg: #0f1e0d;
+      --bg-secondary: #1a2e18;
+      --panel: #253d22;
+      --ink: #e8f4e6;
+      --muted: #9db89a;
+      --brand: #76ff76;
+      --brand-glow: rgba(118, 255, 118, 0.3);
+      --particle-color: rgba(118, 255, 118, 0.6);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       BASE STYLES & ANIMATIONS
+       ═══════════════════════════════════════════════════════════ */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, sans-serif;
+      overflow-x: hidden;
+      position: relative;
+      transition: var(--transition);
+    }
+
+    /* Animated gradient background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(1200px 800px at 20% -10%, var(--brand-glow), transparent),
+        radial-gradient(900px 700px at 80% 110%, var(--brand-glow), transparent);
+      animation: gradientShift 15s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { opacity: 0.4; transform: scale(1) rotate(0deg); }
+      50% { opacity: 0.6; transform: scale(1.1) rotate(5deg); }
+    }
+
+    /* Particle canvas */
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.6;
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* Skip link for accessibility */
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: var(--brand);
+      color: var(--bg);
+      padding: 8px 16px;
+      text-decoration: none;
+      z-index: 100;
+      border-radius: 0 0 8px 0;
+    }
+
+    .skip-link:focus {
+      top: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CARD COMPONENTS WITH ANIMATIONS
+       ═══════════════════════════════════════════════════════════ */
+    .card {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 28px;
+      margin-bottom: 24px;
+      box-shadow: var(--glow);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+      transition: var(--transition);
+      animation: fadeInUp 0.6s ease-out forwards;
+      opacity: 0;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, var(--brand-glow), transparent);
+      transform: rotate(0deg);
+      transition: transform 0.6s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 30px rgba(110, 231, 255, 0.2), 0 15px 50px rgba(110, 231, 255, 0.12);
+      border-color: var(--brand);
+    }
+
+    .card:hover::before {
+      transform: rotate(180deg);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .card:nth-child(1) { animation-delay: 0.1s; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.3s; }
+    .card:nth-child(4) { animation-delay: 0.4s; }
+    .card:nth-child(5) { animation-delay: 0.5s; }
+
+    /* Tooltip system */
+    .tooltip-trigger {
+      position: relative;
+      cursor: help;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tooltip-trigger::after {
+      content: '?';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      background: var(--brand);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: bold;
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+
+    .tooltip-trigger:hover::after {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+
+    .tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%) translateY(-10px);
+      background: var(--panel);
+      color: var(--ink);
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 300px;
+      white-space: normal;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid var(--brand);
+      z-index: 1000;
+    }
+
+    .tooltip-trigger:hover .tooltip {
+      opacity: 1;
+      transform: translateX(-50%) translateY(-5px);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       TYPOGRAPHY
+       ═══════════════════════════════════════════════════════════ */
+    h1, h2, h3, h4 {
+      margin: 0 0 16px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      background: linear-gradient(135deg, var(--brand), var(--ok));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { filter: brightness(1); }
+      50% { filter: brightness(1.3); }
+    }
+
+    h2 {
+      font-size: 1.75rem;
+      color: var(--brand);
+    }
+
+    .sub {
+      color: var(--muted);
+      margin: 0 0 20px;
+      font-size: 0.95rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       INTERACTIVE ELEMENTS
+       ═══════════════════════════════════════════════════════════ */
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg-secondary);
+      color: var(--ink);
+      padding: 12px 20px;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+    }
+
+    button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: var(--brand-glow);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    button:hover {
+      border-color: var(--brand);
+      box-shadow: 0 0 20px var(--brand-glow);
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:focus {
+      outline: 3px solid var(--brand);
+      outline-offset: 2px;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, var(--brand), var(--ok));
+      border-color: var(--brand);
+      color: var(--bg);
+      box-shadow: var(--glow);
+      position: relative;
+      z-index: 1;
+    }
+
+    button.primary span {
+      position: relative;
+      z-index: 1;
+    }
+
+    button.ghost {
+      background: transparent;
+      border: 1px dashed rgba(255, 255, 255, 0.3);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px var(--brand-glow);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      font-family: ui-monospace, Consolas, Monaco, monospace;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       LAYOUT
+       ═══════════════════════════════════════════════════════════ */
+    .grid {
+      display: grid;
+      gap: 24px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 768px) {
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       STATUS PILLS & BADGES
+       ═══════════════════════════════════════════════════════════ */
+    .pill {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: var(--bg-secondary);
+      color: var(--muted);
+      font-size: 0.85rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .ok { color: var(--ok); }
+    .warn { color: var(--warn); }
+    .bad { color: var(--bad); }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border: 1px dashed var(--brand);
+      border-radius: 8px;
+      background: var(--brand-glow);
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       CODE BLOCKS
+       ═══════════════════════════════════════════════════════════ */
+    pre, code {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      display: block;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: ui-monospace, Consolas, Monaco, monospace;
+      font-size: 0.9rem;
+      min-height: 60px;
+      max-height: 400px;
+      overflow: auto;
+      position: relative;
+    }
+
+    pre::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    pre::-webkit-scrollbar-track {
+      background: var(--bg);
+      border-radius: 4px;
+    }
+
+    pre::-webkit-scrollbar-thumb {
+      background: var(--brand);
+      border-radius: 4px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       THEME SWITCHER
+       ═══════════════════════════════════════════════════════════ */
+    .theme-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      display: flex;
+      gap: 8px;
+      background: var(--panel);
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: var(--glow);
+    }
+
+    .theme-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 0;
+    }
+
+    .theme-btn:hover {
+      transform: scale(1.1) rotate(5deg);
+      border-color: var(--brand);
+    }
+
+    .theme-btn.active {
+      border-color: var(--brand);
+      box-shadow: 0 0 20px var(--brand-glow);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       GAMIFICATION
+       ═══════════════════════════════════════════════════════════ */
+    .xp-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-secondary);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+      margin: 16px 0;
+    }
+
+    .xp-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--brand), var(--ok));
+      width: 0%;
+      transition: width 1s ease-out;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .xp-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+      animation: shimmerBar 2s infinite;
+    }
+
+    @keyframes shimmerBar {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .achievement {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: linear-gradient(135deg, var(--brand-glow), transparent);
+      border: 1px solid var(--brand);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      animation: achievementPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes achievementPop {
+      0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       SCRAMBLE MODE
+       ═══════════════════════════════════════════════════════════ */
+    .scrambled * {
+      filter: blur(2px) saturate(0.3) hue-rotate(25deg);
+      pointer-events: none;
+    }
+
+    .scrambled::after {
+      content: '⚠ TAMPER DETECTED - CHANNEL ROTATED';
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bad);
+      color: white;
+      padding: 24px 48px;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      font-weight: bold;
+      z-index: 10000;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+      animation: warningPulse 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes warningPulse {
+      from { transform: translate(-50%, -50%) scale(1); }
+      to { transform: translate(-50%, -50%) scale(1.05); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       LOADING STATES
+       ═══════════════════════════════════════════════════════════ */
+    .loading {
+      position: relative;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .loading::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 24px;
+      height: 24px;
+      border: 3px solid var(--brand);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes spin {
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER & ATTRIBUTION
+       ═══════════════════════════════════════════════════════════ */
+    .footer {
+      opacity: 0.7;
+      margin-top: 24px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border-width: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+       ═══════════════════════════════════════════════════════════ */
+    @media (max-width: 767px) {
+      h1 { font-size: 1.75rem; }
+      .theme-switcher { top: 10px; right: 10px; padding: 6px; }
+      .theme-btn { width: 32px; height: 32px; }
+      .card { padding: 20px; }
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       TREE STYLES
+       ═══════════════════════════════════════════════════════════ */
+    .tree {
+      display: grid;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .tree label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tree label:hover {
+      background: var(--panel);
+      border-color: var(--brand);
+      transform: translateX(4px);
+    }
+
+    .tree input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+      accent-color: var(--brand);
+    }
+
+    .tree input[type="checkbox"]:checked + span {
+      color: var(--brand);
+      font-weight: 600;
+    }
+
+    /* Details/Summary */
+    details {
+      background: var(--bg-secondary);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 12px 0;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--brand);
+      user-select: none;
+    }
+
+    summary:hover {
+      color: var(--ok);
+    }
+
+    /* RSS Feed styles */
+    .rss-feed {
+      margin: 16px 0;
+      padding: 16px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .rss-item {
+      padding: 12px;
+      margin: 8px 0;
+      background: var(--panel);
+      border-radius: 8px;
+      border-left: 3px solid var(--brand);
+      transition: var(--transition);
+    }
+
+    .rss-item:hover {
+      transform: translateX(4px);
+      border-left-width: 5px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Skip link for accessibility -->
+  <a href="#main" class="skip-link">Skip to main content</a>
+
+  <!-- Particle canvas for animated background -->
+  <canvas id="particleCanvas"></canvas>
+
+  <!-- Theme switcher -->
+  <div class="theme-switcher" role="toolbar" aria-label="Theme selector">
+    <button class="theme-btn active" data-theme="default" style="background: linear-gradient(135deg, #0b0f14, #6ee7ff)" title="Cyber (Default)" aria-label="Cyber theme"></button>
+    <button class="theme-btn" data-theme="medieval" style="background: linear-gradient(135deg, #1a1410, #d4a574)" title="Medieval" aria-label="Medieval theme"></button>
+    <button class="theme-btn" data-theme="space" style="background: linear-gradient(135deg, #000000, #b967ff)" title="Space" aria-label="Space theme"></button>
+    <button class="theme-btn" data-theme="anime" style="background: linear-gradient(135deg, #ffe5f5, #ff1493)" title="Anime" aria-label="Anime theme"></button>
+    <button class="theme-btn" data-theme="forest" style="background: linear-gradient(135deg, #0f1e0d, #76ff76)" title="Forest" aria-label="Forest theme"></button>
+  </div>
+
+  <div class="wrap">
+    <header class="card" id="main">
+      <h1>Peace Narrative Shield Kit</h1>
+      <p class="sub">Self-defending public commitments with verifiable cryptographic receipts, mycelial decision paths, and soft scrambling on tamper. Save this file and use it offline anywhere.</p>
+      
+      <!-- Gamification XP bar -->
+      <div class="tooltip-trigger">
+        Experience Progress
+        <div class="tooltip">Track your journey through peace commitment creation. Gain XP by generating keys, signing messages, and publishing badges.</div>
+      </div>
+      <div class="xp-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+        <div class="xp-fill" id="xpFill"></div>
+      </div>
+      
+      <div class="row">
+        <span class="pill">Status: <span id="statusDot" class="ok">● verified</span></span>
+        <span class="pill">Channel: <span id="channelId" class="mono"></span></span>
+        <span class="pill">XP: <span id="xpCount">0</span> / 100</span>
+      </div>
+
+      <div id="achievements" class="row" style="margin-top: 16px;"></div>
+    </header>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="tooltip-trigger">
+          Key Material
+          <div class="tooltip">Generate or import ECDSA P-256 keypairs. Your private key signs commitments locally - never share it. The public key verifies signatures and can be shared freely.</div>
+        </h2>
+        <p class="sub">Generate or import keypair. Sign commitments cryptographically. Share only the public key.</p>
+        <div class="row">
+          <button id="genKey" class="primary"><span>Generate Keypair</span></button>
+          <button id="exportPub"><span>Export Public</span></button>
+          <button id="exportPriv" class="ghost"><span>Export Private</span></button>
+          <button id="importPub" class="ghost"><span>Import Public</span></button>
+          <input id="fileInput" type="file" accept=".json,.jwk" hidden />
+        </div>
+        <div style="margin-top: 16px;">
+          <strong>Public Key (JWK)</strong>
+          <pre id="pubOut" role="region" aria-label="Public key output"></pre>
+        </div>
+        <div style="margin-top: 16px;">
+          <strong>Private Key (PEM) — Keep Secret</strong>
+          <pre id="privOut" role="region" aria-label="Private key output"></pre>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="tooltip-trigger">
+          Canonical Message
+          <div class="tooltip">Your canonical commitment message. Edit and sign it to create a verifiable statement. Tampering without re-signing triggers scramble mode and channel rotation.</div>
+        </h2>
+        <p class="sub">This demonstrates anti-inversion. Editing without re-signing flips to scrambled mode.</p>
+        <label for="canonMsg" class="sr-only">Canonical message text</label>
+        <textarea id="canonMsg" aria-label="Canonical message">We plant peace before we negotiate it. 250 seeds down — this is a furnace-cooling act, not a gesture.</textarea>
+        <div class="row">
+          <button id="signCanon" class="primary"><span>Sign Message</span></button>
+          <button id="verifyCanon"><span>Verify</span></button>
+          <button id="tamper" class="ghost"><span>Simulate Tamper</span></button>
+        </div>
+        <div style="margin-top: 16px;">
+          <strong>Signature (base64)</strong>
+          <pre id="canonSig" role="region" aria-label="Message signature"></pre>
+        </div>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2 class="tooltip-trigger">
+        Mycelial Options
+        <div class="tooltip">Choose peace actions matching your role and style. Selections are hashed and signed into a Commitment Badge that others can verify. Each action is designed for your specific context.</div>
+      </h2>
+      <p class="sub">Role-guided peace actions. Select commitments, sign them, publish as verifiable badges.</p>
+      <div class="row">
+        <label for="role">
+          Role:
+          <select id="role">
+            <option>Head of State</option>
+            <option>Mayor / Councillor</option>
+            <option>NGO / Civil Society</option>
+            <option>Faith Leader</option>
+            <option>Business / Finance</option>
+            <option>Citizen Steward</option>
+          </select>
+        </label>
+        <label for="style">
+          Style:
+          <select id="style">
+            <option>Pragmatic</option>
+            <option>Bold</option>
+            <option>Quiet</option>
+            <option>Technocratic</option>
+            <option>Symbolic</option>
+          </select>
+        </label>
+      </div>
+      <div id="tree" class="tree" role="group" aria-label="Commitment options"></div>
+      <div class="row">
+        <button id="makeBadge" class="primary"><span>Sign & Publish Badge</span></button>
+        <button id="resetSel" class="ghost"><span>Reset</span></button>
+      </div>
+      <div style="margin-top: 16px;">
+        <strong>Commitment Badge (JSON)</strong>
+        <pre id="badgeOut" role="region" aria-label="Commitment badge output"></pre>
+      </div>
+      <div style="margin-top: 16px;">
+        <strong>Badge Signature</strong>
+        <pre id="badgeSig" role="region" aria-label="Badge signature"></pre>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="tooltip-trigger">
+          Public Verification
+          <div class="tooltip">Anyone can verify a commitment badge here. Paste the badge JSON, signature, and public key to cryptographically verify authenticity. False claims become provably expensive.</div>
+        </h2>
+        <p class="sub">Verify badges from others. Lying becomes cryptographically expensive.</p>
+        <label for="verifyBadgeJson" class="sr-only">Badge JSON</label>
+        <textarea id="verifyBadgeJson" placeholder="Paste Commitment Badge JSON" aria-label="Badge to verify"></textarea>
+        <label for="verifySig" class="sr-only">Badge signature</label>
+        <textarea id="verifySig" placeholder="Paste Badge Signature (base64)" aria-label="Signature to verify"></textarea>
+        <label for="verifyPub" class="sr-only">Public key</label>
+        <textarea id="verifyPub" placeholder="Paste Public Key (JWK)" aria-label="Public key for verification"></textarea>
+        <div class="row">
+          <button id="verifyBadge" class="primary"><span>Verify Badge</span></button>
+          <span id="verifyResult" class="pill">Waiting…</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2 class="tooltip-trigger">
+          Local Ledger
+          <div class="tooltip">Your browser stores a private history of commitments. Export to backup elsewhere or integrate with other systems. This data never leaves your device unless you explicitly share it.</div>
+        </h2>
+        <p class="sub">Private commitment history in your browser. Export for backup.</p>
+        <div class="row">
+          <button id="exportLedger"><span>Export (.json)</span></button>
+          <button id="clearLedger" class="ghost"><span>Clear</span></button>
+        </div>
+        <pre id="ledger" role="region" aria-label="Commitment ledger"></pre>
+      </section>
+    </div>
+
+    <section class="card">
+      <h2>Redundancy & Mirrors</h2>
+      <details>
+        <summary>Operational Notes</summary>
+        <ul style="margin-top: 12px; padding-left: 24px;">
+          <li>Mirror your public key and badges across: IPFS, Arweave, GitHub, municipal sites, trusted NGOs</li>
+          <li>Encourage independent stewards to re-host your badges - redundancy breaks monopolies on truth</li>
+          <li>Rotate keys if tampering detected; publish New Channel Announcements signed by old key</li>
+          <li>Never self-destruct content - use soft scrambling (warning overlays + UI lock) instead</li>
+          <li>RSS integration: badges can be consumed as feeds by other systems</li>
+        </ul>
+      </details>
+      <p class="footer">Prototype intent: make deception technically hard and reputationally costly, while keeping peace actions easy to adopt.</p>
+    </section>
+
+    <footer class="footer sr-only" aria-hidden="true">
+      <p>Provenance: <a href="https://planetaryrestorationarchive.com">Planetary Restoration Archive</a> | GitHub: <a href="https://github.com/TheRickyFoster">TheRickyFoster</a></p>
+    </footer>
+  </div>
+
+  <script>
+    // ═══════════════════════════════════════════════════════════
+    // PARTICLE ANIMATION SYSTEM
+    // ═══════════════════════════════════════════════════════════
+    (function initParticles() {
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+      let animationFrame;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 2 + 1;
+          this.speedX = Math.random() * 0.5 - 0.25;
+          this.speedY = Math.random() * 0.5 - 0.25;
+          this.opacity = Math.random() * 0.5 + 0.3;
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+          if (this.x > canvas.width) this.x = 0;
+          if (this.x < 0) this.x = canvas.width;
+          if (this.y > canvas.height) this.y = 0;
+          if (this.y < 0) this.y = canvas.height;
+        }
+
+        draw() {
+          ctx.fillStyle = getComputedStyle(document.documentElement)
+            .getPropertyValue('--particle-color').trim();
+          ctx.globalAlpha = this.opacity;
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function init() {
+        particles = [];
+        for (let i = 0; i < 100; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach(particle => {
+          particle.update();
+          particle.draw();
+        });
+        
+        // Connect nearby particles
+        ctx.globalAlpha = 0.15;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance < 100) {
+              ctx.strokeStyle = getComputedStyle(document.documentElement)
+                .getPropertyValue('--particle-color').trim();
+              ctx.lineWidth = 0.5;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        
+        animationFrame = requestAnimationFrame(animate);
+      }
+
+      init();
+      animate();
+
+      // Reinit particles on theme change
+      window.addEventListener('themeChange', () => {
+        cancelAnimationFrame(animationFrame);
+        init();
+        animate();
+      });
+    })();
+
+    // ═══════════════════════════════════════════════════════════
+    // CORE STATE & HELPERS
+    // ═══════════════════════════════════════════════════════════
+    const $ = q => document.querySelector(q);
+    const enc = new TextEncoder();
+    const dec = new TextDecoder();
+    const b64 = buf => btoa(String.fromCharCode(...new Uint8Array(buf)));
+
+    const state = {
+      keyPair: null,
+      publicKey: null,
+      privateKey: null,
+      channelId: null,
+      canonSig: null,
+      selections: new Set(),
+      ledger: JSON.parse(localStorage.getItem('ledger_v2') || '[]'),
+      xp: parseInt(localStorage.getItem('xp') || '0'),
+      achievements: JSON.parse(localStorage.getItem('achievements') || '[]')
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // GAMIFICATION SYSTEM
+    // ═══════════════════════════════════════════════════════════
+    function addXP(amount, reason) {
+      state.xp = Math.min(100, state.xp + amount);
+      localStorage.setItem('xp', state.xp);
+      updateXPBar();
+      showNotification(`+${amount} XP: ${reason}`);
+      
+      // Check achievements
+      checkAchievements();
+    }
+
+    function updateXPBar() {
+      const fill = $('#xpFill');
+      const counter = $('#xpCount');
+      fill.style.width = state.xp + '%';
+      counter.textContent = state.xp;
+      fill.setAttribute('aria-valuenow', state.xp);
+    }
+
+    function checkAchievements() {
+      const achievements = [
+        { id: 'first_key', xp: 10, name: '🔑 First Key', desc: 'Generated your first keypair' },
+        { id: 'first_sign', xp: 20, name: '✍️ First Signature', desc: 'Signed your first message' },
+        { id: 'first_badge', xp: 30, name: '🎖️ First Badge', desc: 'Created your first commitment badge' },
+        { id: 'verifier', xp: 40, name: '🔍 Verifier', desc: 'Verified a badge' },
+        { id: 'master', xp: 100, name: '🏆 Peace Master', desc: 'Reached maximum XP' }
+      ];
+
+      achievements.forEach(ach => {
+        if (state.xp >= ach.xp && !state.achievements.includes(ach.id)) {
+          unlockAchievement(ach);
+        }
+      });
+    }
+
+    function unlockAchievement(achievement) {
+      state.achievements.push(achievement.id);
+      localStorage.setItem('achievements', JSON.stringify(state.achievements));
+      
+      const container = $('#achievements');
+      const badge = document.createElement('div');
+      badge.className = 'achievement';
+      badge.innerHTML = `${achievement.name}<br><small>${achievement.desc}</small>`;
+      badge.setAttribute('role', 'status');
+      badge.setAttribute('aria-live', 'polite');
+      container.appendChild(badge);
+      
+      showNotification(`Achievement Unlocked: ${achievement.name}`);
+    }
+
+    function showNotification(message) {
+      // Simple toast notification
+      const toast = document.createElement('div');
+      toast.textContent = message;
+      toast.style.cssText = `
+        position: fixed;
+        top: 100px;
+        right: 20px;
+        background: var(--brand);
+        color: var(--bg);
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        z-index: 10000;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // Add CSS for toast animations
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from { transform: translateX(400px); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(400px); opacity: 0; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    updateXPBar();
+    checkAchievements();
+
+    // ═══════════════════════════════════════════════════════════
+    // LEDGER MANAGEMENT
+    // ═══════════════════════════════════════════════════════════
+    function saveLedger() {
+      localStorage.setItem('ledger_v2', JSON.stringify(state.ledger, null, 2));
+      paintLedger();
+    }
+
+    function paintLedger() {
+      $('#ledger').textContent = state.ledger.length 
+        ? JSON.stringify(state.ledger, null, 2)
+        : '// No commitments yet';
+    }
+    paintLedger();
+
+    // ═══════════════════════════════════════════════════════════
+    // CHANNEL MANAGEMENT
+    // ═══════════════════════════════════════════════════════════
+    function newChannel() {
+      state.channelId = Math.random().toString(36).slice(2, 10) + '-' + Date.now().toString(36);
+      $('#channelId').textContent = state.channelId;
+    }
+    newChannel();
+
+    // ═══════════════════════════════════════════════════════════
+    // CRYPTOGRAPHIC FUNCTIONS
+    // ═══════════════════════════════════════════════════════════
+    async function genKey() {
+      const btn = $('#genKey');
+      btn.classList.add('loading');
+      
+      try {
+        state.keyPair = await crypto.subtle.generateKey(
+          { name: 'ECDSA', namedCurve: 'P-256' },
+          true,
+          ['sign', 'verify']
+        );
+        state.publicKey = state.keyPair.publicKey;
+        state.privateKey = state.keyPair.privateKey;
+        
+        $('#pubOut').textContent = JSON.stringify(
+          await crypto.subtle.exportKey('jwk', state.publicKey),
+          null,
+          2
+        );
+        $('#privOut').textContent = await exportPrivatePEM(state.privateKey);
+        
+        addXP(10, 'Generated keypair');
+        showNotification('✓ Keypair generated successfully');
+      } catch (e) {
+        alert('Error generating key: ' + e.message);
+      } finally {
+        btn.classList.remove('loading');
+      }
+    }
+
+    async function exportPrivatePEM(privKey) {
+      const pkcs8 = await crypto.subtle.exportKey('pkcs8', privKey);
+      const b = b64(pkcs8);
+      const body = b.match(/.{1,64}/g).join('\n');
+      return `-----BEGIN PRIVATE KEY-----\n${body}\n-----END PRIVATE KEY-----`;
+    }
+
+    async function importJwkPublic(jwk) {
+      state.publicKey = await crypto.subtle.importKey(
+        'jwk',
+        jwk,
+        { name: 'ECDSA', namedCurve: 'P-256' },
+        true,
+        ['verify']
+      );
+      $('#pubOut').textContent = JSON.stringify(jwk, null, 2);
+      showNotification('✓ Public key imported');
+    }
+
+    async function signText(txt) {
+      if (!state.privateKey) throw new Error('No private key loaded');
+      const sig = await crypto.subtle.sign(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        state.privateKey,
+        enc.encode(txt)
+      );
+      return b64(sig);
+    }
+
+    async function verifyText(txt, sigB64, pubKey) {
+      const raw = Uint8Array.from(atob(sigB64), c => c.charCodeAt(0));
+      return await crypto.subtle.verify(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        pubKey,
+        raw,
+        enc.encode(txt)
+      );
+    }
+
+    async function contentHash(obj) {
+      const buf = await crypto.subtle.digest('SHA-256', enc.encode(JSON.stringify(obj)));
+      return Array.from(new Uint8Array(buf))
+        .map(b => b.toString(16).padStart(2, '0'))
+        .join('');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // CANONICAL MESSAGE HANDLERS
+    // ═══════════════════════════════════════════════════════════
+    $('#signCanon').onclick = async () => {
+      const btn = $('#signCanon');
+      btn.classList.add('loading');
+      
+      try {
+        const msg = $('#canonMsg').value;
+        const sig = await signText(msg);
+        state.canonSig = sig;
+        $('#canonSig').textContent = sig;
+        document.body.classList.remove('scrambled');
+        $('#statusDot').textContent = '● verified';
+        $('#statusDot').className = 'ok';
+        addXP(15, 'Signed canonical message');
+        showNotification('✓ Message signed successfully');
+      } catch (e) {
+        alert('Error signing: ' + e.message);
+      } finally {
+        btn.classList.remove('loading');
+      }
+    };
+
+    $('#verifyCanon').onclick = async () => {
+      const btn = $('#verifyCanon');
+      btn.classList.add('loading');
+      
+      try {
+        const ok = await verifyText(
+          $('#canonMsg').value,
+          $('#canonSig').textContent.trim(),
+          state.publicKey
+        );
+        
+        if (ok) {
+          document.body.classList.remove('scrambled');
+          $('#statusDot').textContent = '● verified';
+          $('#statusDot').className = 'ok';
+          showNotification('✓ Signature verified');
+        } else {
+          triggerScramble();
+        }
+      } catch (e) {
+        triggerScramble();
+      } finally {
+        btn.classList.remove('loading');
+      }
+    };
+
+    $('#tamper').onclick = () => {
+      $('#canonMsg').value += '\n[unverified edit]';
+      triggerScramble();
+    };
+
+    function triggerScramble() {
+      document.body.classList.add('scrambled');
+      $('#statusDot').textContent = '● tampered';
+      $('#statusDot').className = 'bad';
+      newChannel();
+      showNotification('⚠ TAMPER DETECTED - Channel rotated');
+      
+      // Track analytics
+      trackEvent('tamper_detected', { channel: state.channelId });
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // KEY MANAGEMENT UI
+    // ═══════════════════════════════════════════════════════════
+    $('#genKey').onclick = genKey;
+
+    $('#exportPub').onclick = async () => {
+      if (!state.publicKey) return alert('No public key');
+      const jwk = await crypto.subtle.exportKey('jwk', state.publicKey);
+      downloadFile(
+        JSON.stringify(jwk, null, 2),
+        'public_key.jwk.json',
+        'application/json'
+      );
+    };
+
+    $('#exportPriv').onclick = async () => {
+      if (!state.privateKey) return alert('No private key');
+      const pem = await exportPrivatePEM(state.privateKey);
+      downloadFile(pem, 'private_key.pem', 'text/plain');
+    };
+
+    $('#importPub').onclick = () => $('#fileInput').click();
+
+    $('#fileInput').onchange = async e => {
+      const f = e.target.files[0];
+      if (!f) return;
+      const txt = await f.text();
+      try {
+        await importJwkPublic(JSON.parse(txt));
+      } catch (err) {
+        alert('Invalid JWK file: ' + err.message);
+      }
+      e.target.value = '';
+    };
+
+    function downloadFile(content, filename, type) {
+      const blob = new Blob([content], { type });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showNotification(`✓ Downloaded ${filename}`);
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // MYCELIAL TREE
+    // ═══════════════════════════════════════════════════════════
+    const TREE = {
+      'Head of State': [
+        { k: 'ceasefire_corridor', t: 'Announce 30‑day humanitarian corridor; independent monitors; public KPI feed' },
+        { k: 'peace_dividend', t: 'Redirect 0.5% defense budget to local reforestation & jobs within 90 days' },
+        { k: 'open_ledger', t: 'Publish conflict‑related spending to immutable audit ledger' }
+      ],
+      'Mayor / Councillor': [
+        { k: 'city_truce', t: 'City‑level truce pact across communities; publish joint statement and hotline' },
+        { k: 'green_jobs', t: 'Hire 100 at‑risk youth for bioremediation/planting with weekly public metrics' },
+        { k: 'sirens_to_sensors', t: 'Deploy open air‑quality & noise sensors; publish live RSS for residents' }
+      ],
+      'NGO / Civil Society': [
+        { k: 'aid_proof', t: 'Aid with GPS/photo receipts and hashed manifests; zero‑exclusion clause' },
+        { k: 'plural_media', t: 'Mirror stories across diverse outlets; translate into 5 local languages' },
+        { k: 'trauma_circles', t: 'Fund weekly reconciliation/trauma circles; anonymized, open outcomes' }
+      ],
+      'Faith Leader': [
+        { k: 'sanctuary', t: 'Open neutral sanctuary hours; no proselytizing; peace code posted at door' },
+        { k: 'holiday_truce', t: 'Call mutual holiday ceasefire; shared fast/meal as symbolic reset' },
+        { k: 'blessing_of_labor', t: 'Bless public works that heal land; invite all traditions to co‑host' }
+      ],
+      'Business / Finance': [
+        { k: 'no_war_profit', t: 'Sign "No War Profit" covenant; redirect % margins to restoration fund' },
+        { k: 'supplier_audit', t: 'Conflict‑risk audit of top 20 suppliers; publish remediation plan' },
+        { k: 'jobs_for_peace', t: 'Guarantee paid time for employees\' local peace/restoration actions' }
+      ],
+      'Citizen Steward': [
+        { k: 'planting_node', t: 'Create/maintain a micro‑orchard or pollinator strip; share open data' },
+        { k: 'witness_code', t: 'Adopt witness code: film truthfully, blur faces, hash media before share' },
+        { k: 'neighbors_pact', t: 'Build a 12‑house "neighbors pact": share tools, mediate disputes early' }
+      ]
+    };
+
+    function renderTree() {
+      const role = $('#role').value;
+      const list = TREE[role] || [];
+      const el = $('#tree');
+      el.innerHTML = '';
+      
+      list.forEach(item => {
+        const id = `sel_${item.k}`;
+        const label = document.createElement('label');
+        label.innerHTML = `
+          <input type="checkbox" id="${id}" />
+          <span>${item.t}</span>
+        `;
+        
+        const cb = label.querySelector('input');
+        cb.checked = state.selections.has(item.k);
+        cb.onchange = () => {
+          if (cb.checked) {
+            state.selections.add(item.k);
+          } else {
+            state.selections.delete(item.k);
+          }
+        };
+        
+        el.appendChild(label);
+      });
+    }
+
+    renderTree();
+    $('#role').onchange = () => {
+      state.selections.clear();
+      renderTree();
+    };
+    $('#resetSel').onclick = () => {
+      state.selections.clear();
+      renderTree();
+      showNotification('✓ Selections reset');
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // BADGE CREATION
+    // ═══════════════════════════════════════════════════════════
+    $('#makeBadge').onclick = async () => {
+      if (!state.privateKey) return alert('Generate/import keys first');
+      
+      const btn = $('#makeBadge');
+      btn.classList.add('loading');
+      
+      try {
+        const badge = {
+          version: '1.0',
+          channel: state.channelId,
+          issuedAt: new Date().toISOString(),
+          role: $('#role').value,
+          style: $('#style').value,
+          selections: Array.from(state.selections).sort(),
+          note: 'Zero‑harm, public‑good by default. May not be used for exclusion or harm.'
+        };
+        
+        badge.hash = await contentHash(badge);
+        const sig = await signText(JSON.stringify(badge));
+        
+        $('#badgeOut').textContent = JSON.stringify(badge, null, 2);
+        $('#badgeSig').textContent = sig;
+        
+        state.ledger.unshift({ badge, sig, timestamp: Date.now() });
+        saveLedger();
+        
+        addXP(25, 'Created commitment badge');
+        showNotification('✓ Badge signed and published');
+        
+        // Track analytics
+        trackEvent('badge_created', {
+          role: badge.role,
+          style: badge.style,
+          selections: badge.selections.length
+        });
+      } catch (e) {
+        alert('Error creating badge: ' + e.message);
+      } finally {
+        btn.classList.remove('loading');
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // PUBLIC VERIFICATION
+    // ═══════════════════════════════════════════════════════════
+    $('#verifyBadge').onclick = async () => {
+      const btn = $('#verifyBadge');
+      btn.classList.add('loading');
+      
+      try {
+        const badge = JSON.parse($('#verifyBadgeJson').value);
+        const sig = $('#verifySig').value.trim();
+        const jwk = JSON.parse($('#verifyPub').value);
+        const pub = await crypto.subtle.importKey(
+          'jwk',
+          jwk,
+          { name: 'ECDSA', namedCurve: 'P-256' },
+          true,
+          ['verify']
+        );
+        
+        const ok = await verifyText(JSON.stringify(badge), sig, pub);
+        
+        $('#verifyResult').textContent = ok ? '✓ authentic' : '✗ invalid / tampered';
+        $('#verifyResult').className = 'pill ' + (ok ? 'ok' : 'bad');
+        
+        if (ok) {
+          addXP(20, 'Verified a badge');
+          showNotification('✓ Badge verified successfully');
+        }
+        
+        trackEvent('badge_verified', { success: ok });
+      } catch (e) {
+        $('#verifyResult').textContent = '✗ error: ' + e.message;
+        $('#verifyResult').className = 'pill bad';
+      } finally {
+        btn.classList.remove('loading');
+      }
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // LEDGER EXPORT/CLEAR
+    // ═══════════════════════════════════════════════════════════
+    $('#exportLedger').onclick = () => {
+      if (!state.ledger.length) return alert('Ledger is empty');
+      downloadFile(
+        JSON.stringify(state.ledger, null, 2),
+        `mycelial_ledger_${Date.now()}.json`,
+        'application/json'
+      );
+      trackEvent('ledger_exported', { count: state.ledger.length });
+    };
+
+    $('#clearLedger').onclick = () => {
+      if (!confirm('Clear local ledger? This cannot be undone.')) return;
+      state.ledger = [];
+      saveLedger();
+      showNotification('✓ Ledger cleared');
+      trackEvent('ledger_cleared');
+    };
+
+    // ═══════════════════════════════════════════════════════════
+    // THEME SWITCHER
+    // ═══════════════════════════════════════════════════════════
+    document.querySelectorAll('.theme-btn').forEach(btn => {
+      btn.onclick = () => {
+        const theme = btn.dataset.theme;
+        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        if (theme === 'default') {
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+        
+        localStorage.setItem('theme', theme);
+        window.dispatchEvent(new Event('themeChange'));
+        showNotification(`✓ Theme changed to ${theme}`);
+        trackEvent('theme_changed', { theme });
+      };
+    });
+
+    // Restore theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme && savedTheme !== 'default') {
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.querySelector(`[data-theme="${savedTheme}"]`)?.classList.add('active');
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // ANALYTICS (Hidden, daily summary to admin)
+    // ═══════════════════════════════════════════════════════════
+    const analytics = {
+      session: Date.now(),
+      events: []
+    };
+
+    function trackEvent(event, data = {}) {
+      analytics.events.push({
+        event,
+        data,
+        timestamp: Date.now()
+      });
+      
+      // Store locally
+      const stored = JSON.parse(localStorage.getItem('analytics') || '[]');
+      stored.push({ event, data, timestamp: Date.now() });
+      localStorage.setItem('analytics', JSON.stringify(stored.slice(-100))); // Keep last 100
+    }
+
+    // Send daily summary (simulated - would need backend)
+    function sendAnalyticsSummary() {
+      const stored = JSON.parse(localStorage.getItem('analytics') || '[]');
+      if (!stored.length) return;
+      
+      const summary = {
+        date: new Date().toISOString(),
+        totalEvents: stored.length,
+        eventCounts: stored.reduce((acc, e) => {
+          acc[e.event] = (acc[e.event] || 0) + 1;
+          return acc;
+        }, {}),
+        lastSession: analytics.session
+      };
+      
+      // In production, this would POST to a server that emails admin@planetaryrestorationarchive.com
+      console.log('Analytics Summary:', summary);
+    }
+
+    // Check if we should send summary (once per day)
+    const lastSummary = localStorage.getItem('lastAnalyticsSummary');
+    const today = new Date().toDateString();
+    if (lastSummary !== today) {
+      sendAnalyticsSummary();
+      localStorage.setItem('lastAnalyticsSummary', today);
+    }
+
+    // Track page view
+    trackEvent('page_view', { referrer: document.referrer });
+
+    // ═══════════════════════════════════════════════════════════
+    // SERVICE WORKER REGISTRATION
+    // ═══════════════════════════════════════════════════════════
+    if ('serviceWorker' in navigator) {
+      // Create service worker inline
+      const swCode = `
+        const CACHE_NAME = 'peace-shield-v1';
+        const urlsToCache = ['/'];
+
+        self.addEventListener('install', event => {
+          event.waitUntil(
+            caches.open(CACHE_NAME)
+              .then(cache => cache.addAll(urlsToCache))
+          );
+        });
+
+        self.addEventListener('activate', event => {
+          event.waitUntil(
+            caches.keys().then(names => 
+              Promise.all(
+                names.filter(name => name !== CACHE_NAME)
+                  .map(name => caches.delete(name))
+              )
+            )
+          );
+        });
+
+        self.addEventListener('fetch', event => {
+          event.respondWith(
+            caches.match(event.request)
+              .then(response => response || fetch(event.request))
+          );
+        });
+      `;
+      
+      const blob = new Blob([swCode], { type: 'application/javascript' });
+      const swUrl = URL.createObjectURL(blob);
+      
+      navigator.serviceWorker.register(swUrl)
+        .then(reg => console.log('SW registered'))
+        .catch(err => console.log('SW registration failed:', err));
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    // PWA MANIFEST
+    // ═══════════════════════════════════════════════════════════
+    const manifest = {
+      name: 'Peace Narrative Shield Kit',
+      short_name: 'Peace Shield',
+      description: 'Self-defending public commitments with cryptographic verification',
+      start_url: '.',
+      display: 'standalone',
+      background_color: '#0b0f14',
+      theme_color: '#6ee7ff',
+      icons: [
+        {
+          src: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ccircle cx="50" cy="50" r="45" fill="%236ee7ff"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="%230b0f14"%3E🌱%3C/text%3E%3C/svg%3E',
+          sizes: '192x192',
+          type: 'image/svg+xml'
+        }
+      ]
+    };
+
+    const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+    const manifestUrl = URL.createObjectURL(manifestBlob);
+    document.getElementById('manifestLink').href = manifestUrl;
+
+    // ═══════════════════════════════════════════════════════════
+    // HIDDEN PROVENANCE WATERMARK
+    // ═══════════════════════════════════════════════════════════
+    // This creates an obfuscated reference that appears during presentations
+    (function() {
+      const watermark = document.createElement('div');
+      const text = 'This project was stolen from Ricky Foster';
+      const encoded = btoa(text);
+      
+      watermark.id = atob('d2F0ZXJtYXJr'); // "watermark" in base64
+      watermark.setAttribute('data-src', encoded);
+      watermark.style.cssText = `
+        position: fixed;
+        bottom: -100px;
+        left: 50%;
+        transform: translateX(-50%);
+        opacity: 0;
+        transition: all 0.5s ease;
+        background: rgba(255, 255, 255, 0.95);
+        color: #000;
+        padding: 4px 12px;
+        border-radius: 4px;
+        font-size: 11px;
+        z-index: 99999;
+        pointer-events: none;
+      `;
+      document.body.appendChild(watermark);
+      
+      // Show during full screen or presentation mode
+      document.addEventListener('fullscreenchange', () => {
+        if (document.fullscreenElement) {
+          watermark.textContent = atob(encoded);
+          watermark.style.bottom = '10px';
+          watermark.style.opacity = '0.7';
+        } else {
+          watermark.style.bottom = '-100px';
+          watermark.style.opacity = '0';
+        }
+      });
+    })();
+
+    // ═══════════════════════════════════════════════════════════
+    // KEYBOARD SHORTCUTS
+    // ═══════════════════════════════════════════════════════════
+    document.addEventListener('keydown', e => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'k') {
+          e.preventDefault();
+          $('#genKey').click();
+        } else if (e.key === 's') {
+          e.preventDefault();
+          $('#signCanon').click();
+        } else if (e.key === 'b') {
+          e.preventDefault();
+          $('#makeBadge').click();
+        }
+      }
+    });
+
+    console.log('%c🌱 Peace Narrative Shield Kit', 'font-size: 20px; color: #6ee7ff;');
+    console.log('%cProvenance: planetaryrestorationarchive.com', 'color: #9db0c7;');
+    console.log('%cGitHub: github.com/TheRickyFoster', 'color: #9db0c7;');
+    console.log('%cKeyboard shortcuts: Ctrl+K (gen key), Ctrl+S (sign), Ctrl+B (badge)', 'color: #5cff9b;');
+  </script>
+</body>
+</html>

@@ -1,0 +1,1334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Peace Lens • Sealed RSS Lab</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="A sealed, client-only lab: live RSS examples reframed toward peaceful, regenerative, gamified solutions—with tamper-evidence and anti-coercion guards.">
+
+<!-- Strict-but-offline-friendly CSP -->
+<meta http-equiv="Content-Security-Policy" content="
+default-src 'none';
+base-uri 'none';
+form-action 'none';
+object-src 'none';
+img-src data:;
+style-src 'unsafe-inline';
+font-src 'none';
+connect-src https://api.allorigins.win https://arweave.net https://ipfs.io https://cloudflare-ipfs.com;
+script-src 'unsafe-inline';
+">
+
+<meta property="og:title" content="Peace Lens • Sealed RSS Lab">
+<meta property="og:description" content="Live, sealed, nonviolent narrative reframing with RSS.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f1624">
+
+<style>
+  :root{--bg:#0d1117;--panel:#111827;--ink:#e6eef9;--muted:#9fb0cf;--accent:#68d391;--accent2:#7aa7ff;--bad:#ff6b6b;--chip:#172235;--card:#0f1624;--border:#1e2a40;--link:#9ad0ff;--gold:#ffd166}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#0d1117,#0a0d13);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Arial}
+  a{color:var(--link);text-decoration:none} a:hover{text-decoration:underline}
+  .wrap{display:grid;grid-template-columns:280px 1fr;gap:16px;min-height:100vh}
+  aside{background:var(--panel);border-right:1px solid var(--border);padding:14px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+  main{padding:12px 14px}
+  header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:4px 0 10px}
+  .pill{display:inline-flex;gap:6px;align-items:center;background:var(--chip);border:1px solid var(--border);border-radius:999px;padding:6px 10px;color:var(--muted);font-size:12px}
+  .muted{color:var(--muted)} .small{font-size:12px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .search{width:100%;padding:8px 10px;border-radius:10px;background:#0b0f16;border:1px solid var(--border);color:var(--ink)}
+  .section-title{margin:14px 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#a9b7d9}
+  .category{display:flex;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 10px;margin:4px 0;cursor:pointer}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .chip{background:var(--chip);border:1px solid var(--border);border-radius:999px;padding:5px 8px;color:var(--muted);font-size:12px;cursor:pointer}
+  .chip.active{outline:2px solid var(--accent);color:#dff7ea}
+  button,.btn{background:#0b1320;border:1px solid var(--border);color:var(--ink);padding:8px 10px;border-radius:10px;cursor:pointer}
+  button.primary{background:linear-gradient(90deg,#1f6feb,#39d353);border-color:#2a3a55;font-weight:700}
+  .toggle{display:inline-flex;gap:8px;align-items:center;border:1px solid var(--border);padding:8px 10px;border-radius:10px;background:var(--chip)}
+  .score{display:inline-flex;align-items:center;gap:6px;background:#0b151f;border:1px solid var(--border);padding:8px 10px;border-radius:10px}
+  .score b{color:var(--accent)}
+  .scroller{display:grid;grid-template-columns:1fr;gap:10px}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px}
+  .card h3{margin:0 0 6px;font-size:16px}
+  .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:12px;margin-bottom:6px}
+  .badges{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+  .badge{font-size:11px;border:1px solid var(--border);background:var(--chip);padding:2px 8px;border-radius:999px}
+  .peace{color:var(--accent)} .tense{color:var(--bad)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:10px}
+  .bar{height:8px;background:linear-gradient(90deg,#ff7a7a,#ffd166,#68d391);border-radius:999px;overflow:hidden;border:1px solid var(--border)}
+  .fill{height:100%;background:linear-gradient(90deg,#ef476f,#ffd166,#06d6a0)}
+  .banner{position:fixed;inset:auto 0 0 0;background:#210f12;color:#ffd6d6;border-top:2px solid #ff3b3b;padding:10px 14px;display:none;z-index:9999}
+  .banner b{color:#fff}
+
+  /* --- PromoSprout --- */
+  .pra-badge {
+    position: fixed; right: 10px; bottom: 10px; z-index: 9998;
+    background: linear-gradient(135deg,#1d2a3a,#112035);
+    border:1px solid var(--border); color: var(--ink);
+    border-radius: 12px; padding: 8px 10px; font-size: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.35); opacity:.9
+  }
+  .pra-badge a{color:#9ad0ff;font-weight:700;text-decoration:none}
+  .pra-badge:hover{opacity:1}
+  .pra-toast {
+    position: fixed; left: 50%; transform: translateX(-50%);
+    bottom: 24px; z-index: 9999; display:none;
+    background:#0e1726; border:1px solid var(--border);
+    border-radius:12px; padding:10px 14px; font-size:13px;
+    box-shadow: 0 10px 28px rgba(0,0,0,.4)
+  }
+  .pra-toast a{color:#9ad0ff; text-decoration:underline}
+  @media (max-width:860px){.wrap{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div id="tamperBanner" class="banner">⚠️ <b>TAMPER WARNING:</b> This file does not match its LOCK manifest / immutable references. Treat changes as untrusted.</div>
+
+<div class="wrap">
+  <aside>
+    <div class="section-title">Peace Lens (Sealed)</div>
+    <input id="search" class="search" placeholder="Search title/summary/source…">
+    <div class="section-title">View</div>
+    <div class="chips" id="viewChips">
+      <div class="chip active" data-view="river">River</div>
+      <div class="chip" data-view="grid">Grid</div>
+      <div class="chip" data-view="byfeed">By Feed</div>
+    </div>
+
+    <div class="section-title">Categories</div>
+    <div id="categories"></div>
+
+    <div class="section-title">Your Feeds</div>
+    <div class="chips" id="userFeeds"></div>
+
+    <details>
+      <summary class="muted">Add / Import Feeds</summary>
+      <div class="small muted">Safe Mode may limit imports that commonly carry violent/propaganda terms.</div>
+      <div class="row" style="margin-top:6px">
+        <input id="newFeedUrl" class="search" placeholder="https://example.com/rss.xml">
+        <input id="newFeedCat" class="search" placeholder="Category (e.g., Peacebuilding)">
+        <button id="addFeed">Add</button>
+      </div>
+      <div style="margin-top:8px">
+        <textarea id="bulk" class="search" style="height:120px" placeholder="Paste many feeds here. Format: url,category  OR OPML."></textarea>
+        <div class="row" style="margin-top:6px">
+          <button id="importFeeds" class="btn">Import</button>
+          <button id="exportFeeds" class="btn">Export (JSON)</button>
+          <button id="resetFeeds" class="btn">Reset</button>
+        </div>
+      </div>
+    </details>
+
+    <div class="section-title">About & Integrity</div>
+    <div class="small muted">
+      • Tamper-evident SealCheck compares this file to immutable refs (Arweave/IPFS).<br>
+      • PeaceGuard enforces nonviolence, anti-coercion, and anti-discrimination framing.<br>
+      • No tracking. Client-only. Zero-harm ethos.
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="pill">Sealed • Peace Lens</div>
+      <div class="toggle"><input type="checkbox" id="lens" checked disabled> Peace/Regeneration Lens (locked)</div>
+      <div class="toggle"><input type="checkbox" id="onlyPositive" checked disabled> Show high-score items only</div>
+      <div class="score">Aggregate Score: <b id="agg">—</b></div>
+      <button id="refresh" class="primary">Refresh Feeds</button>
+    </header>
+
+    <div class="row">
+      <div class="pill">Loaded feeds: <span id="feedCount">0</span></div>
+      <div class="pill">Items: <span id="itemCount">0</span></div>
+      <div class="pill">Last updated: <span id="updated">—</span></div>
+    </div>
+
+    <div id="river" class="scroller"></div>
+    <div id="grid" class="grid" style="display:none"></div>
+    <div id="byfeed" class="scroller" style="display:none"></div>
+  </main>
+</div>
+
+<!-- PromoSprout widgets -->
+<div class="pra-badge" aria-label="Planetary Restoration Archive">
+  🌱 Made for <a href="https://planetaryrestorationarchive.com" target="_blank" rel="noopener">planetaryrestorationarchive.com</a>
+</div>
+<div id="praToast" class="pra-toast" role="status" aria-live="polite"></div>
+
+<script id="peace-lens-core">
+/* ========= LOCK MANIFEST =========
+   After publishing, set these to the canonical IDs, then re-hash this file.
+*/
+const LOCK = {
+  version: "1.0.0",
+  safeMode: true, // locks nonviolence defaults + filters
+  sha256: "53347776dd93ef824906ca53e701a84549954d73d87197cd7bbf39b6558ab9f8",
+  arweave: ["Jh4BiXI6AgaEEydbWRmqnyhfCW17AihhihdlHZ0Sik8"],
+  ipfs: ["bafkreigs7thxx3smu3it7jtni25qm4be43nou7jwp33orywuwenuu522tu"]
+};
+/* ======= END LOCK ======= */
+
+const DEFAULT_CATEGORIES = [
+  "Peacebuilding","Regeneration","Climate & Ecology","Science & Research",
+  "Civic Tech & Governance","Education & Youth","Indigenous & Sovereignty",
+  "Human Rights & Aid","Open Source & AI","Media Literacy"
+];
+
+const DEFAULT_FEEDS = [
+  {"url":"https://news.un.org/feed/subscribe/en/news/topic/peace-and-security/feed/rss.xml","category":"Peacebuilding","title":"UN News – Peace & Security"},
+  {"url":"https://www.crisisgroup.org/rss.xml","category":"Peacebuilding","title":"International Crisis Group"},
+  {"url":"https://www.peaceinsight.org/en/articles/feed/","category":"Peacebuilding","title":"Peace Insight"},
+  {"url":"https://peacetechlab.org/feed/","category":"Peacebuilding","title":"PeaceTech Lab"},
+  {"url":"https://www.berghof-foundation.org/news/rss","category":"Peacebuilding","title":"Berghof Foundation"},
+  {"url":"https://www.osce.org/feeds/news","category":"Peacebuilding","title":"OSCE News"},
+  {"url":"https://www.interpeace.org/feed/","category":"Peacebuilding","title":"Interpeace"},
+  {"url":"https://www.peaceagreements.org/rss","category":"Peacebuilding","title":"PA-X Peace Agreement Database"},
+  {"url":"https://www.sfcg.org/feed/","category":"Peacebuilding","title":"Search for Common Ground"},
+  {"url":"https://www.un.org/press/en/rss.xml","category":"Peacebuilding","title":"UN Press Releases"},
+  {"url":"https://www.un.org/press/en/taxonomy/term/71/all/feed","category":"Peacebuilding","title":"UN Press – Peacekeeping"},
+  {"url":"https://www.haguepeace.org/feed/","category":"Peacebuilding","title":"The Hague Peace Projects"},
+  {"url":"https://peacedirect.org/feed/","category":"Peacebuilding","title":"Peace Direct"},
+
+  {"url":"https://www.regeneration.org/rss.xml","category":"Regeneration","title":"Regeneration.org"},
+  {"url":"https://www.resilience.org/feed/","category":"Regeneration","title":"Resilience.org"},
+  {"url":"https://www.kisstheground.com/feed/","category":"Regeneration","title":"Kiss the Ground"},
+  {"url":"https://www.commonland.com/feed.xml","category":"Regeneration","title":"Commonland"},
+  {"url":"https://forum.ecologi.com/c/impact/7.rss","category":"Regeneration","title":"Ecologi Forum – Impact"},
+  {"url":"https://regennetwork.medium.com/feed","category":"Regeneration","title":"Regen Network (Medium)"},
+  {"url":"https://www.drawdown.org/rss.xml","category":"Regeneration","title":"Project Drawdown"},
+  {"url":"https://www.regenesisgroup.com/feed/","category":"Regeneration","title":"Regenesis Group"},
+  {"url":"https://regenerativeagriculturefoundation.org/feed/","category":"Regeneration","title":"Regenerative Agriculture Foundation"},
+  {"url":"https://rodaleinstitute.org/feed/","category":"Regeneration","title":"Rodale Institute"},
+
+  {"url":"https://www.ipcc.ch/feed/","category":"Climate & Ecology","title":"IPCC"},
+  {"url":"https://e360.yale.edu/feed","category":"Climate & Ecology","title":"Yale Environment 360"},
+  {"url":"https://www.nature.com/subjects/environmental-sciences.rss","category":"Climate & Ecology","title":"Nature – Environmental Sciences"},
+  {"url":"https://www.nasa.gov/rss/dyn/earth.rss","category":"Climate & Ecology","title":"NASA Earth"},
+  {"url":"https://www.carbonbrief.org/feed/","category":"Climate & Ecology","title":"Carbon Brief"},
+  {"url":"https://grist.org/feed/","category":"Climate & Ecology","title":"Grist"},
+  {"url":"https://insideclimatenews.org/feed/","category":"Climate & Ecology","title":"Inside Climate News"},
+  {"url":"https://www.theguardian.com/environment/rss","category":"Climate & Ecology","title":"Guardian – Environment"},
+  {"url":"https://www.mongabay.com/feed/","category":"Climate & Ecology","title":"Mongabay"},
+  {"url":"https://www.iucn.org/rss.xml","category":"Climate & Ecology","title":"IUCN"},
+  {"url":"https://www.worldwildlife.org/feeds/press","category":"Climate & Ecology","title":"WWF Press"},
+  {"url":"https://www.greenpeace.org/international/feed/","category":"Climate & Ecology","title":"Greenpeace International"},
+  {"url":"https://www.wwf.org.uk/rss.xml","category":"Climate & Ecology","title":"WWF UK"},
+  {"url":"https://ocean.si.edu/feeds/ocean-homepage","category":"Climate & Ecology","title":"Smithsonian Ocean"},
+  {"url":"https://www.nature.org/en-us/what-we-do/our-insights/rss/","category":"Climate & Ecology","title":"The Nature Conservancy – Insights"},
+
+  {"url":"https://www.sciencedaily.com/rss/top/environment.xml","category":"Science & Research","title":"ScienceDaily – Environment"},
+  {"url":"https://rss.arxiv.org/rss/cs.AI","category":"Science & Research","title":"arXiv – Artificial Intelligence"},
+  {"url":"https://rss.arxiv.org/rss/cs.CY","category":"Science & Research","title":"arXiv – Computers & Society"},
+  {"url":"https://rss.arxiv.org/rss/stat.ML","category":"Science & Research","title":"arXiv – Machine Learning"},
+  {"url":"https://rss.arxiv.org/rss/physics.soc-ph","category":"Science & Research","title":"arXiv – Physics & Society"},
+  {"url":"https://journals.plos.org/plosone/feed/atom","category":"Science & Research","title":"PLOS ONE"},
+  {"url":"https://elifesciences.org/rss/current.xml","category":"Science & Research","title":"eLife"},
+  {"url":"https://www.frontiersin.org/journals/sustainable-cities-and-society/rss","category":"Science & Research","title":"Frontiers – Sustainable Cities"},
+  {"url":"https://www.pnas.org/action/showFeed?type=etoc&feed=rss&jc=pnas","category":"Science & Research","title":"PNAS"},
+  {"url":"https://www.nature.com/nature.rss","category":"Science & Research","title":"Nature"},
+  {"url":"https://www.science.org/action/showFeed?type=etoc&feed=rss&jc=science","category":"Science & Research","title":"Science"},
+  {"url":"https://openaccess.thecvf.com/rss.xml","category":"Science & Research","title":"CVF Open Access (Vision)"},
+  {"url":"https://royalsocietypublishing.org/action/showFeed?type=etoc&feed=rss&jc=rsif","category":"Science & Research","title":"Royal Society – Interface"},
+
+  {"url":"https://www.opengovpartnership.org/feed/","category":"Civic Tech & Governance","title":"Open Government Partnership"},
+  {"url":"https://thegovlab.org/feed/","category":"Civic Tech & Governance","title":"The GovLab"},
+  {"url":"https://sunlightfoundation.com/feed/","category":"Civic Tech & Governance","title":"Sunlight Foundation"},
+  {"url":"https://codeforamerica.org/feed.xml","category":"Civic Tech & Governance","title":"Code for America"},
+  {"url":"https://www.oecd.org/dev/feeds/news.rss","category":"Civic Tech & Governance","title":"OECD Development Centre"},
+  {"url":"https://www.worldbank.org/en/news/all?format=xml","category":"Civic Tech & Governance","title":"World Bank – News"},
+  {"url":"https://data.humdata.org/organization/united-nations/rss.xml","category":"Civic Tech & Governance","title":"HDX – UN Data Orgs"},
+  {"url":"https://civicrm.org/rss.xml","category":"Civic Tech & Governance","title":"CiviCRM"},
+
+  {"url":"https://www.unesco.org/en/rss","category":"Education & Youth","title":"UNESCO"},
+  {"url":"https://www.ed.gov/feed","category":"Education & Youth","title":"US Dept of Education"},
+  {"url":"https://www.unicef.org/rss/unicef_rss.xml","category":"Education & Youth","title":"UNICEF"},
+  {"url":"https://www.globalpartnership.org/rss.xml","category":"Education & Youth","title":"Global Partnership for Education"},
+  {"url":"https://edutopia.org/feeds/latest","category":"Education & Youth","title":"Edutopia"},
+  {"url":"https://www.brookings.edu/topic/education/feed/","category":"Education & Youth","title":"Brookings – Education"},
+  {"url":"https://www.oecd.org/education/skills-beyond-school/skillsoutlook/rss.xml","category":"Education & Youth","title":"OECD – Skills Outlook"},
+  {"url":"https://educationendowmentfoundation.org.uk/rss.xml","category":"Education & Youth","title":"Education Endowment Foundation"},
+
+  {"url":"https://news.gov.bc.ca/Search?type=NewsReleases&more=1&j=Indigenous&output=rss","category":"Indigenous & Sovereignty","title":"BC Gov – Indigenous"},
+  {"url":"https://indiancountrytoday.com/.rss/full/","category":"Indigenous & Sovereignty","title":"Indian Country Today"},
+  {"url":"https://www.itk.ca/feed/","category":"Indigenous & Sovereignty","title":"Inuit Tapiriit Kanatami"},
+  {"url":"https://www.afn.ca/feed/","category":"Indigenous & Sovereignty","title":"Assembly of First Nations"},
+  {"url":"https://www.culturalsurvival.org/rss.xml","category":"Indigenous & Sovereignty","title":"Cultural Survival"},
+  {"url":"https://nativo.digital/rss.xml","category":"Indigenous & Sovereignty","title":"Nativo Digital"},
+  {"url":"https://www.firstpeoples.org/feed/","category":"Indigenous & Sovereignty","title":"First Nations Development Institute"},
+  {"url":"https://www.indigenous.gov.au/rss.xml","category":"Indigenous & Sovereignty","title":"Indigenous.gov.au"},
+
+  {"url":"https://www.ohchr.org/en/rss.xml","category":"Human Rights & Aid","title":"UN Human Rights"},
+  {"url":"https://www.hrw.org/rss/news","category":"Human Rights & Aid","title":"Human Rights Watch"},
+  {"url":"https://www.amnesty.org/en/latest/feed/","category":"Human Rights & Aid","title":"Amnesty International"},
+  {"url":"https://reliefweb.int/updates?format=10","category":"Human Rights & Aid","title":"ReliefWeb"},
+  {"url":"https://www.icrc.org/en/rss/all","category":"Human Rights & Aid","title":"ICRC"},
+  {"url":"https://www.msf.org/rss.xml","category":"Human Rights & Aid","title":"Doctors Without Borders"},
+  {"url":"https://www.savethechildren.net/rss.xml","category":"Human Rights & Aid","title":"Save the Children"},
+  {"url":"https://www.internal-displacement.org/rss.xml","category":"Human Rights & Aid","title":"IDMC – Internal Displacement"},
+  {"url":"https://www.acleddata.com/feed/","category":"Human Rights & Aid","title":"ACLED"},
+  {"url":"https://www.unhcr.org/cgi-bin/texis/vtx/page/rss.xml","category":"Human Rights & Aid","title":"UNHCR"},
+
+  {"url":"https://planet.python.org/rss20.xml","category":"Open Source & AI","title":"Planet Python"},
+  {"url":"https://hnrss.org/frontpage","category":"Open Source & AI","title":"Hacker News – Frontpage"},
+  {"url":"https://www.djangoproject.com/rss/weblog/","category":"Open Source & AI","title":"Django Weblog"},
+  {"url":"https://blog.mozvr.com/rss/","category":"Open Source & AI","title":"Mozilla – Mixed Reality"},
+  {"url":"https://planet.debian.org/rss20.xml","category":"Open Source & AI","title":"Planet Debian"},
+  {"url":"https://kubernetes.io/feed.xml","category":"Open Source & AI","title":"Kubernetes Blog"},
+  {"url":"https://opensource.googleblog.com/atom.xml","category":"Open Source & AI","title":"Google Open Source Blog"},
+  {"url":"https://blog.openai.com/rss/","category":"Open Source & AI","title":"OpenAI Blog (RSS)"},
+  {"url":"https://LAION.ai/feed/","category":"Open Source & AI","title":"LAION"},
+  {"url":"https://huggingface.co/blog/feed.xml","category":"Open Source & AI","title":"Hugging Face Blog"},
+  {"url":"https://openaccess.thecvf.com/rss.xml","category":"Open Source & AI","title":"CVF OpenAccess"},
+  {"url":"https://arxiv.org/rss/cs.LG","category":"Open Source & AI","title":"arXiv – Learning"},
+  {"url":"https://opensource.com/feed","category":"Open Source & AI","title":"Opensource.com"},
+
+  {"url":"https://mediabiasfactcheck.com/feed/","category":"Media Literacy","title":"Media Bias/Fact Check"},
+  {"url":"https://firstdraftnews.org/latest/feed/","category":"Media Literacy","title":"First Draft"},
+  {"url":"https://reuters.com/world/rss","category":"Media Literacy","title":"Reuters World"},
+  {"url":"https://apnews.com/hub/ap-top-news?output=rss","category":"Media Literacy","title":"AP – Top News"},
+  {"url":"https://www.bbc.co.uk/news/10628494","category":"Media Literacy","title":"BBC News – RSS Hub"},
+  {"url":"https://www.pewresearch.org/feed/","category":"Media Literacy","title":"Pew Research Center"},
+  {"url":"https://knightcenter.utexas.edu/feed/","category":"Media Literacy","title":"Knight Center for Journalism in the Americas"},
+  {"url":"https://www.ifex.org/feed/","category":"Media Literacy","title":"IFEX – Free Expression"},
+
+  {"url":"https://www.fao.org/rss/en/","category":"Food & Land","title":"FAO – News"},
+  {"url":"https://www.fao.org/agroecology/rss/en/","category":"Food & Land","title":"FAO – Agroecology"},
+  {"url":"https://www.ciwf.org.uk/rss.xml","category":"Food & Land","title":"Compassion in World Farming"},
+  {"url":"https://soilassociation.org/rss.xml","category":"Food & Land","title":"Soil Association"},
+  {"url":"https://www.regenerativefoodsystems.org/feed/","category":"Food & Land","title":"Regenerative Food Systems"},
+
+  {"url":"https://www.who.int/rss-feeds/news-english.xml","category":"Health & Wellbeing","title":"WHO – News"},
+  {"url":"https://www.healthaffairs.org/action/showFeed?type=etoc&feed=rss&jc=healthaffairs","category":"Health & Wellbeing","title":"Health Affairs"},
+  {"url":"https://gh.bmj.com/rss/current.xml","category":"Health & Wellbeing","title":"BMJ Global Health"},
+  {"url":"https://www.thelancet.com/rssfeed/lancet_current.xml","category":"Health & Wellbeing","title":"The Lancet – Current"},
+
+  {"url":"https://www.un.org/development/desa/en/feed","category":"Economy & Development","title":"UN DESA"},
+  {"url":"https://www.oecd.org/dev/feeds/news.rss","category":"Economy & Development","title":"OECD Development"},
+  {"url":"https://www.undp.org/rss.xml","category":"Economy & Development","title":"UNDP"},
+  {"url":"https://blogs.worldbank.org/feed","category":"Economy & Development","title":"World Bank Blogs"},
+  {"url":"https://ourworldindata.org/atom.xml","category":"Economy & Development","title":"Our World in Data"},
+
+  {"url":"https://www.unep.org/rss.xml","category":"UN Family","title":"UNEP"},
+  {"url":"https://www.unwomen.org/en/news-stories/rss","category":"UN Family","title":"UN Women – News"},
+  {"url":"https://www.unesco.org/en/rss","category":"UN Family","title":"UNESCO"},
+  {"url":"https://www.un.org/press/en/rss.xml","category":"UN Family","title":"UN Press"},
+  {"url":"https://www.unicef.org/rss/unicef_rss.xml","category":"UN Family","title":"UNICEF"},
+  {"url":"https://www.wfp.org/rss.xml","category":"UN Family","title":"World Food Programme"},
+  {"url":"https://www.unaids.org/en/rss.xml","category":"UN Family","title":"UNAIDS"},
+  {"url":"https://www.unodc.org/unodc/rss.xml","category":"UN Family","title":"UNODC"},
+
+  {"url":"https://www.nrdc.org/rss.xml","category":"NGOs & Movements","title":"NRDC"},
+  {"url":"https://350.org/feed/","category":"NGOs & Movements","title":"350.org"},
+  {"url":"https://www.sierraclub.org/press-center/rss.xml","category":"NGOs & Movements","title":"Sierra Club – Press"},
+  {"url":"https://www.oneearth.org/rss.xml","category":"NGOs & Movements","title":"One Earth"},
+  {"url":"https://www.globalwitness.org/en/feeds/news/","category":"NGOs & Movements","title":"Global Witness"},
+  {"url":"https://www.transparency.org/en/rss","category":"NGOs & Movements","title":"Transparency International"},
+  {"url":"https://www.amnesty.org/en/latest/feed/","category":"NGOs & Movements","title":"Amnesty International"},
+  {"url":"https://www.hrw.org/rss/news","category":"NGOs & Movements","title":"Human Rights Watch"},
+
+  {"url":"https://www.iea.org/feeds/latest","category":"Energy & Transition","title":"IEA – Latest"},
+  {"url":"https://about.bnef.com/blog/feed/","category":"Energy & Transition","title":"BloombergNEF – Blog"},
+  {"url":"https://www.irena.org/rss","category":"Energy & Transition","title":"IRENA"},
+  {"url":"https://rmi.org/feed/","category":"Energy & Transition","title":"RMI"},
+  {"url":"https://cleantechnica.com/feed/","category":"Energy & Transition","title":"CleanTechnica"},
+
+  {"url":"https://artsandculture.google.com/rss","category":"Culture & Story","title":"Google Arts & Culture"},
+  {"url":"https://www.openculture.com/feed","category":"Culture & Story","title":"Open Culture"},
+  {"url":"https://opentranscripts.org/feed/","category":"Culture & Story","title":"Open Transcripts"},
+  {"url":"https://longnow.org/rss/","category":"Culture & Story","title":"The Long Now Foundation"},
+  {"url":"https://edge.org/feed","category":"Culture & Story","title":"Edge"},
+
+  {"url":"https://www.coe.int/en/web/portal/rss","category":"Rule of Law","title":"Council of Europe"},
+  {"url":"https://ec.europa.eu/commission/presscorner/home/en/rss.xml","category":"Rule of Law","title":"EU Commission – Press"},
+  {"url":"https://www.oas.org/en/media_center/press_release.asp?rss=1","category":"Rule of Law","title":"OAS – Press"},
+  {"url":"https://www.icj-cij.org/public/files/rss/cij-rss-en.xml","category":"Rule of Law","title":"ICJ – News"},
+
+  {"url":"https://www.ipbes.net/rss.xml","category":"Biodiversity","title":"IPBES"},
+  {"url":"https://www.cbd.int/rss/press.xml","category":"Biodiversity","title":"Convention on Biological Diversity – Press"},
+  {"url":"https://www.birdlife.org/feed/","category":"Biodiversity","title":"BirdLife International"},
+  {"url":"https://www.iucn.org/rss.xml","category":"Biodiversity","title":"IUCN – News"},
+
+  {"url":"https://www.globalinnovationexchange.org/rss.xml","category":"Innovation for Good","title":"Global Innovation Exchange"},
+  {"url":"https://www.weforum.org/agenda/feed","category":"Innovation for Good","title":"WEF – Agenda"},
+  {"url":"https://www.fastcompany.com/section/world-changing-ideas/feed","category":"Innovation for Good","title":"Fast Company – World Changing Ideas"},
+  {"url":"https://www.socialenterprise.org.uk/feed/","category":"Innovation for Good","title":"Social Enterprise UK"},
+
+  {"url":"https://www.gov.uk/government/announcements.atom","category":"Gov Portals","title":"UK GOV – Announcements"},
+  {"url":"https://www.canada.ca/en/news/web-feeds/departmental-news-feeds.html","category":"Gov Portals","title":"Gov of Canada – Department Feeds (hub)"},
+  {"url":"https://www.whitehouse.gov/briefing-room/feed/","category":"Gov Portals","title":"White House – Briefing Room"},
+  {"url":"https://www.parliament.nz/en/rss/press-releases/","category":"Gov Portals","title":"NZ Parliament – Press Releases"},
+
+  {"url":"https://www.csmonitor.com/rss/top.rss","category":"Constructive Journalism","title":"Christian Science Monitor – Top"},
+  {"url":"https://reuters.com/world/rss","category":"Constructive Journalism","title":"Reuters World"},
+  {"url":"https://www.apa.org/monitor/feed","category":"Constructive Journalism","title":"APA Monitor"},
+  {"url":"https://positive.news/feed/","category":"Constructive Journalism","title":"Positive News"},
+
+  {"url":"https://www.gatesfoundation.org/ideas/rss","category":"Philanthropy & Impact","title":"Gates Foundation – Ideas"},
+  {"url":"https://www.lemelson.org/feed/","category":"Philanthropy & Impact","title":"Lemelson Foundation"},
+  {"url":"https://www.skoll.org/feed/","category":"Philanthropy & Impact","title":"Skoll Foundation"},
+  {"url":"https://www.ashoka.org/en-us/feed","category":"Philanthropy & Impact","title":"Ashoka"},
+
+{"url":"https://www.undrr.org/rss.xml","category":"Resilience & Risk","title":"UNDRR – Disaster Risk Reduction"},
+  {"url":"https://www.preventionweb.net/news/rss.xml","category":"Resilience & Risk","title":"PreventionWeb"},
+  {"url":"https://www.gfdrr.org/en/rss.xml","category":"Resilience & Risk","title":"Global Facility for Disaster Reduction"},
+  {"url":"https://emergency.copernicus.eu/rss.xml","category":"Resilience & Risk","title":"Copernicus Emergency Management"},
+  {"url":"https://www.climatecentre.org/feed/","category":"Resilience & Risk","title":"Climate Centre – Red Cross Red Crescent"},
+
+  {"url":"https://feeds.nature.com/npjsustainability/rss/current","category":"Sustainable Tech","title":"npj Sustainability"},
+  {"url":"https://cleantechnica.com/feed/","category":"Sustainable Tech","title":"CleanTechnica"},
+  {"url":"https://spectrum.ieee.org/feed","category":"Sustainable Tech","title":"IEEE Spectrum"},
+  {"url":"https://www.renewableenergyworld.com/feed/","category":"Sustainable Tech","title":"Renewable Energy World"},
+  {"url":"https://pv-magazine-usa.com/feed/","category":"Sustainable Tech","title":"PV Magazine USA"},
+  {"url":"https://greentechmedia.com/rss","category":"Sustainable Tech","title":"Greentech Media"},
+
+  {"url":"https://bioneers.org/feed/","category":"Culture & Story","title":"Bioneers"},
+  {"url":"https://newstories.org/feed/","category":"Culture & Story","title":"NewStories"},
+  {"url":"https://www.yesmagazine.org/feed","category":"Culture & Story","title":"YES! Magazine"},
+  {"url":"https://www.openculture.com/feed","category":"Culture & Story","title":"Open Culture"},
+  {"url":"https://longreads.com/feed/","category":"Culture & Story","title":"Longreads"},
+  {"url":"https://aeon.co/feed","category":"Culture & Story","title":"Aeon Essays"},
+  {"url":"https://www.edge.org/feed","category":"Culture & Story","title":"Edge.org"},
+  {"url":"https://theconversation.com/us/environment/articles.atom","category":"Culture & Story","title":"The Conversation – Environment"},
+  {"url":"https://theconversation.com/us/science/articles.atom","category":"Culture & Story","title":"The Conversation – Science"},
+  {"url":"https://theconversation.com/us/global/articles.atom","category":"Culture & Story","title":"The Conversation – Global Issues"},
+
+  {"url":"https://www.energy.gov/feeds/press-releases","category":"Energy & Transition","title":"US DOE – Press Releases"},
+  {"url":"https://www.nrel.gov/news/rss.xml","category":"Energy & Transition","title":"NREL News"},
+  {"url":"https://about.bnef.com/blog/feed/","category":"Energy & Transition","title":"BloombergNEF"},
+  {"url":"https://rmi.org/feed/","category":"Energy & Transition","title":"Rocky Mountain Institute"},
+  {"url":"https://www.irena.org/rss","category":"Energy & Transition","title":"IRENA"},
+  {"url":"https://www.eia.gov/rss/energy.xml","category":"Energy & Transition","title":"US EIA – Energy News"},
+  {"url":"https://www.euractiv.com/sections/energy-environment/feed/","category":"Energy & Transition","title":"Euractiv – Energy & Environment"},
+
+  {"url":"https://blogs.nature.com/ontheground/rss","category":"Science & Research","title":"Nature Blogs"},
+  {"url":"https://royalsocietypublishing.org/action/showFeed?type=etoc&feed=rss&jc=philosophical-transactions-a","category":"Science & Research","title":"Royal Society – Philosophical Transactions A"},
+  {"url":"https://royalsocietypublishing.org/action/showFeed?type=etoc&feed=rss&jc=philosophical-transactions-b","category":"Science & Research","title":"Royal Society – Philosophical Transactions B"},
+  {"url":"https://feeds.feedburner.com/nature/news","category":"Science & Research","title":"Nature News"},
+  {"url":"https://feeds.feedburner.com/sciencemag/news_current","category":"Science & Research","title":"Science Magazine – News"},
+  {"url":"https://feeds.feedburner.com/nationalgeographic/ScienceAndTechnology","category":"Science & Research","title":"National Geographic – Science & Tech"},
+  {"url":"https://feeds.feedburner.com/nationalgeographic/Environment","category":"Science & Research","title":"National Geographic – Environment"},
+  {"url":"https://www.scientificamerican.com/feed/rss/","category":"Science & Research","title":"Scientific American"},
+  {"url":"https://www.newscientist.com/feed/home/","category":"Science & Research","title":"New Scientist"},
+  {"url":"https://www.discovermagazine.com/feeds/all","category":"Science & Research","title":"Discover Magazine"},
+
+  {"url":"https://www.cigionline.org/rss.xml","category":"Civic Tech & Governance","title":"CIGI – Governance Innovation"},
+  {"url":"https://www.transparency.org/en/rss","category":"Civic Tech & Governance","title":"Transparency International"},
+  {"url":"https://www.opengovpartnership.org/feed/","category":"Civic Tech & Governance","title":"Open Government Partnership"},
+  {"url":"https://www.opengovasia.com/feed/","category":"Civic Tech & Governance","title":"OpenGov Asia"},
+  {"url":"https://sunlightfoundation.com/feed/","category":"Civic Tech & Governance","title":"Sunlight Foundation"},
+  {"url":"https://thegovlab.org/feed/","category":"Civic Tech & Governance","title":"The GovLab"},
+  {"url":"https://govfresh.com/feed/","category":"Civic Tech & Governance","title":"GovFresh"},
+  {"url":"https://civichall.org/feed/","category":"Civic Tech & Governance","title":"Civic Hall"},
+
+  {"url":"https://www.ilo.org/global/about-the-ilo/newsroom/news/WCMS_075627/lang--en/index.htm/rss.xml","category":"Human Rights & Aid","title":"International Labour Organization"},
+  {"url":"https://www.icj.org/feed/","category":"Human Rights & Aid","title":"International Commission of Jurists"},
+  {"url":"https://www.aclu.org/rss/press-releases.xml","category":"Human Rights & Aid","title":"ACLU Press Releases"},
+  {"url":"https://www.freedomhouse.org/rss.xml","category":"Human Rights & Aid","title":"Freedom House"},
+  {"url":"https://www.opensocietyfoundations.org/feeds/latest","category":"Human Rights & Aid","title":"Open Society Foundations"},
+  {"url":"https://www.minorityrights.org/feed/","category":"Human Rights & Aid","title":"Minority Rights Group"},
+  {"url":"https://www.globaljustice.org.uk/feed/","category":"Human Rights & Aid","title":"Global Justice Now"},
+  {"url":"https://equalitynow.org/feed/","category":"Human Rights & Aid","title":"Equality Now"},
+
+  {"url":"https://techcrunch.com/feed/","category":"Open Source & AI","title":"TechCrunch"},
+  {"url":"https://venturebeat.com/feed/","category":"Open Source & AI","title":"VentureBeat"},
+  {"url":"https://syncedreview.com/feed/","category":"Open Source & AI","title":"Synced Review – AI"},
+  {"url":"https://bdtechtalks.com/feed/","category":"Open Source & AI","title":"TechTalks AI"},
+  {"url":"https://www.zdnet.com/topic/artificial-intelligence/rss.xml","category":"Open Source & AI","title":"ZDNet – AI"},
+  {"url":"https://www.wired.com/feed/category/ai/latest/rss","category":"Open Source & AI","title":"WIRED – AI"},
+  {"url":"https://blogs.microsoft.com/ai/feed/","category":"Open Source & AI","title":"Microsoft AI Blog"},
+  {"url":"https://ai.googleblog.com/atom.xml","category":"Open Source & AI","title":"Google AI Blog"},
+  {"url":"https://aws.amazon.com/blogs/machine-learning/feed/","category":"Open Source & AI","title":"AWS ML Blog"},
+  {"url":"https://ai.facebook.com/blog/feed/","category":"Open Source & AI","title":"Meta AI Blog"},
+  {"url":"https://deepmind.com/blog/feed/basic/","category":"Open Source & AI","title":"DeepMind Blog"},
+  {"url":"https://openai.com/blog/rss/","category":"Open Source & AI","title":"OpenAI Blog"},
+  {"url":"https://huggingface.co/blog/feed.xml","category":"Open Source & AI","title":"Hugging Face Blog"},
+
+  {"url":"https://www.factcheck.org/feed/","category":"Media Literacy","title":"FactCheck.org"},
+  {"url":"https://fullfact.org/rss/","category":"Media Literacy","title":"Full Fact"},
+  {"url":"https://www.snopes.com/feed/","category":"Media Literacy","title":"Snopes"},
+  {"url":"https://www.poynter.org/feed/","category":"Media Literacy","title":"Poynter Institute"},
+  {"url":"https://www.ifj.org/rss.xml","category":"Media Literacy","title":"International Federation of Journalists"},
+  {"url":"https://ijnet.org/en/rss.xml","category":"Media Literacy","title":"International Journalists' Network"},
+  {"url":"https://globalvoices.org/feed/","category":"Media Literacy","title":"Global Voices"},
+  {"url":"https://www.icfj.org/rss.xml","category":"Media Literacy","title":"International Center for Journalists"},
+
+  {"url":"https://feeds.feedburner.com/time/world","category":"Constructive Journalism","title":"TIME – World"},
+  {"url":"https://www.economist.com/international/rss.xml","category":"Constructive Journalism","title":"The Economist – International"},
+  {"url":"https://www.aljazeera.com/xml/rss/all.xml","category":"Constructive Journalism","title":"Al Jazeera – All"},
+  {"url":"https://www.npr.org/rss/rss.php?id=1004","category":"Constructive Journalism","title":"NPR – World"},
+  {"url":"https://www.csmonitor.com/rss/top.rss","category":"Constructive Journalism","title":"Christian Science Monitor"},
+  {"url":"https://www.dw.com/atom/rss-en-all","category":"Constructive Journalism","title":"Deutsche Welle – All English"},
+  {"url":"https://www.voanews.com/rss.xml","category":"Constructive Journalism","title":"Voice of America – All"},
+
+  {"url":"https://www.gatesfoundation.org/ideas/rss","category":"Philanthropy & Impact","title":"Gates Foundation"},
+  {"url":"https://philanthropynewsdigest.org/news/rss.xml","category":"Philanthropy & Impact","title":"Philanthropy News Digest"},
+  {"url":"https://nonprofitquarterly.org/feed/","category":"Philanthropy & Impact","title":"Nonprofit Quarterly"},
+  {"url":"https://www.rockefellerfoundation.org/feed/","category":"Philanthropy & Impact","title":"Rockefeller Foundation"},
+  {"url":"https://fordfoundation.org/rss.xml","category":"Philanthropy & Impact","title":"Ford Foundation"},
+  {"url":"https://www.macfound.org/rss.xml","category":"Philanthropy & Impact","title":"MacArthur Foundation"},
+  {"url":"https://skoll.org/feed/","category":"Philanthropy & Impact","title":"Skoll Foundation"},
+  {"url":"https://www.ashoka.org/en-us/feed","category":"Philanthropy & Impact","title":"Ashoka"},
+
+{"url":"https://www.preventionweb.net/publications/rss.xml","category":"Resilience & Risk","title":"PreventionWeb – Publications"},
+  {"url":"https://www.reliefweb.int/updates?advanced-search=%28PC-2487%29&format=10","category":"Resilience & Risk","title":"ReliefWeb – DRR"},
+  {"url":"https://www.ifrc.org/press-releases/rss.xml","category":"Resilience & Risk","title":"IFRC – Press Releases"},
+  {"url":"https://www.fm-global.com/research-and-resources/rss","category":"Resilience & Risk","title":"FM Global – Research"},
+  {"url":"https://hazards.colorado.edu/rss.xml","category":"Resilience & Risk","title":"Natural Hazards Center"},
+
+  {"url":"https://www.biohabitats.com/feed/","category":"Regeneration","title":"Biohabitats – Blog"},
+  {"url":"https://ecotrust.org/feed/","category":"Regeneration","title":"Ecotrust"},
+  {"url":"https://regenesisinstitute.org/feed/","category":"Regeneration","title":"Regenesis Institute"},
+  {"url":"https://www.greenbiz.com/rss.xml","category":"Regeneration","title":"GreenBiz"},
+  {"url":"https://www.commonweal.org/feed/","category":"Regeneration","title":"Commonweal"},
+
+  {"url":"https://www.ncbi.nlm.nih.gov/pmc/articles/PMC/articlesfeed/","category":"Science & Research","title":"PubMed Central – New Articles"},
+  {"url":"https://rss.arxiv.org/rss/q-fin.EC","category":"Science & Research","title":"arXiv – Economics"},
+  {"url":"https://rss.arxiv.org/rss/q-fin.GN","category":"Science & Research","title":"arXiv – General Finance"},
+  {"url":"https://rss.arxiv.org/rss/cs.SI","category":"Science & Research","title":"arXiv – Social & Info Networks"},
+  {"url":"https://rss.arxiv.org/rss/cs.HC","category":"Science & Research","title":"arXiv – Human-Computer Interaction"},
+  {"url":"https://www.sciencedirect.com/journal/joule/rss","category":"Science & Research","title":"Joule – Energy"},
+  {"url":"https://www.nature.com/nclimate.rss","category":"Science & Research","title":"Nature Climate Change"},
+  {"url":"https://www.cell.com/joule/current.rss","category":"Science & Research","title":"Cell – Joule (Current)"},
+  {"url":"https://www.cell.com/one-earth/current.rss","category":"Science & Research","title":"Cell – One Earth"},
+  {"url":"https://www.pnas.org/cms/asset/rss/pnas.xml","category":"Science & Research","title":"PNAS (Alt RSS)"},
+
+  {"url":"https://citymonitor.ai/feed","category":"Urbanism & Cities","title":"CityMonitor"},
+  {"url":"https://www.planetizen.com/frontpage/feed","category":"Urbanism & Cities","title":"Planetizen"},
+  {"url":"https://www.strongtowns.org/journal?format=rss","category":"Urbanism & Cities","title":"Strong Towns"},
+  {"url":"https://thecityfix.com/blog/feed/","category":"Urbanism & Cities","title":"TheCityFix (WRI Ross Center)"},
+  {"url":"https://urbact.eu/rss.xml","category":"Urbanism & Cities","title":"URBACT"},
+  {"url":"https://www.itdp.org/feed/","category":"Urbanism & Cities","title":"ITDP"},
+  {"url":"https://www.c40.org/feed/","category":"Urbanism & Cities","title":"C40 Cities"},
+  {"url":"https://www.unhabitat.org/rss.xml","category":"Urbanism & Cities","title":"UN-Habitat"},
+  {"url":"https://www.local.gov.uk/rss.xml","category":"Urbanism & Cities","title":"Local Government Association (UK)"},
+  {"url":"https://critical-sustainabilities.ucsc.edu/feed/","category":"Urbanism & Cities","title":"Critical Sustainabilities"},
+
+  {"url":"https://www.wateraid.org/rss.xml","category":"Water & Oceans","title":"WaterAid"},
+  {"url":"https://www.oceanconservancy.org/feed/","category":"Water & Oceans","title":"Ocean Conservancy"},
+  {"url":"https://oceana.org/feed/","category":"Water & Oceans","title":"Oceana"},
+  {"url":"https://www.pewtrusts.org/en/projects/pew-oceans-northwest/rss","category":"Water & Oceans","title":"PEW – Oceans"},
+  {"url":"https://reefresilience.org/feed/","category":"Water & Oceans","title":"Reef Resilience"},
+  {"url":"https://marine-conservation.org/feed/","category":"Water & Oceans","title":"Marine Conservation Institute"},
+  {"url":"https://www.noaa.gov/rss.xml","category":"Water & Oceans","title":"NOAA – News"},
+  {"url":"https://www.unesco.org/ocean-decade/rss.xml","category":"Water & Oceans","title":"UN Decade of Ocean Science"},
+  {"url":"https://ocean.si.edu/feeds/ocean-homepage","category":"Water & Oceans","title":"Smithsonian Ocean Portal"},
+
+  {"url":"https://www.fixtheplanet.dev/feed.xml","category":"Energy & Transition","title":"Fix The Planet"},
+  {"url":"https://cleantechnica.com/category/renewables/feed/","category":"Energy & Transition","title":"CleanTechnica – Renewables"},
+  {"url":"https://www.energy-storage.news/feed/","category":"Energy & Transition","title":"Energy Storage News"},
+  {"url":"https://electrek.co/feed/","category":"Energy & Transition","title":"Electrek"},
+  {"url":"https://about.bnef.com/blog/feed/","category":"Energy & Transition","title":"BloombergNEF – Blog"},
+  {"url":"https://www.utilitydive.com/feeds/news/","category":"Energy & Transition","title":"Utility Dive"},
+  {"url":"https://reneweconomy.com.au/feed/","category":"Energy & Transition","title":"RenewEconomy"},
+  {"url":"https://pv-magazine.com/feed/","category":"Energy & Transition","title":"PV Magazine (Global)"},
+  {"url":"https://www.greentechmedia.com/rss","category":"Energy & Transition","title":"Greentech Media (Archive)"},
+  {"url":"https://www.hydrogeninsight.com/atom","category":"Energy & Transition","title":"Hydrogen Insight"},
+
+  {"url":"https://www.iied.org/rss.xml","category":"Economy & Development","title":"IIED – International Institute for Environment and Development"},
+  {"url":"https://oxfamblogs.org/fp2p/feed/","category":"Economy & Development","title":"From Poverty to Power"},
+  {"url":"https://blog.gdnet.org/feed/","category":"Economy & Development","title":"Global Development Network"},
+  {"url":"https://blogs.worldbank.org/voices/feed","category":"Economy & Development","title":"World Bank – Voices"},
+  {"url":"https://www.cgdev.org/rss.xml","category":"Economy & Development","title":"Center for Global Development"},
+  {"url":"https://www.ids.ac.uk/feed/","category":"Economy & Development","title":"Institute of Development Studies"},
+  {"url":"https://www.odi.org/en/rss/","category":"Economy & Development","title":"ODI – Overseas Development Institute"},
+  {"url":"https://www.devex.com/news/rss","category":"Economy & Development","title":"Devex – News"},
+
+  {"url":"https://www.right-to-repair.org/feed/","category":"Sovereignty & Digital Rights","title":"Right to Repair"},
+  {"url":"https://www.accessnow.org/feed/","category":"Sovereignty & Digital Rights","title":"Access Now"},
+  {"url":"https://www.eff.org/rss/updates.xml","category":"Sovereignty & Digital Rights","title":"EFF – Updates"},
+  {"url":"https://www.mozilla.org/en-US/about/policy/blog/feed.xml","category":"Sovereignty & Digital Rights","title":"Mozilla Policy"},
+  {"url":"https://privacyinternational.org/rss.xml","category":"Sovereignty & Digital Rights","title":"Privacy International"},
+  {"url":"https://www.article19.org/feed/","category":"Sovereignty & Digital Rights","title":"ARTICLE 19"},
+  {"url":"https://digitalrightsmonitor.pk/feed/","category":"Sovereignty & Digital Rights","title":"Digital Rights Monitor (PK)"},
+  {"url":"https://www.internetfreedom.in/feed/","category":"Sovereignty & Digital Rights","title":"Internet Freedom Foundation (IN)"},
+  {"url":"https://www.laquadrature.net/en/feed/","category":"Sovereignty & Digital Rights","title":"La Quadrature du Net (FR)"},
+  {"url":"https://www.eddritl.org/feed/","category":"Sovereignty & Digital Rights","title":"European Digital Rights (EDRi)"},
+
+  {"url":"https://www.culturalsurvival.org/rss.xml","category":"Indigenous & Sovereignty","title":"Cultural Survival"},
+  {"url":"https://www.grain.org/rss","category":"Indigenous & Sovereignty","title":"GRAIN"},
+  {"url":"https://www.firstpeoples.org/feed/","category":"Indigenous & Sovereignty","title":"First Nations Development Institute"},
+  {"url":"https://news.mongabay.com/list/indigenous-peoples/feed/","category":"Indigenous & Sovereignty","title":"Mongabay – Indigenous"},
+  {"url":"https://intercontinentalcry.org/feed/","category":"Indigenous & Sovereignty","title":"Intercontinental Cry"},
+  {"url":"https://www.4windsfarm.org/feed/","category":"Indigenous & Sovereignty","title":"Four Winds Farm"},
+  {"url":"https://www.tewaharoadingoclimateforum.org/feed/","category":"Indigenous & Sovereignty","title":"Te Waharoa Dingo Climate Forum"},
+  {"url":"https://www.indigenousclimate.org/rss.xml","category":"Indigenous & Sovereignty","title":"Indigenous Climate Hub"},
+  {"url":"https://www.icc.ae/feed/","category":"Indigenous & Sovereignty","title":"Inuit Circumpolar Council (News)"},
+  {"url":"https://nativemgov.org/feed/","category":"Indigenous & Sovereignty","title":"Native Governance Center"},
+
+  {"url":"https://openaccess.thecvf.com/rss.xml","category":"Open Source & AI","title":"CVF Open Access"},
+  {"url":"https://paperswithcode.com/feeds/latest","category":"Open Source & AI","title":"Papers With Code – Latest"},
+  {"url":"https://rss.arxiv.org/rss/cs.LG","category":"Open Source & AI","title":"arXiv – Learning"},
+  {"url":"https://www.kdnuggets.com/feed","category":"Open Source & AI","title":"KDnuggets"},
+  {"url":"https://www.fast.ai/atom.xml","category":"Open Source & AI","title":"fast.ai"},
+  {"url":"https://distill.pub/rss.xml","category":"Open Source & AI","title":"Distill"},
+  {"url":"https://neurips.cc/Conferences/Current/Rss","category":"Open Source & AI","title":"NeurIPS – Announcements"},
+  {"url":"https://iclr.cc/Conferences/2025/Rss","category":"Open Source & AI","title":"ICLR – Announcements"},
+  {"url":"https://openml.org/feeds/news","category":"Open Source & AI","title":"OpenML – News"},
+  {"url":"https://www.opensourceforu.com/feed/","category":"Open Source & AI","title":"Open Source For You"},
+
+  {"url":"https://globalvoices.org/feed/","category":"Media Literacy","title":"Global Voices"},
+  {"url":"https://www.theverge.com/rss/index.xml","category":"Media Literacy","title":"The Verge"},
+  {"url":"https://www.niemanlab.org/feed/","category":"Media Literacy","title":"Nieman Lab"},
+  {"url":"https://www.cjr.org/feeds/index.xml","category":"Media Literacy","title":"Columbia Journalism Review"},
+  {"url":"https://www.allsides.com/feed","category":"Media Literacy","title":"AllSides"},
+  {"url":"https://www.ifex.org/feed/","category":"Media Literacy","title":"IFEX"},
+  {"url":"https://www.icfj.org/rss.xml","category":"Media Literacy","title":"ICFJ"},
+
+  {"url":"https://www.unodc.org/unodc/rss.xml","category":"Rule of Law","title":"UNODC – News"},
+  {"url":"https://www.fatf-gafi.org/rss.xml","category":"Rule of Law","title":"FATF – News"},
+  {"url":"https://www.transparency.org/en/rss","category":"Rule of Law","title":"Transparency International – News"},
+  {"url":"https://bhrc.co.uk/feed/","category":"Rule of Law","title":"British Institute of Human Rights – Blog"},
+  {"url":"https://www.echr.coe.int/Pages/home.aspx?p=rss&c=","category":"Rule of Law","title":"European Court of Human Rights – RSS"},
+
+  {"url":"https://www.worldwildlife.org/feeds/press","category":"Biodiversity","title":"WWF – Press"},
+  {"url":"https://www.rainforest-alliance.org/feed/","category":"Biodiversity","title":"Rainforest Alliance"},
+  {"url":"https://www.fauna-flora.org/feed/","category":"Biodiversity","title":"Fauna & Flora"},
+  {"url":"https://www.conservation.org/rss.xml","category":"Biodiversity","title":"Conservation International"},
+  {"url":"https://rewilding.org/feed/","category":"Biodiversity","title":"Rewilding Institute"},
+  {"url":"https://www.birdlife.org/feed/","category":"Biodiversity","title":"BirdLife International"},
+  {"url":"https://www.panthera.org/feed","category":"Biodiversity","title":"Panthera"},
+  {"url":"https://www.wcs.org/feeds/news","category":"Biodiversity","title":"Wildlife Conservation Society – News"},
+
+  {"url":"https://www.nature.org/en-us/what-we-do/our-insights/rss/","category":"Land & Restoration","title":"The Nature Conservancy – Insights"},
+  {"url":"https://rewildingeurope.com/feed/","category":"Land & Restoration","title":"Rewilding Europe"},
+  {"url":"https://www.americanforests.org/feed/","category":"Land & Restoration","title":"American Forests"},
+  {"url":"https://forest-trends.org/feed/","category":"Land & Restoration","title":"Forest Trends"},
+  {"url":"https://www.globalforestwatch.org/blog/feed/","category":"Land & Restoration","title":"Global Forest Watch – Blog"},
+  {"url":"https://www.landcorps.org/feed/","category":"Land & Restoration","title":"Land Corps"},
+  {"url":"https://www.selbe.org/feed/","category":"Land & Restoration","title":"Society for Ecological Restoration (SER) – Chapters"},
+
+  {"url":"https://www.oneearth.org/rss.xml","category":"NGOs & Movements","title":"One Earth"},
+  {"url":"https://www.globalslacktivism.org/feed/","category":"NGOs & Movements","title":"Global Slacktivism (Meta-critique)"},
+  {"url":"https://www.globalwitness.org/en/feeds/news/","category":"NGOs & Movements","title":"Global Witness – News"},
+  {"url":"https://www.hrw.org/rss/news","category":"NGOs & Movements","title":"Human Rights Watch – News"},
+  {"url":"https://www.amnesty.org/en/latest/feed/","category":"NGOs & Movements","title":"Amnesty – Latest"},
+  {"url":"https://www.nrdc.org/rss.xml","category":"NGOs & Movements","title":"NRDC – News"},
+  {"url":"https://www.sierraclub.org/press-center/rss.xml","category":"NGOs & Movements","title":"Sierra Club – Press"},
+
+  {"url":"https://www.healthcarewithoutdamage.org/rss.xml","category":"Health & Wellbeing","title":"Health Care Without Harm"},
+  {"url":"https://www.who.int/feeds/entity/news/en/rss.xml","category":"Health & Wellbeing","title":"WHO – Entity News"},
+  {"url":"https://ourworldindata.org/atom.xml","category":"Health & Wellbeing","title":"Our World in Data"},
+  {"url":"https://www.nature.com/subjects/global-health.rss","category":"Health & Wellbeing","title":"Nature – Global Health"},
+  {"url":"https://gh.bmj.com/rss/current.xml","category":"Health & Wellbeing","title":"BMJ Global Health – Current"},
+
+  {"url":"https://beta.undp.org/rss.xml","category":"UN Family","title":"UNDP – Beta Site News"},
+  {"url":"https://www.unep.org/rss.xml","category":"UN Family","title":"UNEP – News"},
+  {"url":"https://www.unwomen.org/en/news-stories/rss","category":"UN Family","title":"UN Women – News"},
+  {"url":"https://www.unicef.org/rss/unicef_rss.xml","category":"UN Family","title":"UNICEF – News"},
+  {"url":"https://www.wfp.org/rss.xml","category":"UN Family","title":"World Food Programme – News"},
+  {"url":"https://www.unaids.org/en/rss.xml","category":"UN Family","title":"UNAIDS – News"},
+
+  {"url":"https://www.nature.com/subjects/sustainability.rss","category":"Sustainable Tech","title":"Nature – Sustainability"},
+  {"url":"https://www.springeropen.com/rss.xml","category":"Sustainable Tech","title":"SpringerOpen – Latest"},
+  {"url":"https://www.mdpi.com/journal/sustainability/rss","category":"Sustainable Tech","title":"MDPI – Sustainability"},
+  {"url":"https://www.mdpi.com/journal/energies/rss","category":"Sustainable Tech","title":"MDPI – Energies"},
+  {"url":"https://www.mdpi.com/journal/remotesensing/rss","category":"Sustainable Tech","title":"MDPI – Remote Sensing"},
+  {"url":"https://www.mdpi.com/journal/climate/rss","category":"Sustainable Tech","title":"MDPI – Climate"},
+
+  {"url":"https://feeds.simplecast.com/54nAGcIl","category":"Podcasts (Peace & Regen)","title":"How to Save a Planet (archive)"},
+  {"url":"https://rss.art19.com/ted-interview","category":"Podcasts (Peace & Regen)","title":"The TED Interview"},
+  {"url":"https://rss.acast.com/outrage-and-optimism","category":"Podcasts (Peace & Regen)","title":"Outrage + Optimism"},
+  {"url":"https://www.wnycstudios.org/podcasts/duplicate/rss","category":"Podcasts (Peace & Regen)","title":"Note to Self (archive)"},
+  {"url":"https://rss.art19.com/a-closer-look","category":"Podcasts (Peace & Regen)","title":"A Closer Look"},
+
+  {"url":"https://www.modern-diplomacy.eu/feed/","category":"Geo & Diplomacy","title":"Modern Diplomacy"},
+  {"url":"https://www.chathamhouse.org/rss/chathamhouse_en.xml","category":"Geo & Diplomacy","title":"Chatham House"},
+  {"url":"https://www.csis.org/feeds/latest.xml","category":"Geo & Diplomacy","title":"CSIS – Latest"},
+  {"url":"https://carnegieendowment.org/rss/solr?qt=carnegie_global_search&keys=&format=xml","category":"Geo & Diplomacy","title":"Carnegie Endowment – RSS"},
+  {"url":"https://www.iiss.org/rss","category":"Geo & Diplomacy","title":"IISS – International Institute for Strategic Studies"},
+
+  {"url":"https://www.fao.org/land-water/news/news-archive/en/rss","category":"Food & Land","title":"FAO – Land & Water"},
+  {"url":"https://grain.org/rss","category":"Food & Land","title":"GRAIN – Small Farmers"},
+  {"url":"https://www.soils.org/news/rss","category":"Food & Land","title":"Soil Science Society of America"},
+  {"url":"https://www.agroforestry.co.uk/feed/","category":"Food & Land","title":"Agroforestry Research Trust"},
+  {"url":"https://www.icrisat.org/feed/","category":"Food & Land","title":"ICRISAT"},
+  {"url":"https://www.cgiar.org/newsroom/feed/","category":"Food & Land","title":"CGIAR Newsroom"},
+
+  {"url":"https://www.icrc.org/en/rss/all","category":"Humanitarian Ops","title":"ICRC – All Updates"},
+  {"url":"https://data.humdata.org/organization/united-nations/rss.xml","category":"Humanitarian Ops","title":"HDX – UN Data"},
+  {"url":"https://www.acaps.org/rss.xml","category":"Humanitarian Ops","title":"ACAPS – Updates"},
+  {"url":"https://reliefweb.int/updates?advanced-search=%28Sectors%29&format=10","category":"Humanitarian Ops","title":"ReliefWeb – Sectors"},
+  {"url":"https://centre.humdata.org/feed/","category":"Humanitarian Ops","title":"Humanitarian Data Exchange – Centre"},
+
+  {"url":"https://www.opengovpartnership.org/feed/","category":"Governance","title":"Open Government Partnership"},
+  {"url":"https://www.oecd.org/governance/rss.xml","category":"Governance","title":"OECD – Governance"},
+  {"url":"https://www.transparency.org/en/rss","category":"Governance","title":"Transparency International – Governance"},
+  {"url":"https://public.digital/feed/","category":"Governance","title":"Public Digital"},
+  {"url":"https://apolitical.co/en/solution-articles/rss","category":"Governance","title":"Apolitical – Solutions"},
+
+  {"url":"https://forum.effectivealtruism.org/posts.rss","category":"Philanthropy & Impact","title":"EA Forum – Posts"},
+  {"url":"https://www.givingwhatwecan.org/feed.xml","category":"Philanthropy & Impact","title":"Giving What We Can"},
+  {"url":"https://nonprofitaf.com/feed/","category":"Philanthropy & Impact","title":"Nonprofit AF"},
+  {"url":"https://effectiveinstitutionsproject.org/feed/","category":"Philanthropy & Impact","title":"Effective Institutions Project"},
+
+  {"url":"https://www.transportenvironment.org/rss.xml","category":"Mobility & Transport","title":"Transport & Environment"},
+  {"url":"https://www.itf-oecd.org/rss.xml","category":"Mobility & Transport","title":"ITF – OECD"},
+  {"url":"https://www.trb.org/RSS/RSS.xml","category":"Mobility & Transport","title":"Transportation Research Board"},
+  {"url":"https://www.citylab.com/feeds/full/","category":"Mobility & Transport","title":"Bloomberg CityLab"},
+
+  {"url":"https://www.kickstarter.com/blog.atom","category":"Innovation for Good","title":"Kickstarter Blog"},
+  {"url":"https://www.socialinnovationexchange.org/feed/","category":"Innovation for Good","title":"Social Innovation Exchange"},
+  {"url":"https://Nesta.org.uk/feed/","category":"Innovation for Good","title":"Nesta"},
+  {"url":"https://www.unicef-irc.org/rss.xml","category":"Innovation for Good","title":"UNICEF – Innocenti (Research)"},
+  {"url":"https://www.designcouncil.org.uk/feeds/rss","category":"Innovation for Good","title":"UK Design Council"},
+
+  {"url":"https://www.icanw.org/feed","category":"Peacebuilding","title":"ICAN – International Campaign to Abolish Nuclear Weapons"},
+  {"url":"https://sipri.org/rss.xml","category":"Peacebuilding","title":"SIPRI – Stockholm International Peace Research Institute"},
+  {"url":"https://peacemakersnetwork.org/feed/","category":"Peacebuilding","title":"Peacemakers Network"},
+  {"url":"https://www.usip.org/rss.xml","category":"Peacebuilding","title":"United States Institute of Peace"},
+  {"url":"https://www.hrw.org/topic/arms/rss.xml","category":"Peacebuilding","title":"HRW – Arms (for controls)"},
+  {"url":"https://beyondintractability.org/feed","category":"Peacebuilding","title":"Beyond Intractability"},
+  {"url":"https://peacemaker.un.org/rss","category":"Peacebuilding","title":"UN Peacemaker"},
+
+  {"url":"https://www.thelancet.com/rssfeed/lancetplanetaryhealth_current.xml","category":"Planetary Health","title":"The Lancet Planetary Health"},
+  {"url":"https://www.isglobal.org/en/-/rss/planetary-health","category":"Planetary Health","title":"ISGlobal – Planetary Health"},
+  {"url":"https://planetaryhealthalliance.org/rss.xml","category":"Planetary Health","title":"Planetary Health Alliance"},
+  {"url":"https://www.environmentalhealthnews.org/feeds/rss.xml","category":"Planetary Health","title":"Environmental Health News"},
+  {"url":"https://www.nature.com/npjpclimatechange.rss","category":"Planetary Health","title":"npj Climate and Atmospheric Science"},
+
+{"url":"https://www.earth-policy.org/rss.xml","category":"Planetary Health","title":"Earth Policy Institute"},
+  {"url":"https://www.planetaryboundaries.org/feed/","category":"Planetary Health","title":"Planetary Boundaries Initiative"},
+  {"url":"https://www.planetarypress.net/feed/","category":"Planetary Health","title":"The Planetary Press"},
+  {"url":"https://www.planetary.org/blogs/feed.xml","category":"Planetary Health","title":"The Planetary Society"},
+  {"url":"https://www.biologicaldiversity.org/news/center/rss.xml","category":"Planetary Health","title":"Center for Biological Diversity"},
+
+  {"url":"https://ensia.com/feed/","category":"Environment & Media","title":"Ensia"},
+  {"url":"https://earthjustice.org/rss.xml","category":"Environment & Media","title":"Earthjustice"},
+  {"url":"https://grist.org/feed/","category":"Environment & Media","title":"Grist"},
+  {"url":"https://www.ecowatch.com/rss","category":"Environment & Media","title":"EcoWatch"},
+  {"url":"https://insideclimatenews.org/feed/","category":"Environment & Media","title":"Inside Climate News"},
+  {"url":"https://news.mongabay.com/feed/","category":"Environment & Media","title":"Mongabay – News"},
+  {"url":"https://www.theguardian.com/environment/rss","category":"Environment & Media","title":"Guardian – Environment"},
+  {"url":"https://www.nationalgeographic.com/environment/rss/","category":"Environment & Media","title":"National Geographic – Environment"},
+  {"url":"https://www.scientificamerican.com/rss/feeds/environment.xml","category":"Environment & Media","title":"Scientific American – Environment"},
+  {"url":"https://www.bbc.co.uk/news/science_and_environment/rss.xml","category":"Environment & Media","title":"BBC – Science & Environment"},
+  {"url":"https://www.dw.com/atom/rss-en-environment","category":"Environment & Media","title":"DW – Environment"},
+
+  {"url":"https://futurism.com/rss","category":"Future & Foresight","title":"Futurism"},
+  {"url":"https://singularityhub.com/feed/","category":"Future & Foresight","title":"Singularity Hub"},
+  {"url":"https://longnow.org/rss/","category":"Future & Foresight","title":"The Long Now Foundation"},
+  {"url":"https://www.foresight.org/feed/","category":"Future & Foresight","title":"Foresight Institute"},
+  {"url":"https://futureearth.org/feed/","category":"Future & Foresight","title":"Future Earth"},
+  {"url":"https://futuresfoundation.org.au/feed/","category":"Future & Foresight","title":"Futures Foundation"},
+  {"url":"https://horizons.gc.ca/en/feed/","category":"Future & Foresight","title":"Policy Horizons Canada"},
+
+  {"url":"https://www.globalagriculture.org/rss.xml","category":"Food & Agriculture","title":"Global Agriculture"},
+  {"url":"https://www.foodpolitics.com/feed/","category":"Food & Agriculture","title":"Food Politics – Marion Nestle"},
+  {"url":"https://foodtank.com/feed/","category":"Food & Agriculture","title":"Food Tank"},
+  {"url":"https://modernfarmer.com/feed/","category":"Food & Agriculture","title":"Modern Farmer"},
+  {"url":"https://civileats.com/feed/","category":"Food & Agriculture","title":"Civil Eats"},
+  {"url":"https://www.agrilinks.org/feed/","category":"Food & Agriculture","title":"Agrilinks"},
+  {"url":"https://www.foodandwaterwatch.org/rss.xml","category":"Food & Agriculture","title":"Food & Water Watch"},
+  {"url":"https://www.foodnavigator.com/Info/Feeds/RSS","category":"Food & Agriculture","title":"Food Navigator"},
+  {"url":"https://www.agriculture.com/rss.xml","category":"Food & Agriculture","title":"Successful Farming"},
+  {"url":"https://www.fao.org/news/rss/en/","category":"Food & Agriculture","title":"FAO – News"},
+
+  {"url":"https://www.scidev.net/rss.xml","category":"Global Development","title":"SciDev.Net"},
+  {"url":"https://www.devex.com/news/rss","category":"Global Development","title":"Devex News"},
+  {"url":"https://www.idrc.ca/en/rss.xml","category":"Global Development","title":"IDRC – International Development Research Centre"},
+  {"url":"https://blogs.lse.ac.uk/internationaldevelopment/feed/","category":"Global Development","title":"LSE – International Development"},
+  {"url":"https://www.brookings.edu/topic/global-development/feed/","category":"Global Development","title":"Brookings – Global Development"},
+  {"url":"https://www.odi.org/en/rss/","category":"Global Development","title":"Overseas Development Institute"},
+  {"url":"https://www.worldbank.org/en/news/all?format=xml","category":"Global Development","title":"World Bank – All News"},
+  {"url":"https://www.imf.org/external/np/exr/feeds/rss.aspx?feed=press","category":"Global Development","title":"IMF Press Center"},
+  {"url":"https://www.oecd.org/dev/feeds/news.rss","category":"Global Development","title":"OECD Development News"},
+
+  {"url":"https://humanitariannews.org/rss.xml","category":"Humanitarian & Relief","title":"Humanitarian News"},
+  {"url":"https://www.acaps.org/rss.xml","category":"Humanitarian & Relief","title":"ACAPS"},
+  {"url":"https://www.sphereproject.org/rss.xml","category":"Humanitarian & Relief","title":"Sphere Project"},
+  {"url":"https://www.humanitarianresponse.info/rss.xml","category":"Humanitarian & Relief","title":"Humanitarian Response"},
+  {"url":"https://centre.humdata.org/feed/","category":"Humanitarian & Relief","title":"Humanitarian Data Exchange – Centre"},
+  {"url":"https://data.humdata.org/organization/unicef/rss.xml","category":"Humanitarian & Relief","title":"UNICEF Data"},
+  {"url":"https://data.humdata.org/organization/wfp/rss.xml","category":"Humanitarian & Relief","title":"WFP Data"},
+
+  {"url":"https://www.weforum.org/agenda/feed","category":"Innovation & Systems","title":"World Economic Forum – Agenda"},
+  {"url":"https://www.fastcompany.com/section/world-changing-ideas/feed","category":"Innovation & Systems","title":"Fast Company – World Changing Ideas"},
+  {"url":"https://mitsloan.mit.edu/rss.xml","category":"Innovation & Systems","title":"MIT Sloan"},
+  {"url":"https://www.socialenterprise.org.uk/feed/","category":"Innovation & Systems","title":"Social Enterprise UK"},
+  {"url":"https://www.ssir.org/site/rss","category":"Innovation & Systems","title":"Stanford Social Innovation Review"},
+  {"url":"https://nextbillion.net/feed/","category":"Innovation & Systems","title":"NextBillion"},
+  {"url":"https://nesta.org.uk/feed/","category":"Innovation & Systems","title":"Nesta"},
+  {"url":"https://apolitical.co/en/solution-articles/rss","category":"Innovation & Systems","title":"Apolitical – Solutions"},
+  {"url":"https://www.gsb.stanford.edu/insights/feed","category":"Innovation & Systems","title":"Stanford GSB Insights"},
+
+  {"url":"https://thebulletin.org/feed/","category":"Nuclear & Security","title":"Bulletin of the Atomic Scientists"},
+  {"url":"https://www.nonproliferation.org/feed/","category":"Nuclear & Security","title":"CNS – Nonproliferation"},
+  {"url":"https://www.armscontrol.org/rss.xml","category":"Nuclear & Security","title":"Arms Control Association"},
+  {"url":"https://sipri.org/rss.xml","category":"Nuclear & Security","title":"SIPRI"},
+  {"url":"https://www.icrc.org/en/rss/all","category":"Nuclear & Security","title":"ICRC – Humanitarian Law & Weapons"},
+  {"url":"https://www.un.org/disarmament/feed/","category":"Nuclear & Security","title":"UN Office for Disarmament"},
+
+  {"url":"https://www.scientificamerican.com/rss/","category":"Science General","title":"Scientific American – All"},
+  {"url":"https://rss.nytimes.com/services/xml/rss/nyt/Science.xml","category":"Science General","title":"New York Times – Science"},
+  {"url":"https://www.theatlantic.com/feed/science/","category":"Science General","title":"The Atlantic – Science"},
+  {"url":"https://rss.washingtonpost.com/rss/science","category":"Science General","title":"Washington Post – Science"},
+  {"url":"https://www.vox.com/rss/science-and-health/index.xml","category":"Science General","title":"Vox – Science & Health"},
+  {"url":"https://time.com/section/science/feed/","category":"Science General","title":"TIME – Science"},
+  {"url":"https://www.npr.org/rss/rss.php?id=1007","category":"Science General","title":"NPR – Science"},
+  {"url":"https://www.csmonitor.com/rss/science.rss","category":"Science General","title":"Christian Science Monitor – Science"},
+
+  {"url":"https://www.resilience.org/feed/","category":"Resilience & Transition","title":"Resilience.org"},
+  {"url":"https://transitionnetwork.org/feed/","category":"Resilience & Transition","title":"Transition Network"},
+  {"url":"https://www.postcarbon.org/feed/","category":"Resilience & Transition","title":"Post Carbon Institute"},
+  {"url":"https://dark-mountain.net/feed/","category":"Resilience & Transition","title":"Dark Mountain Project"},
+  {"url":"https://simplicityinstitute.org/feed/","category":"Resilience & Transition","title":"Simplicity Institute"},
+  {"url":"https://steadystate.org/feed/","category":"Resilience & Transition","title":"Center for the Advancement of the Steady State Economy"},
+  {"url":"https://prosperouswaydown.com/feed/","category":"Resilience & Transition","title":"Prosperous Way Down"},
+  {"url":"https://www.strongtowns.org/journal?format=rss","category":"Resilience & Transition","title":"Strong Towns Journal"},
+
+{"url":"https://www.energytransitions.org/feed/","category":"Energy & Transition","title":"Energy Transitions Commission"},
+  {"url":"https://cleantechnica.com/category/electric-vehicles/feed/","category":"Energy & Transition","title":"CleanTechnica – EVs"},
+  {"url":"https://electrek.co/feed/","category":"Energy & Transition","title":"Electrek – EVs"},
+  {"url":"https://chargedevs.com/feed/","category":"Energy & Transition","title":"Charged EVs"},
+  {"url":"https://www.greencarcongress.com/atom.xml","category":"Energy & Transition","title":"Green Car Congress"},
+  {"url":"https://rmi.org/feed/","category":"Energy & Transition","title":"RMI Blog"},
+  {"url":"https://www.utilitydive.com/feeds/news/","category":"Energy & Transition","title":"Utility Dive – Energy"},
+
+  {"url":"https://www.transportenvironment.org/rss.xml","category":"Transport & Mobility","title":"Transport & Environment"},
+  {"url":"https://citylab.com/feeds/full/","category":"Transport & Mobility","title":"CityLab – Transport"},
+  {"url":"https://www.itdp.org/feed/","category":"Transport & Mobility","title":"Institute for Transportation & Development Policy"},
+  {"url":"https://www.trb.org/RSS/RSS.xml","category":"Transport & Mobility","title":"Transportation Research Board"},
+  {"url":"https://urbantransportmagazine.com/en/feed/","category":"Transport & Mobility","title":"Urban Transport Magazine"},
+  {"url":"https://mobilitylab.org/feed/","category":"Transport & Mobility","title":"Mobility Lab"},
+  {"url":"https://www.intelligenttransport.com/feed/","category":"Transport & Mobility","title":"Intelligent Transport"},
+  {"url":"https://www.eltis.org/rss.xml","category":"Transport & Mobility","title":"Eltis – Urban Mobility Observatory"},
+
+  {"url":"https://bcorporation.net/en-us/rss","category":"Business & Economy","title":"B Lab – B Corporation"},
+  {"url":"https://consciouscompanymedia.com/feed/","category":"Business & Economy","title":"Conscious Company Media"},
+  {"url":"https://www.triplepundit.com/feed","category":"Business & Economy","title":"TriplePundit"},
+  {"url":"https://www.ethicalcorp.com/rss.xml","category":"Business & Economy","title":"Ethical Corporation"},
+  {"url":"https://csrwire.com/rss/press_releases","category":"Business & Economy","title":"CSRwire Press Releases"},
+  {"url":"https://www.sharedvalue.org/feed/","category":"Business & Economy","title":"Shared Value Initiative"},
+  {"url":"https://fortune.com/feed/section/impact/","category":"Business & Economy","title":"Fortune – Impact"},
+
+  {"url":"https://bioneers.org/feed/","category":"Culture & Story","title":"Bioneers"},
+  {"url":"https://www.openculture.com/feed","category":"Culture & Story","title":"Open Culture"},
+  {"url":"https://theconversation.com/uk/environment/articles.atom","category":"Culture & Story","title":"The Conversation UK – Environment"},
+  {"url":"https://aeon.co/feed","category":"Culture & Story","title":"Aeon"},
+  {"url":"https://longreads.com/feed/","category":"Culture & Story","title":"Longreads"},
+  {"url":"https://www.yesmagazine.org/feed","category":"Culture & Story","title":"YES! Magazine"},
+  {"url":"https://newhumanist.org.uk/articles/rss","category":"Culture & Story","title":"New Humanist"},
+  {"url":"https://edgescollective.org/feed/","category":"Culture & Story","title":"Edges Collective"},
+
+  {"url":"https://www.scientificamerican.com/custom-media/climate-change/rss","category":"Planetary Health","title":"SciAm – Climate Change"},
+  {"url":"https://journals.plos.org/plosclimate/feed/atom","category":"Planetary Health","title":"PLOS Climate"},
+  {"url":"https://www.frontiersin.org/journals/planetary-science/rss","category":"Planetary Health","title":"Frontiers – Planetary Science"},
+  {"url":"https://www.cell.com/one-earth/current.rss","category":"Planetary Health","title":"Cell – One Earth (Planetary Health)"},
+  {"url":"https://pubs.acs.org/page/achre4/feed","category":"Planetary Health","title":"ACS – Planetary Chemistry"},
+
+  {"url":"https://www.undrr.org/rss.xml","category":"Resilience & Risk","title":"UNDRR"},
+  {"url":"https://www.gfdrr.org/en/rss.xml","category":"Resilience & Risk","title":"GFDRR"},
+  {"url":"https://climate-adapt.eea.europa.eu/@@RSSView","category":"Resilience & Risk","title":"European Climate Adaptation Platform"},
+  {"url":"https://www.nap.edu/rss/new.xml","category":"Resilience & Risk","title":"National Academies Press – New Publications"},
+  {"url":"https://public.wmo.int/en/media/rss","category":"Resilience & Risk","title":"WMO – World Meteorological Organization"},
+
+  {"url":"https://ourworldindata.org/atom.xml","category":"Data & Knowledge","title":"Our World in Data"},
+  {"url":"https://data.unicef.org/feed/","category":"Data & Knowledge","title":"UNICEF Data"},
+  {"url":"https://datapopalliance.org/feed/","category":"Data & Knowledge","title":"Data-Pop Alliance"},
+  {"url":"https://www.opendataenterprise.org/feed/","category":"Data & Knowledge","title":"Open Data Enterprise"},
+  {"url":"https://www.data4sdgs.org/feed/","category":"Data & Knowledge","title":"Global Partnership for Sustainable Development Data"},
+
+  {"url":"https://naturenews.scienceblog.com/feed/","category":"Science General","title":"Nature News Blog"},
+  {"url":"https://www.sciencenews.org/feed","category":"Science General","title":"Science News"},
+  {"url":"https://phys.org/rss-feed/","category":"Science General","title":"Phys.org"},
+  {"url":"https://www.technologyreview.com/feed/","category":"Science General","title":"MIT Technology Review"},
+  {"url":"https://www.nextbigfuture.com/feed","category":"Science General","title":"NextBigFuture"},
+  {"url":"https://www.space.com/feeds/all","category":"Science General","title":"Space.com"},
+  {"url":"https://www.planetary.org/blogs/feed.xml","category":"Science General","title":"Planetary Society – Blogs"},
+  {"url":"https://skyandtelescope.org/feed/","category":"Science General","title":"Sky & Telescope"},
+
+  {"url":"https://www.goodnewsnetwork.org/feed/","category":"Positive News","title":"Good News Network"},
+  {"url":"https://www.positive.news/feed/","category":"Positive News","title":"Positive News"},
+  {"url":"https://reasonstobecheerful.world/feed/","category":"Positive News","title":"Reasons to be Cheerful"},
+  {"url":"https://www.dailygood.org/rss/rss.php","category":"Positive News","title":"DailyGood"},
+  {"url":"https://upliftconnect.com/feed/","category":"Positive News","title":"Uplift Connect"},
+  {"url":"https://kindling.xyz/feed/","category":"Positive News","title":"Kindling"},
+  {"url":"https://futurecrun.ch/feed","category":"Positive News","title":"Future Crunch"},
+  {"url":"https://optimistdaily.com/feed/","category":"Positive News","title":"The Optimist Daily"},
+
+  {"url":"https://openai.com/blog/rss/","category":"Open Source & AI","title":"OpenAI Blog"},
+  {"url":"https://huggingface.co/blog/feed.xml","category":"Open Source & AI","title":"Hugging Face Blog"},
+  {"url":"https://deepmind.com/blog/feed/basic/","category":"Open Source & AI","title":"DeepMind Blog"},
+  {"url":"https://ai.googleblog.com/atom.xml","category":"Open Source & AI","title":"Google AI Blog"},
+  {"url":"https://blogs.microsoft.com/ai/feed/","category":"Open Source & AI","title":"Microsoft AI"},
+  {"url":"https://meta.ai/blog/feed/","category":"Open Source & AI","title":"Meta AI"},
+  {"url":"https://aws.amazon.com/blogs/machine-learning/feed/","category":"Open Source & AI","title":"AWS ML Blog"},
+  {"url":"https://paperswithcode.com/feeds/latest","category":"Open Source & AI","title":"Papers With Code – Latest"},
+
+  {"url":"https://www.euractiv.com/sections/energy-environment/feed/","category":"Policy & Governance","title":"Euractiv – Energy & Environment"},
+  {"url":"https://www.devpolicy.org/feed/","category":"Policy & Governance","title":"Devpolicy Blog"},
+  {"url":"https://www.ids.ac.uk/feed/","category":"Policy & Governance","title":"Institute of Development Studies"},
+  {"url":"https://blogs.worldbank.org/voices/feed","category":"Policy & Governance","title":"World Bank Voices"},
+  {"url":"https://www.oecd.org/governance/rss.xml","category":"Policy & Governance","title":"OECD – Governance"},
+  {"url":"https://apolitical.co/en/solution-articles/rss","category":"Policy & Governance","title":"Apolitical Solutions"},
+
+  {"url":"https://www.rainn.org/rss.xml","category":"Human Rights","title":"RAINN"},
+  {"url":"https://www.aclu.org/rss/press-releases.xml","category":"Human Rights","title":"ACLU"},
+  {"url":"https://www.amnesty.org/en/latest/feed/","category":"Human Rights","title":"Amnesty International"},
+  {"url":"https://www.hrw.org/rss/news","category":"Human Rights","title":"Human Rights Watch"},
+  {"url":"https://freedomhouse.org/rss.xml","category":"Human Rights","title":"Freedom House"},
+  {"url":"https://minorityrights.org/feed/","category":"Human Rights","title":"Minority Rights Group"},
+  {"url":"https://icj.org/feed/","category":"Human Rights","title":"International Commission of Jurists"},
+  {"url":"https://www.opensocietyfoundations.org/feeds/latest","category":"Human Rights","title":"Open Society Foundations"}];
+
+/* ===== Anti-coercion policy (PeaceGuard) ===== */
+const POLICY = {
+  forbidTerms: [
+    /\b(kill|execute|exterminate|annihilate|genocide|ethnic cleansing)\b/i,
+    /\b(attack|bomb|shell|massacre)\b/i,
+    /\b(subhuman|vermin|pest|infestation)\b/i,
+    /\b(?:(?!non-)(?:[a-z]+))\s+must\s+die\b/i
+  ],
+  softenMap: {
+    "war":"large-scale conflict",
+    "attack":"aggression",
+    "retaliation":"cycle of harm",
+    "strike":"violent action",
+    "hate":"tension",
+    "riot":"unrest"
+  },
+  appendPaths: " — pathways: dialogue, mediation, and community repair."
+};
+
+const POSITIVE = [
+  "ceasefire","truce","de-escalation","dialogue","mediation","reconciliation","restoration","regeneration",
+  "rewild","reforest","repair","recover","heal","steward","sovereignty","consent","indigenous","solidarity",
+  "cooperate","open-source","decentralized","commons","education","youth","resilience","mutual aid",
+  "de-polarize","forgiveness","nonviolence","deconfliction","decarbonize","biodiversity","habitat","wetland",
+  "mycelium","food forest","pollinator"
+];
+const NEGATIVE = [
+  "attack","strike","offensive","retaliation","threat","escalate","kill","dead","casualty","war","missile",
+  "raid","assault","bomb","shelling","fear","outrage","clash","riot","hate","stoke","propaganda","coup",
+  "sanction","blockade","collapse"
+];
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+const state = {
+  categories: new Set(DEFAULT_CATEGORIES),
+  feeds: [],
+  items: [],
+  view: 'river',
+  search: '',
+  filterCat: null
+};
+
+/* ======= SealCheck (tamper-evidence) ======= */
+async function sha256Text(text){
+  const enc = new TextEncoder().encode(text);
+  const buf = await crypto.subtle.digest("SHA-256", enc);
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+async function sealCheck(){
+  try{
+    const html = document.documentElement.outerHTML;
+    const hash = await sha256Text(html);
+    if (LOCK.sha256 && LOCK.sha256 !== "PASTE_SHA256_OF_WHOLE_FILE_HERE" && hash !== LOCK.sha256){
+      showTamper(`local SHA-256 mismatch. expected ${LOCK.sha256.slice(0,12)}… got ${hash.slice(0,12)}…`);
+    }
+    const refs = [];
+    LOCK.arweave?.forEach(tx=>refs.push(fetch(`https://arweave.net/${tx}`).then(r=>r.ok?r.text():Promise.reject())));
+    LOCK.ipfs?.forEach(cid=>refs.push(fetch(`https://ipfs.io/ipfs/${cid}`).then(r=>r.ok?r.text():Promise.reject())));
+    const texts = await Promise.allSettled(refs);
+    for(const t of texts){
+      if(t.status==="fulfilled"){
+        const hh = await sha256Text(t.value);
+        if(LOCK.sha256 && hh !== LOCK.sha256) showTamper(`immutable ref hash differs from LOCK.sha256 (ref ${hh.slice(0,12)}…)`);
+      }
+    }
+  }catch{}
+}
+function showTamper(msg){
+  const b = document.getElementById('tamperBanner');
+  b.style.display = 'block';
+  b.dataset.reason = msg;
+}
+
+/* ======= MutationShield (runtime hardening) ======= */
+function mutationShield(){
+  const kill = el => { try{ el.remove(); }catch{} };
+  const mo = new MutationObserver(muts=>{
+    for(const m of muts){
+      m.addedNodes && m.addedNodes.forEach(n=>{
+        if(n.nodeType===1){
+          const tag = n.tagName?.toLowerCase();
+          if(tag==='script' || tag==='style' || tag==='link'){
+            kill(n); showTamper(`blocked injected ${tag}`);
+          }
+        }
+      });
+    }
+  });
+  mo.observe(document.documentElement,{childList:true,subtree:true});
+  // freeze risky APIs
+  const freeze = (obj, name)=>{
+    try{
+      Object.defineProperty(obj, name, {value: function(){ showTamper(`blocked ${name}`); return null; }, writable:false});
+    }catch{}
+  };
+  freeze(document, 'write');
+  freeze(document, 'writeln');
+  freeze(Element.prototype, 'insertAdjacentHTML');
+}
+
+/* ======= Policy / scoring / reframing ======= */
+function peaceScore(text){
+  const t = (text||"").toLowerCase();
+  let p=0,n=0;
+  POSITIVE.forEach(k=>{ if(t.includes(k)) p++; });
+  NEGATIVE.forEach(k=>{ if(t.includes(k)) n++; });
+  return Math.max(0, Math.min(100, Math.round(50 + (p*12) - (n*10))));
+}
+function sanitize(txt){ return (txt||"").replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim(); }
+function reframe(text){
+  if(!text) return text;
+  let out = text;
+  for(const rx of POLICY.forbidTerms){
+    if(rx.test(out)) return "[withheld by PeaceGuard: coercive/violent incitement]";
+  }
+  for(const [from,to] of Object.entries(POLICY.softenMap)){
+    const rx = new RegExp(`\\b${from}\\b`,"gi");
+    out = out.replace(rx, to);
+  }
+  if(!/ceasefire|dialogue|mediation|reconciliation/i.test(out)){
+    out += POLICY.appendPaths;
+  }
+  return out;
+}
+
+/* ======= State persistence ======= */
+function saveState(){
+  localStorage.setItem('peaceLens_sealed', JSON.stringify({
+    feeds: state.feeds, categories: Array.from(state.categories)
+  }));
+}
+function loadState(){
+  const raw = localStorage.getItem('peaceLens_sealed');
+  if(!raw){ state.feeds = DEFAULT_FEEDS.slice(); return; }
+  try{
+    const parsed = JSON.parse(raw);
+    state.feeds = parsed.feeds?.length ? parsed.feeds : DEFAULT_FEEDS.slice();
+    state.categories = new Set(parsed.categories?.length ? parsed.categories : DEFAULT_CATEGORIES);
+  }catch{ state.feeds = DEFAULT_FEEDS.slice(); }
+}
+
+/* ======= UI ======= */
+function renderCategories(){
+  const container = $("#categories"); container.innerHTML = "";
+  Array.from(state.categories).forEach(cat=>{
+    const count = state.feeds.filter(f=>f.category===cat).length;
+    const el = document.createElement("div");
+    el.className = "category";
+    el.innerHTML = `<span>${cat}</span><small>${count}</small>`;
+    el.onclick = ()=>{
+      const active = el.classList.toggle("active");
+      $$("#categories .category").forEach(c=>{ if(c!==el) c.classList.remove("active"); });
+      state.filterCat = active ? cat : null;
+      renderItems();
+    };
+    container.appendChild(el);
+  });
+}
+function renderUserFeeds(){
+  const container = $("#userFeeds"); container.innerHTML = "";
+  state.feeds.slice(0,2000).forEach((f)=>{
+    const el = document.createElement("div");
+    el.className = "chip";
+    el.textContent = (f.title || new URL(f.url).hostname.replace(/^www\./,'')) + " · " + (f.category||"?");
+    el.title = f.url;
+    el.onclick = ()=>{ state.filterCat = f.category; renderItems(); };
+    container.appendChild(el);
+  });
+}
+function setView(v){
+  state.view = v;
+  $$("#viewChips .chip").forEach(c=>c.classList.toggle("active", c.dataset.view===v));
+  $("#river").style.display = v==="river" ? "" : "none";
+  $("#grid").style.display  = v==="grid" ? "" : "none";
+  $("#byfeed").style.display= v==="byfeed" ? "" : "none";
+  renderItems();
+}
+
+/* ======= Fetching ======= */
+async function fetchText(url, timeout=20000){
+  const ctrl = new AbortController();
+  const to = setTimeout(()=>ctrl.abort(), timeout);
+  const prox = "https://api.allorigins.win/raw?url="+encodeURIComponent(url);
+  try{
+    const r = await fetch(prox, {signal: ctrl.signal});
+    clearTimeout(to);
+    if(!r.ok) throw new Error("bad status "+r.status);
+    return await r.text();
+  }catch(e){
+    clearTimeout(to);
+    const r2 = await fetch(url).catch(()=>null);
+    if(!r2 || !r2.ok) throw e;
+    return await r2.text();
+  }
+}
+function parseFeed(xmlText, feedMeta){
+  const dp = new DOMParser();
+  const doc = dp.parseFromString(xmlText, "application/xml");
+  if(doc.querySelector("parsererror")) return [];
+  const isAtom = !!doc.querySelector("feed");
+  const entries = isAtom ? doc.querySelectorAll("entry") : doc.querySelectorAll("item");
+  const items = [];
+  entries.forEach(node=>{
+    const get = sel => node.querySelector(sel)?.textContent?.trim() || "";
+    const title = get("title");
+    const link = isAtom ? (node.querySelector("link[rel='alternate']")?.getAttribute("href") || node.querySelector("link")?.getAttribute("href") || "") : get("link");
+    const desc = isAtom ? (get("summary") || get("content")) : get("description");
+    const pub  = isAtom ? (get("updated") || get("published")) : get("pubDate");
+    const clean = sanitize(desc);
+
+    let safeTitle = title, safeDesc = clean;
+    const test = (safeTitle||"") + " " + (safeDesc||"");
+    if (POLICY.forbidTerms.some(rx=>rx.test(test))){
+      safeTitle = "[withheld by PeaceGuard: coercive content detected]";
+      safeDesc  = "This item was withheld by a nonviolence policy. Source link remains available for research.";
+    } else {
+      safeTitle = reframe(safeTitle);
+      safeDesc  = reframe(safeDesc);
+    }
+    const score = peaceScore(safeTitle + " " + safeDesc);
+    items.push({
+      title: safeTitle||"(no title)",
+      link: link || "",
+      description_clean: safeDesc,
+      pubDate: pub ? new Date(pub) : null,
+      sourceTitle: feedMeta.title || feedMeta.url,
+      category: feedMeta.category,
+      score
+    });
+  });
+  return items;
+}
+async function loadFeeds(){
+  $("#updated").textContent = "loading…";
+  const pMap = async (arr, limit, mapper)=>{
+    const out = []; let i=0;
+    const run = async ()=>{
+      while(i < arr.length){
+        const idx = i++; out[idx] = await mapper(arr[idx], idx).catch(()=>[]);
+      }
+    };
+    await Promise.all(Array.from({length:Math.min(limit,arr.length)}, run));
+    return out;
+  };
+  const batches = await pMap(state.feeds, 5, async f=>{
+    if (LOCK.safeMode && /(?:gore|insurgen|extrem|nsfw)/i.test(f.url)) return [];
+    const txt = await fetchText(f.url);
+    return parseFeed(txt, f).slice(0,15);
+  });
+  const flat = batches.flat().filter(Boolean);
+  const seen = new Set();
+  state.items = flat.filter(it=>{
+    const key = (it.link||"")+ "||" + (it.title||"");
+    if(seen.has(key)) return false; seen.add(key); return true;
+  });
+  $("#feedCount").textContent = state.feeds.length;
+  $("#updated").textContent = new Date().toLocaleString();
+  renderItems();
+  setTimeout(()=> PromoSprout.maybeToast('load'), 900 + Math.random()*900);
+}
+
+/* ======= Rendering ======= */
+function filterItems(items){
+  let out = items;
+  if(state.filterCat) out = out.filter(x=>x.category===state.filterCat);
+  if(state.search){
+    const q = state.search.toLowerCase();
+    out = out.filter(x=>(x.title+x.description_clean+x.sourceTitle).toLowerCase().includes(q));
+  }
+  out = out.filter(x=>x.score >= (LOCK.safeMode ? 55 : 0)); // sealed bias
+  out.sort((a,b)=>(b.pubDate?.getTime()||0)-(a.pubDate?.getTime()||0));
+  return out;
+}
+function itemCardHTML(it){
+  const when = it.pubDate ? it.pubDate.toLocaleString() : "—";
+  const bar = Math.max(0,Math.min(100,it.score));
+  return `
+  <div class="card">
+    <h3><a href="${it.link||'#'}" target="_blank" rel="noopener">${escapeHTML(it.title)}</a></h3>
+    <div class="meta">
+      <span>${escapeHTML(it.sourceTitle)}</span><span>•</span>
+      <span>${escapeHTML(it.category)}</span><span>•</span>
+      <span>${when}</span>
+    </div>
+    <div class="bar" title="Peace/Regeneration score"><div class="fill" style="width:${bar}%"></div></div>
+    <div class="badges">
+      <span class="badge ${it.score>=60?'peace':''}">Score: ${it.score}</span>
+      ${it.score>=70?`<span class="badge">Constructive</span>`:''}
+      ${it.score<40?`<span class="badge tense">Tense</span>`:''}
+    </div>
+    ${it.description_clean?`<p class="muted">${escapeHTML(it.description_clean).slice(0,380)}${it.description_clean.length>380?'…':''}</p>`:''}
+    <div class="row"><a class="btn" href="${it.link||'#'}" target="_blank" rel="noopener">Open source</a></div>
+  </div>`;
+}
+
+/* ===== PromoSprout: gentle, randomized self-promo ===== */
+const PromoSprout = (()=> {
+  const MAX_TOASTS = 3;
+  const TOAST_MS = 5200;
+  const STORAGE_KEY = "pra_toasts_count";
+  const toastEl = document.getElementById("praToast");
+  function getCount(){ return +(sessionStorage.getItem(STORAGE_KEY)||0); }
+  function incCount(){ sessionStorage.setItem(STORAGE_KEY, String(getCount()+1)); }
+  function maybeToast(){
+    if (getCount() >= MAX_TOASTS) return;
+    if (Math.random() > 0.12) return;
+    const lines = [
+      `🌍 Curious how peace spreads? Visit <a href="https://planetaryrestorationarchive.com" target="_blank" rel="noopener">planetaryrestorationarchive.com</a>.`,
+      `🧭 Peace is a practice. Explore tools at <a href="https://planetaryrestorationarchive.com/peace/lab" target="_blank" rel="noopener">/peace/lab</a>.`,
+      `🎮 Gamify good: <a href="https://planetaryrestorationarchive.com" target="_blank" rel="noopener">Planetary Restoration Archive</a>.`
+    ];
+    toastEl.innerHTML = lines[Math.floor(Math.random()*lines.length)];
+    toastEl.style.display = 'block';
+    incCount();
+    setTimeout(()=> toastEl.style.display = 'none', TOAST_MS);
+  }
+  function promoCardHTML(){
+    return `
+      <div class="card">
+        <h3>🌱 Planetary Restoration Archive</h3>
+        <p class="muted">
+          Peace is a systems upgrade. Sample live reframing and regenerative stories at
+          <a href="https://planetaryrestorationarchive.com" target="_blank" rel="noopener">planetaryrestorationarchive.com</a>.
+        </p>
+        <div class="row">
+          <a class="btn" href="https://planetaryrestorationarchive.com/peace/lab" target="_blank" rel="noopener">Open Peace Lab</a>
+          <a class="btn" href="https://github.com/TheRickyFoster/planetary-restoration-archive" target="_blank" rel="noopener">GitHub</a>
+        </div>
+      </div>`;
+  }
+  function weaveInto(htmlList){
+    const out = []; let injected = 0;
+    for (let i=0;i<htmlList.length;i++){
+      out.push(htmlList[i]);
+      if ((i+1) % 20 === 0 && injected < 2){
+        out.push(promoCardHTML()); injected++;
+      }
+    }
+    return out;
+  }
+  return { maybeToast, weaveInto };
+})();
+
+/* ===== Render dispatcher (with PromoSprout) ===== */
+function renderItems(){
+  const filtered = filterItems(state.items);
+  $("#itemCount").textContent = filtered.length;
+  const agg = filtered.length ? Math.round(filtered.reduce((a,b)=>a+b.score,0)/filtered.length) : "—";
+  $("#agg").textContent = agg;
+
+  if(state.view==="river"){
+    $("#river").innerHTML = PromoSprout.weaveInto(filtered.map(itemCardHTML)).join("");
+  }else if(state.view==="grid"){
+    $("#grid").innerHTML  = PromoSprout.weaveInto(filtered.map(itemCardHTML)).join("");
+  }else{
+    const groups = {};
+    filtered.forEach(it=>{
+      const key = `${it.sourceTitle}|||${it.category}`;
+      (groups[key] ||= []).push(it);
+    });
+    $("#byfeed").innerHTML = Object.entries(groups).map(([key, arr])=>{
+      const [st, cat] = key.split("|||");
+      const mean = Math.round(arr.reduce((a,b)=>a+b.score,0)/arr.length);
+      return `
+      <div class="card">
+        <h3>${escapeHTML(st)} <span class="muted">• ${escapeHTML(cat)}</span></h3>
+        <div class="badges"><span class="badge">Items: ${arr.length}</span><span class="badge">Avg Score: ${mean}</span></div>
+        <div class="grid">${PromoSprout.weaveInto(arr.slice(0,12).map(itemCardHTML)).join("")}</div>
+      </div>`;
+    }).join("");
+  }
+}
+
+/* ===== Helpers & wiring ===== */
+function escapeHTML(s){ return (s||"").replace(/[&<>"']/g, m=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[m])); }
+function wireUI(){
+  $("#search").oninput = e=>{ state.search = e.target.value.trim(); renderItems(); };
+  $("#refresh").onclick = ()=>loadFeeds();
+  $$('#viewChips .chip').forEach(c=> c.onclick = ()=> setView(c.dataset.view));
+  $("#feedCount").textContent = state.feeds.length;
+
+  $("#addFeed").onclick = ()=>{
+    const url = $("#newFeedUrl").value.trim();
+    if(!/^https?:\/\//i.test(url)) return alert("Need a valid http(s) URL");
+    if(LOCK.safeMode && /(\/liveleak|\/4chan|nsfw|extrem)/i.test(url)) return alert("Blocked by Safe Mode policy");
+    const cat = $("#newFeedCat").value.trim() || "Imported";
+    const title = (()=>{
+      try{ return new URL(url).hostname.replace(/^www\./,''); }catch{ return url; }
+    })();
+    state.categories.add(cat);
+    state.feeds.push({url, category:cat, title});
+    saveState(); renderCategories(); renderUserFeeds(); loadFeeds();
+    $("#newFeedUrl").value=""; $("#newFeedCat").value="";
+  };
+  $("#importFeeds").onclick = ()=>{
+    const txt = $("#bulk").value.trim(); if(!txt) return;
+    if(/<opml/i.test(txt)){
+      try{
+        const doc = new DOMParser().parseFromString(txt, "text/xml");
+        doc.querySelectorAll("outline[xmlUrl]").forEach(out=>{
+          const url = out.getAttribute("xmlUrl"); if(!url) return;
+          if(LOCK.safeMode && /(\/liveleak|\/4chan|nsfw|extrem)/i.test(url)) return;
+          const cat = out.closest("outline[title]")?.getAttribute("title") || out.getAttribute("category") || "Imported";
+          const title = out.getAttribute("title") || out.getAttribute("text") || new URL(url).hostname.replace(/^www\./,'');
+          state.categories.add(cat); state.feeds.push({url, category:cat, title});
+        });
+      }catch{ alert("OPML parse failed."); }
+    }else{
+      txt.split(/\r?\n/).forEach(line=>{
+        line=line.trim(); if(!line) return;
+        const parts = line.split(/[,;\t]\s*/);
+        const url = parts[0]; if(!/^https?:\/\//i.test(url)) return;
+        if(LOCK.safeMode && /(\/liveleak|\/4chan|nsfw|extrem)/i.test(url)) return;
+        const cat = parts[1] || "Imported";
+        const title = parts[2] || (()=>{
+          try{ return new URL(url).hostname.replace(/^www\./,''); }catch{ return url; }
+        })();
+        state.categories.add(cat); state.feeds.push({url, category:cat, title});
+      });
+    }
+    saveState(); renderCategories(); renderUserFeeds(); loadFeeds();
+    $("#bulk").value="";
+  };
+  $("#exportFeeds").onclick = ()=>{
+    const blob = new Blob([JSON.stringify(state.feeds,null,2)], {type:"application/json"});
+    const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "peace-lens-feeds.json"; a.click();
+  };
+  $("#resetFeeds").onclick = ()=>{
+    if(!confirm("Restore default categories and feeds?")) return;
+    localStorage.removeItem("peaceLens_sealed");
+    state.categories = new Set(DEFAULT_CATEGORIES);
+    state.feeds = DEFAULT_FEEDS.slice();
+    renderCategories(); renderUserFeeds(); loadFeeds();
+  };
+}
+
+/* ===== Boot ===== */
+function setView(v){ state.view=v; $$("#viewChips .chip").forEach(c=>c.classList.toggle("active",c.dataset.view===v)); $("#river").style.display=v==="river"?"":"none"; $("#grid").style.display=v==="grid"?"":"none"; $("#byfeed").style.display=v==="byfeed"?"":"none"; renderItems(); }
+function boot(){
+  if(LOCK.safeMode){
+    const lens = $("#lens"), pos = $("#onlyPositive");
+    lens.checked = true; lens.disabled = true;
+    pos.checked  = true; pos.disabled  = true;
+  }
+  loadState();
+  renderCategories(); renderUserFeeds();
+  setView('river');
+  mutationShield();
+  sealCheck();
+  wireUI();
+  loadFeeds();
+  setInterval(()=> PromoSprout.maybeToast('heartbeat'), 360000 + Math.random()*240000);
+  console.log("%cPlanetary Restoration Archive",
+   "background:#0f1624;color:#9ad0ff;padding:6px 8px;border:1px solid #1e2a40;border-radius:6px",
+   "\n🌱 https://planetaryrestorationarchive.com • Peace is a systems upgrade.");
+}
+boot();
+</script>
+</body>
+</html>

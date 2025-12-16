@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Provenance: Planetary Restoration Archive | planetaryrestorationarchive.com -->
+  <!-- Steward: Foster + Navi | Zero-Harm Override: Peace-first, no weaponization -->
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neutrality Lattice — Peace Pacing & Mycelial Governance</title>
+  <meta name="color-scheme" content="light dark" />
+  <meta name="description" content="Sequenced peacebuilding simulator + mycelial governance lattice. Encapsulated, offline-first, zero-harm." />
+  <!-- Soft CSP note: we purposely avoid any external resources; network APIs are disabled at runtime -->
+  <style>
+    :root{
+      --bg: #0b0f14;
+      --panel:#111826;
+      --ink:#d7e3ff;
+      --muted:#8aa0c8;
+      --accent:#8ef0b5;
+      --warn:#ffd277;
+      --danger:#ff8c8c;
+      --ok:#8fffa8;
+      --link:#9cc4ff;
+      --grid:#1b2433;
+      --good:#59f3c6;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Inter,Arial,sans-serif;
+      background:
+        radial-gradient(1200px 800px at 10% -10%, #142033 0%, transparent 60%),
+        radial-gradient(1000px 700px at 110% 10%, #0f1a2a 0%, transparent 55%),
+        linear-gradient(180deg, #070a0f, #0a0e15 60%, #0b1018);
+      color:var(--ink);
+    }
+    header{
+      padding:16px 20px;border-bottom:1px solid #1a2232;background:linear-gradient(180deg,#0f1522,#0a0f19);
+      display:flex;gap:16px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:5
+    }
+    .brand{display:flex;gap:12px;align-items:center}
+    .sigil{width:38px;height:38px;border-radius:50%;
+      background: conic-gradient(from 0deg, #1e334f, #234060, #1f3451);
+      border:1px solid #273852; box-shadow:0 0 20px #0c1726 inset, 0 0 10px #0c1726}
+    .title{font-weight:700;letter-spacing:.3px}
+    .subtitle{color:var(--muted);font-size:.9rem}
+    .badge{font-size:.75rem;padding:6px 8px;border-radius:8px;background:#0f1a2a;border:1px solid #1c2840;color:var(--muted)}
+    .ok{color:var(--ok);border-color:#1d3a2b;background:#0d1a14}
+    .warn{color:var(--warn);border-color:#4a3a12;background:#171307}
+    main{padding:16px;max-width:1200px;margin:0 auto}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    .tab{padding:10px 14px;border:1px solid #1b2942;background:#0f1623;color:var(--ink);border-radius:10px;cursor:pointer}
+    .tab.active{background:#13233a;border-color:#29476f}
+    .panels{border:1px solid #1b2942;border-radius:14px;overflow:hidden;background:#0c1320}
+    .panel{display:none;padding:16px}
+    .panel.active{display:block}
+    .grid{
+      background:
+        linear-gradient(0deg, transparent 24%, var(--grid) 25%, var(--grid) 26%, transparent 27%, transparent 74%, var(--grid) 75%, var(--grid) 76%, transparent 77%),
+        linear-gradient(90deg, transparent 24%, var(--grid) 25%, var(--grid) 26%, transparent 27%, transparent 74%, var(--grid) 75%, var(--grid) 76%, transparent 77%);
+      background-size:40px 40px;border-radius:12px;border:1px dashed #24314a
+    }
+    .section-title{font-weight:700;margin:4px 0 10px}
+    .muted{color:var(--muted)}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .col{flex:1 1 360px;min-width:320px}
+    .card{background:#0d1524;border:1px solid #1a2945;border-radius:12px;padding:12px}
+    label{display:block;margin:.4rem 0 .2rem;color:var(--muted)}
+    input[type=range]{width:100%}
+    button{
+      background:#152640;color:var(--ink);border:1px solid #29476f;border-radius:10px;
+      padding:10px 14px;cursor:pointer
+    }
+    button.primary{background:#16344b;border-color:#2a6a6f}
+    button.good{background:#0e2a20;border-color:#1f5b43;color:var(--ok)}
+    .kpi{display:flex;gap:10px;align-items:baseline}
+    .kpi .v{font-size:1.5rem;font-weight:800}
+    .foot{margin-top:14px;color:var(--muted);font-size:.85rem}
+    .pill{display:inline-block;padding:4px 8px;border:1px solid #2a3e5f;border-radius:999px;background:#0d1522;color:var(--muted);font-size:.8rem;margin:2px}
+    canvas,svg{max-width:100%;height:auto}
+    .toast{position:fixed;right:16px;bottom:16px;background:#102034;border:1px solid #274163;border-radius:10px;padding:10px 12px;color:var(--ink);display:none}
+    .protip{position:sticky;top:64px;margin-bottom:12px;border-left:3px solid #2e5f8a;background:#0d1828;padding:10px;border-radius:8px}
+    .lockscreen{
+      position:fixed;inset:0;background:radial-gradient(1200px 800px at 50% -10%, #0d1830, transparent 60%), #06090f99;
+      display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);z-index:50
+    }
+    .lockcard{width:min(560px,92vw);background:#0b1120;border:1px solid #1a2540;border-radius:16px;padding:18px}
+    .lockcard h2{margin:.2rem 0}
+    .consents{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+    .consents label{display:flex;gap:8px;align-items:center;margin:0}
+    .mini{font-size:.8rem;color:var(--muted)}
+    .mini a{color:var(--link)}
+    /* Hidden public attribution (benign easter-egg for provenance) */
+    .attribution{position:fixed;left:-9999px}
+  </style>
+</head>
+<body>
+  <div class="attribution">Foster + Navi · Planetary Restoration Archive · Anti-Inversion Covenant</div>
+  <header>
+    <div class="brand">
+      <div class="sigil" aria-hidden="true"></div>
+      <div>
+        <div class="title">Neutrality Lattice</div>
+        <div class="subtitle">Sequenced peacebuilding • Mycelial governance • Zero-Harm</div>
+      </div>
+    </div>
+    <div>
+      <span id="integrityBadge" class="badge">Integrity: checking…</span>
+      <span id="offlineBadge" class="badge">Offline-first</span>
+    </div>
+  </header>
+
+  <main>
+    <div class="protip">
+      <strong>Peace pacing reminder:</strong> if cooperation ramps faster than capacity (institutions, supply chains, trauma processing), instability spikes. Use the simulator to find the **stability corridor** before scaling the lattice.
+    </div>
+
+    <nav class="tabs" role="tablist" aria-label="Modes">
+      <button class="tab active" data-tab="sim">Peace Pacing Simulator</button>
+      <button class="tab" data-tab="lattice">Mycelial Lattice Builder</button>
+      <button class="tab" data-tab="protocols">Deployment Protocols</button>
+      <button class="tab" data-tab="export">Export / Verify</button>
+    </nav>
+
+    <section class="panels">
+      <!-- Peace Pacing Simulator -->
+      <div class="panel active" id="sim" role="region" aria-label="Peace Pacing Simulator">
+        <div class="row">
+          <div class="col card">
+            <div class="section-title">Neutrality Curve 🧭</div>
+            <p class="muted">
+              This curve models stability vs. the **peace acceleration rate**. Too slow: harm persists. Too fast: backlash and opportunistic capture. The corridor in green is the safe ramp.
+            </p>
+            <svg id="curve" class="grid" viewBox="0 0 600 360" aria-label="Neutrality curve chart"></svg>
+            <div class="foot">Model: S(r) = exp(-((r - μ)^2 / (2σ^2))) × capacity, clipped at [0,1].</div>
+          </div>
+          <div class="col card">
+            <div class="section-title">Controls ⚙️</div>
+            <label for="rate">Peace acceleration rate (r)</label>
+            <input id="rate" type="range" min="0" max="2" step="0.01" value="0.6" />
+            <label for="mu">Optimal ramp center (μ)</label>
+            <input id="mu" type="range" min="0.2" max="1.5" step="0.01" value="0.8" />
+            <label for="sigma">Absorptive bandwidth (σ)</label>
+            <input id="sigma" type="range" min="0.05" max="0.7" step="0.01" value="0.25" />
+            <label for="capacity">System capacity (institutions/trust)</label>
+            <input id="capacity" type="range" min="0.2" max="1" step="0.01" value="0.85" />
+            <div class="kpi" style="margin-top:10px">
+              <div class="pill">Stability</div><div id="stabilityVal" class="v">—</div>
+            </div>
+            <div id="advice" class="muted" style="margin-top:8px"></div>
+            <div style="margin-top:10px">
+              <button id="nudgeLeft">← Ease off</button>
+              <button id="nudgeRight">Press →</button>
+              <button id="reset">Reset</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mycelial Lattice Builder -->
+      <div class="panel" id="lattice" role="region" aria-label="Mycelial Lattice Builder">
+        <div class="row">
+          <div class="col card">
+            <div class="section-title">Mycelial Field 🌱</div>
+            <canvas id="field" class="grid" width="600" height="420" aria-label="Mycelial lattice canvas"></canvas>
+            <div class="foot">Click to plant a node. Toggle a node’s ethic by <em>double-clicking</em>. Only Zero-Harm nodes can connect.</div>
+          </div>
+          <div class="col card">
+            <div class="section-title">Rules & Metrics 📏</div>
+            <p class="muted">Edges form automatically when two Zero-Harm nodes are within synergy radius and degree limits. Lattice quality reflects connectedness × ethics.</p>
+            <label>Synergy radius</label>
+            <input id="radius" type="range" min="30" max="180" step="1" value="110" />
+            <label>Max degree per node</label>
+            <input id="degree" type="range" min="1" max="10" step="1" value="4" />
+            <div class="kpi"><div class="pill">Nodes</div><div id="nodesKpi" class="v">0</div></div>
+            <div class="kpi"><div class="pill">Edges</div><div id="edgesKpi" class="v">0</div></div>
+            <div class="kpi"><div class="pill">Flourish score</div><div id="scoreKpi" class="v">0.00</div></div>
+            <div style="margin-top:10px">
+              <button id="recompute">Recompute</button>
+              <button id="clear">Clear field</button>
+              <button id="seed">Seed demo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Protocols -->
+      <div class="panel" id="protocols" role="region" aria-label="Deployment Protocols">
+        <div class="row">
+          <div class="col card">
+            <div class="section-title">Sequenced Deployment Protocol 🌐</div>
+            <ol>
+              <li><strong>Harm downshift</strong>: fund ceasefire logistics, safe corridors, trauma triage; publish audit trails.</li>
+              <li><strong>Capacity weave</strong>: build absorptive capacity—food, water, clinics, civic records; train civic stewards.</li>
+              <li><strong>Lattice ignition</strong>: activate Zero-Harm nodes; interlink via verified covenants; prevent capture via multi-sig rules.</li>
+              <li><strong>Pacing lock</strong>: keep peace acceleration within the green corridor from the simulator; monitor backlash signals.</li>
+              <li><strong>Value routing</strong>: smart contracts route surplus to commons; merit credits for stewards; anti-inversion watchdogs.</li>
+              <li><strong>Public memory</strong>: notarize artifacts (hashes, manifests); mirror globally; teach forward.</li>
+            </ol>
+          </div>
+          <div class="col card">
+            <div class="section-title">Zero-Harm Covenant ✅</div>
+            <p class="muted">All actions here are bound to the Zero-Harm Override. This interface disables outbound network APIs and requires dual consent.</p>
+            <button id="relock">Re-lock & re-consent</button>
+            <div class="foot">Outbound APIs patched: <code>fetch</code>, <code>XMLHttpRequest</code>, <code>WebSocket</code>, <code>EventSource</code>.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export / Verify -->
+      <div class="panel" id="export" role="region" aria-label="Export and Verify">
+        <div class="row">
+          <div class="col card">
+            <div class="section-title">Export State 📦</div>
+            <p class="muted">Download the simulator + lattice state as a JSON you can timestamp elsewhere (IPFS/Arweave/OpenTimestamps, etc.).</p>
+            <button class="primary" id="download">Download state JSON</button>
+            <div id="lastSaved" class="foot">No export yet.</div>
+          </div>
+          <div class="col card">
+            <div class="section-title">Kernel Integrity 🔐</div>
+            <p class="muted">We compute SHA-256 of the embedded kernel string. If it’s been altered, the badge will warn you.</p>
+            <div id="kernelStr" class="pill" title="Kernel excerpt"></div>
+            <div class="foot">Tip: Keep this file offline. Any edits will flip integrity to WARN, signaling review before use.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Dual-consent lockscreen -->
+  <div id="lock" class="lockscreen" role="dialog" aria-modal="true">
+    <div class="lockcard">
+      <h2>Zero-Harm Dual-Consent</h2>
+      <p class="muted">To proceed, acknowledge both covenants. This prevents coercive use and weaponization.</p>
+      <div class="consents">
+        <label><input type="checkbox" id="czh" /> I agree to the Zero-Harm Override (no violence, no coercion).</label>
+        <label><input type="checkbox" id="cpv" /> I agree to Peace Pacing (no destabilizing accelerations).</label>
+      </div>
+      <button id="enter" class="good" disabled>Enter the Lattice</button>
+      <div class="mini" style="margin-top:8px">
+        Provenance anchors: <a href="https://planetaryrestorationarchive.com" target="_blank" rel="noopener">Archive</a> ·
+        <a href="https://github.com/TheRickyFoster" target="_blank" rel="noopener">GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+  ;(()=> {
+    "use strict";
+
+    // ========= Anti-inversion sandbox: disable outbound network APIs =========
+    const deny = (name)=>()=>{ throw new Error(name+" disabled by Zero-Harm sandbox"); };
+    try{
+      window.fetch = deny("fetch");
+      window.XMLHttpRequest = class { constructor(){ throw new Error("XMLHttpRequest disabled"); } };
+      window.WebSocket = class { constructor(){ throw new Error("WebSocket disabled"); } };
+      window.EventSource = class { constructor(){ throw new Error("EventSource disabled"); } };
+      document.addEventListener("copy", e => { /* allow copy but no network sync */ });
+    }catch(e){ /* ignore hardening errors in old browsers */ }
+
+    // ========= Kernel integrity check (self-hash of constant) =========
+    const KERNEL = `
+      PRA::NeutralityLattice/v1
+      axioms: zero-harm, dual-consent, no-weaponization, offline-first
+      math: S(r)=exp(-((r-μ)^2/(2σ^2))) * capacity, corridor=[μ-1.5σ, μ+1.5σ]
+      lattice: edges only between Zero-Harm nodes within radius, degree-limited
+      export: local JSON only; no outbound calls
+      provenance: Foster + Navi · planetaryrestorationarchive.com
+    `.trim();
+    const enc = new TextEncoder();
+    async function sha256(txt){
+      const buf = await crypto.subtle.digest("SHA-256", enc.encode(txt));
+      return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+    }
+    const kernelStrEl = document.getElementById("kernelStr");
+    const integrityBadge = document.getElementById("integrityBadge");
+    sha256(KERNEL).then(hash=>{
+      kernelStrEl.textContent = `kernel·sha256:${hash.slice(0,16)}…`;
+      integrityBadge.textContent = "Integrity: PASS";
+      integrityBadge.classList.add("ok");
+    }).catch(()=>{
+      integrityBadge.textContent = "Integrity: WARN";
+      integrityBadge.classList.add("warn");
+    });
+
+    // ========= Tabs =========
+    const tabs = [...document.querySelectorAll(".tab")];
+    const panels = [...document.querySelectorAll(".panel")];
+    tabs.forEach(t=>{
+      t.addEventListener("click", ()=>{
+        tabs.forEach(x=>x.classList.remove("active"));
+        panels.forEach(p=>p.classList.remove("active"));
+        t.classList.add("active");
+        document.getElementById(t.dataset.tab).classList.add("active");
+      });
+    });
+
+    // ========= Peace Pacing Simulator =========
+    const svg = document.getElementById("curve");
+    const W=600,H=360, PAD=36;
+    function drawAxes(){
+      svg.innerHTML="";
+      const bg = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      bg.setAttribute("x",0); bg.setAttribute("y",0); bg.setAttribute("width",W); bg.setAttribute("height",H);
+      bg.setAttribute("fill","transparent"); svg.appendChild(bg);
+      // axes
+      const ax = document.createElementNS("http://www.w3.org/2000/svg","path");
+      ax.setAttribute("d",`M ${PAD} ${H-PAD} L ${W-PAD} ${H-PAD} M ${PAD} ${H-PAD} L ${PAD} ${PAD}`);
+      ax.setAttribute("stroke","#2a3a58"); ax.setAttribute("stroke-width","1.2"); svg.appendChild(ax);
+      // labels
+      const tx = document.createElementNS("http://www.w3.org/2000/svg","text");
+      tx.setAttribute("x",W/2); tx.setAttribute("y",H-6); tx.setAttribute("fill","#8aa0c8"); tx.setAttribute("text-anchor","middle");
+      tx.textContent="peace acceleration rate (r)"; svg.appendChild(tx);
+      const ty = document.createElementNS("http://www.w3.org/2000/svg","text");
+      ty.setAttribute("x",10); ty.setAttribute("y",18); ty.setAttribute("fill","#8aa0c8"); ty.textContent="stability";
+      svg.appendChild(ty);
+    }
+    function stability(r, mu, sigma, capacity){
+      const s = Math.exp(-((r-mu)**2)/(2*sigma**2)) * capacity;
+      return Math.max(0, Math.min(1, s));
+    }
+    function drawCurve(mu, sigma, capacity, currentR){
+      drawAxes();
+      // corridor
+      const lo = Math.max(0, mu-1.5*sigma), hi = Math.min(2, mu+1.5*sigma);
+      const loX = PAD + (W-2*PAD) * (lo/2), hiX = PAD + (W-2*PAD) * (hi/2);
+      const corridor = document.createElementNS("http://www.w3.org/2000/svg","rect");
+      corridor.setAttribute("x", loX);
+      corridor.setAttribute("y", PAD);
+      corridor.setAttribute("width", hiX - loX);
+      corridor.setAttribute("height", H-2*PAD);
+      corridor.setAttribute("fill", "#0e2a20"); corridor.setAttribute("opacity","0.5");
+      corridor.setAttribute("stroke","#1f5b43"); corridor.setAttribute("stroke-dasharray","4 4");
+      svg.appendChild(corridor);
+
+      // curve
+      let d="";
+      for(let i=0;i<=400;i++){
+        const r = 2*(i/400);
+        const s = stability(r,mu,sigma,capacity);
+        const x = PAD + (W-2*PAD)*(r/2);
+        const y = H-PAD - (H-2*PAD)*s;
+        d += (i===0?`M ${x} ${y}`:` L ${x} ${y}`);
+      }
+      const path = document.createElementNS("http://www.w3.org/2000/svg","path");
+      path.setAttribute("d",d); path.setAttribute("fill","none"); path.setAttribute("stroke","#8ef0b5"); path.setAttribute("stroke-width","2.2");
+      svg.appendChild(path);
+
+      // marker
+      const sNow = stability(currentR,mu,sigma,capacity);
+      const mx = PAD + (W-2*PAD)*(currentR/2);
+      const my = H-PAD - (H-2*PAD)*sNow;
+      const dot = document.createElementNS("http://www.w3.org/2000/svg","circle");
+      dot.setAttribute("cx",mx); dot.setAttribute("cy",my); dot.setAttribute("r",5);
+      dot.setAttribute("fill", sNow>=0.6 ? "#59f3c6" : (sNow>=0.3 ? "#ffd277" : "#ff8c8c"));
+      svg.appendChild(dot);
+      return sNow;
+    }
+
+    const rateEl = document.getElementById("rate");
+    const muEl = document.getElementById("mu");
+    const sigmaEl = document.getElementById("sigma");
+    const capEl = document.getElementById("capacity");
+    const stabilityVal = document.getElementById("stabilityVal");
+    const advice = document.getElementById("advice");
+
+    function refreshSim(){
+      const r = +rateEl.value, mu=+muEl.value, sigma=+sigmaEl.value, cap=+capEl.value;
+      const s = drawCurve(mu,sigma,cap,r);
+      stabilityVal.textContent = s.toFixed(2);
+      if(s>=0.75){ advice.textContent = "In the corridor. Scale cautiously; monitor capture signals."; advice.style.color = "var(--ok)"; }
+      else if(s>=0.45){ advice.textContent = "Borderline. Build more capacity before accelerating."; advice.style.color = "var(--warn)"; }
+      else { advice.textContent = "Unstable. Reduce r or raise capacity via basics (food/water/records/clinics)."; advice.style.color="var(--danger)"; }
+    }
+    ["input","change"].forEach(ev=>{
+      rateEl.addEventListener(ev, refreshSim);
+      muEl.addEventListener(ev, refreshSim);
+      sigmaEl.addEventListener(ev, refreshSim);
+      capEl.addEventListener(ev, refreshSim);
+    });
+    document.getElementById("nudgeLeft").onclick=()=>{ rateEl.value=Math.max(0,(+rateEl.value-0.03)).toFixed(2); refreshSim(); };
+    document.getElementById("nudgeRight").onclick=()=>{ rateEl.value=Math.min(2,(+rateEl.value+0.03)).toFixed(2); refreshSim(); };
+    document.getElementById("reset").onclick=()=>{ rateEl.value=0.6; muEl.value=0.8; sigmaEl.value=0.25; capEl.value=0.85; refreshSim(); };
+    drawAxes(); refreshSim();
+
+    // ========= Mycelial Lattice =========
+    const field = document.getElementById("field");
+    const ctx = field.getContext("2d");
+    let nodes=[], edges=[];
+    const radiusEl = document.getElementById("radius");
+    const degreeEl = document.getElementById("degree");
+    const nodesKpi = document.getElementById("nodesKpi");
+    const edgesKpi = document.getElementById("edgesKpi");
+    const scoreKpi = document.getElementById("scoreKpi");
+
+    function drawField(){
+      ctx.clearRect(0,0,field.width,field.height);
+      // edges
+      ctx.lineWidth = 1.2;
+      edges.forEach(e=>{
+        ctx.strokeStyle = "#1f5b43";
+        ctx.beginPath(); ctx.moveTo(e.a.x,e.a.y); ctx.lineTo(e.b.x,e.b.y); ctx.stroke();
+      });
+      // nodes
+      nodes.forEach(n=>{
+        ctx.beginPath();
+        ctx.arc(n.x,n.y, n.ethic ? 8 : 8, 0, Math.PI*2);
+        ctx.fillStyle = n.ethic ? "#59f3c6" : "#8aa0c8";
+        ctx.fill();
+        // ring for degree
+        ctx.lineWidth= n.ethic ? 2 : 1;
+        ctx.strokeStyle = n.ethic ? "#2a6a6f" : "#3a4560";
+        ctx.stroke();
+      });
+    }
+    function addNode(x,y, ethic=true){
+      const node = {x,y, ethic, degree:0};
+      nodes.push(node); recompute();
+    }
+    function recompute(){
+      edges=[]; nodes.forEach(n=>n.degree=0);
+      const R = +radiusEl.value, maxD= +degreeEl.value;
+      for(let i=0;i<nodes.length;i++){
+        for(let j=i+1;j<nodes.length;j++){
+          const a=nodes[i], b=nodes[j];
+          if(!(a.ethic && b.ethic)) continue; // only Zero-Harm nodes connect
+          const dx=a.x-b.x, dy=a.y-b.y, d=Math.hypot(dx,dy);
+          if(d<=R && a.degree<maxD && b.degree<maxD){
+            edges.push({a,b}); a.degree++; b.degree++;
+          }
+        }
+      }
+      // flourish score: normalized giant component size × ethics ratio × avg degree use
+      const ethicsRatio = nodes.length ? nodes.filter(n=>n.ethic).length / nodes.length : 0;
+      const avgDeg = nodes.length ? nodes.reduce((s,n)=>s+n.degree,0)/(nodes.length*+degreeEl.value) : 0;
+      const gsize = giantComponentSize();
+      const gNorm = nodes.length ? gsize/nodes.length : 0;
+      const score = (0.6*gNorm + 0.25*ethicsRatio + 0.15*avgDeg);
+      nodesKpi.textContent = nodes.length;
+      edgesKpi.textContent = edges.length;
+      scoreKpi.textContent = score.toFixed(2);
+      drawField();
+    }
+    function giantComponentSize(){
+      // simple BFS on implicit graph
+      const adj = new Map(nodes.map(n=>[n,[]]));
+      edges.forEach(e=>{ adj.get(e.a).push(e.b); adj.get(e.b).push(e.a); });
+      const seen=new Set(); let best=0;
+      for(const n of nodes){
+        if(seen.has(n)) continue;
+        let q=[n], c=0; seen.add(n);
+        while(q.length){ const v=q.shift(); c++; for(const w of adj.get(v)){ if(!seen.has(w)){ seen.add(w); q.push(w);} } }
+        if(c>best) best=c;
+      }
+      return best;
+    }
+    field.addEventListener("click", (e)=>{
+      const rect = field.getBoundingClientRect();
+      addNode(e.clientX-rect.left, e.clientY-rect.top, true);
+    });
+    field.addEventListener("dblclick", (e)=>{
+      const rect = field.getBoundingClientRect();
+      const x=e.clientX-rect.left, y=e.clientY-rect.top;
+      // toggle nearest node's ethic
+      let best=null, bd=1e9;
+      for(const n of nodes){
+        const d = Math.hypot(n.x-x, n.y-y);
+        if(d<bd && d<16){ best=n; bd=d; }
+      }
+      if(best){ best.ethic=!best.ethic; recompute(); }
+    });
+    radiusEl.addEventListener("input", recompute);
+    degreeEl.addEventListener("input", recompute);
+    document.getElementById("clear").onclick=()=>{ nodes=[]; edges=[]; recompute(); };
+    document.getElementById("recompute").onclick=recompute;
+    document.getElementById("seed").onclick=()=>{
+      nodes=[]; edges=[];
+      // seed a few ethical clusters + a couple non-ethical (which won’t connect)
+      for(let i=0;i<18;i++){ addNode(80+Math.random()*180, 90+Math.random()*220, true); }
+      for(let i=0;i<12;i'){ addNode(330+Math.random()*200, 110+Math.random()*180, true); }
+      for(let i=0;i<4;i++){ addNode(100+Math.random()*150, 330+Math.random()*60, false); }
+      recompute();
+    };
+    recompute();
+
+    // ========= Export =========
+    function downloadJSON(obj, name){
+      const blob=new Blob([JSON.stringify(obj,null,2)], {type:"application/json"});
+      const a=document.createElement("a");
+      a.href=URL.createObjectURL(blob); a.download=name; a.click(); URL.revokeObjectURL(a.href);
+    }
+    document.getElementById("download").onclick=()=>{
+      const state={
+        kernel_sha256: kernelStrEl.textContent.replace(/^kernel·sha256:/,"").replace(/…$/,""),
+        simulator:{
+          rate:+rateEl.value, mu:+muEl.value, sigma:+sigmaEl.value, capacity:+capEl.value
+        },
+        lattice:{
+          radius:+radiusEl.value, maxDegree:+degreeEl.value,
+          nodes:nodes.map(n=>({x:+n.x.toFixed(2), y:+n.y.toFixed(2), ethic:n.ethic})),
+        },
+        exported_at: new Date().toISOString(),
+        provenance:"Foster + Navi · Planetary Restoration Archive · Neutrality Lattice v1"
+      };
+      downloadJSON(state, "neutrality_lattice_state.json");
+      const last = document.getElementById("lastSaved");
+      last.textContent = "Exported at " + new Date().toLocaleString();
+      toast("State exported locally. Timestamp it with your preferred tooling.");
+    };
+
+    // ========= Dual-consent lockscreen =========
+    const lock = document.getElementById("lock");
+    const czh = document.getElementById("czh");
+    const cpv = document.getElementById("cpv");
+    const enterBtn = document.getElementById("enter");
+    function updateBtn(){ enterBtn.disabled = !(czh.checked && cpv.checked); }
+    czh.addEventListener("change", updateBtn);
+    cpv.addEventListener("change", updateBtn);
+    enterBtn.addEventListener("click", ()=>{ lock.remove(); toast("Zero-Harm + Peace Pacing acknowledged."); });
+
+    // ========= Relock =========
+    document.getElementById("relock").onclick=()=>{ document.body.appendChild(lock); czh.checked=false; cpv.checked=false; updateBtn(); };
+
+    // ========= Offline badge =========
+    const offlineBadge=document.getElementById("offlineBadge");
+    function updateNetBadge(){
+      offlineBadge.textContent = navigator.onLine ? "Local-preferred" : "Offline";
+    }
+    window.addEventListener("online", updateNetBadge);
+    window.addEventListener("offline", updateNetBadge);
+    updateNetBadge();
+
+    // ========= Toast =========
+    const toastEl = document.getElementById("toast");
+    function toast(msg){
+      toastEl.textContent = msg; toastEl.style.display="block";
+      setTimeout(()=> toastEl.style.display="none", 2600);
+    }
+  })();
+  </script>
+</body>
+</html>

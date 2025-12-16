@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peace Engineering Dashboard</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://unpkg.com/tabler/dist/css/tabler.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { padding: 2rem; background-color: #f0f4f8; font-family: 'Segoe UI', sans-serif; }
+    .zone { margin-bottom: 2rem; }
+    canvas { max-width: 100%; }
+    .mnemonic { font-weight: bold; color: #0d6efd; }
+  </style>
+</head>
+<body>
+  <h1>🕊️ Peace Engineering & Reconciliation Systems</h1>
+  <p><em>Conversion Power: ✦✦✦✦✦ — Re-engineering conflict into cooperation.</em></p>
+
+  <!-- Mnemonic Account Creation -->
+  <div class="zone card p-3">
+    <h2>🔡 Mnemonic Identity Generator</h2>
+    <p>Create peacekeeper accounts using mnemonic handles:</p>
+    <ul>
+      <li><span class="mnemonic">RippleFox-7</span> — De-escalation specialist</li>
+      <li><span class="mnemonic">KindSoul-42</span> — Empathy trainer</li>
+      <li><span class="mnemonic">GuardianWolf-19</span> — Logistics planner</li>
+    </ul>
+    <p>Use these handles for leaderboard and ledger attribution.</p>
+  </div>
+
+  <!-- Peace Ripple Tracker -->
+  <div class="zone card p-3">
+    <h2>🌊 Peace Ripple Tracker</h2>
+    <p>Measures and rewards real acts of de-escalation.</p>
+    <canvas id="rippleChart"></canvas>
+    <script>
+      const rippleCtx = document.getElementById('rippleChart').getContext('2d');
+      new Chart(rippleCtx, {
+        type: 'line',
+        data: {
+          labels: ['Zone A', 'Zone B', 'Zone C', 'Zone D'],
+          datasets: [{
+            label: 'Ripple Score',
+            data: [12, 19, 7, 14],
+            borderColor: 'rgba(75, 192, 192, 1)',
+            fill: false
+          }]
+        }
+      });
+    </script>
+  </div>
+
+  <!-- Guardian’s Ledger -->
+  <div class="zone card p-3">
+    <h2>🛡️ Guardian’s Ledger</h2>
+    <p>Converts military skillsets into peacekeeping logistics and reconstruction planning.</p>
+    <ul>
+      <li>🧭 Navigation → Supply Chain Routing</li>
+      <li>📦 Tactical Ops → Crisis Logistics</li>
+      <li>🔧 Engineering → Infrastructure Repair</li>
+    </ul>
+    <p><strong>IndexedDB module:</strong> stores skill conversion logs locally for offline use.</p>
+    <script>
+      const dbRequest = indexedDB.open("GuardiansLedgerDB", 1);
+      dbRequest.onupgradeneeded = e => {
+        const db = e.target.result;
+        db.createObjectStore("skills", { keyPath: "id", autoIncrement: true });
+      };
+    </script>
+  </div>
+
+  <!-- Kindness Wins Wars Protocol -->
+  <div class="zone card p-3">
+    <h2>🎮 Kindness Wins Wars Protocol</h2>
+    <p>Gamified empathy training network replacing punitive systems with restorative pathways.</p>
+    <ul>
+      <li>🧠 Empathy Quests (via <a href="https://github.com/topics/empathy" target="_blank">GitHub empathy tools</a>)</li>
+      <li>🎓 Gamified Learning (see <a href="https://github.com/topics/gamified-learning" target="_blank">Gamified Learning repos</a>)</li>
+      <li>🔄 Feedback Loops for Restorative Justice</li>
+    </ul>
+    <p><strong>Leaderboard Mnemonics:</strong></p>
+    <ul>
+      <li><span class="mnemonic">HeartBeacon-88</span> — Top empathy score</li>
+      <li><span class="mnemonic">BridgeBuilder-33</span> — Most reconciliations</li>
+      <li><span class="mnemonic">EchoKind-21</span> — Ripple multiplier</li>
+    </ul>
+  </div>
+
+  <!-- Attribution & Provenance -->
+  <div class="zone card p-3">
+    <h2>📜 Attribution & Provenance</h2>
+    <p>Protects origin of peace actions and enforces credit.</p>
+    <ul>
+      <li>🔐 Anti-cooption overlays</li>
+      <li>🧾 Ledger-backed provenance tracking</li>
+      <li>🌐 GitHub-linked contribution logs</li>
+    </ul>
+    <script>
+      const provenanceLog = [
+        { actor: "RippleFox-7", action: "De-escalation in Zone B", timestamp: "2025-10-21T14:00Z" },
+        { actor: "GuardianWolf-19", action: "Logistics plan for Zone D", timestamp: "2025-10-21T16:30Z" }
+      ];
+      localStorage.setItem("provenance", JSON.stringify(provenanceLog));
+    </script>
+  </div>
+
+  <footer class="mt-5">
+    <p><em>Built by Ricky Foster — planetaryrestorationarchive.com</em></p>
+  </footer>
+</body>
+</html>

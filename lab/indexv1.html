@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="en" data-app="mycelial-peace-lab">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Mycelial Peace Laboratory — Live AI Conflict Transformation</title>
+  <meta name="description" content="Interactive exploration of ten AI-driven solutions for conflict transformation between Russian–English entanglement" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="color-scheme" content="dark light" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <style>
+    :root{
+      --bg:#0a0f1c; --card:#111827; --ink:#f1f5f9; --muted:#94a3b8; --ink-weak:#cbd5e1;
+      --accent:#34d399; --warm:#f59e0b; --danger:#ef4444; --mystic:#a855f7; --cool:#06b6d4;
+      --maxw:1400px; --radius:16px; --gap:1.2rem; --shadow:0 12px 40px rgba(0,0,0,.4);
+      --dur:.4s; --ease:cubic-bezier(.2,.8,.2,1); --focus: 0 0 0 3px rgba(52,211,153,.5);
+    }
+    @media (prefers-color-scheme: light){
+      :root{ --bg:#f8fafc; --card:#ffffff; --ink:#0f172a; --muted:#475569; --ink-weak:#334155; --shadow:0 8px 28px rgba(0,0,0,.12) }
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;overflow-x:hidden}
+    body{
+      margin:0; font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Inter,sans-serif; color:var(--ink);
+      background:
+        radial-gradient(1400px 800px at 20% -15%, rgba(52,211,153,.08), transparent 70%),
+        radial-gradient(1400px 800px at 80% -15%, rgba(168,85,247,.08), transparent 70%),
+        radial-gradient(800px 400px at 50% 50%, rgba(245,158,11,.04), transparent 60%),
+        conic-gradient(from 0deg at 50% 100%, rgba(6,182,212,.02), transparent 20%, rgba(239,68,68,.02), transparent 40%),
+        var(--bg);
+      min-height:100vh;
+    }
+    .wrap{max-width:var(--maxw); margin:0 auto; padding:1.5rem}
+    /* Header */
+    header{
+      display:grid; grid-template-columns:1fr auto; gap:2rem; align-items:center;
+      padding:2rem; border-radius:var(--radius); margin-bottom:2rem;
+      background:linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      box-shadow:var(--shadow); position:relative; overflow:hidden;
+    }
+    header::before{
+      content:''; position:absolute; inset:0;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(52,211,153,.15), transparent 50%),
+        radial-gradient(circle at 70% 80%, rgba(168,85,247,.15), transparent 50%);
+      animation:headerFlow 20s ease-in-out infinite;
+    }
+    @keyframes headerFlow{
+      0%,100%{transform:scale(1) rotate(0deg)}
+      33%{transform:scale(1.06) rotate(120deg)}
+      66%{transform:scale(.94) rotate(240deg)}
+    }
+    @media (prefers-reduced-motion: reduce){
+      header::before{animation:none}
+      *{scroll-behavior:auto}
+    }
+    .header-content{position:relative; z-index:2}
+    .title{font-weight:900; font-size:clamp(2rem, 5vw, 3.5rem); letter-spacing:-.02em; margin:0;
+      background:linear-gradient(135deg, var(--accent), var(--mystic)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+    .subtitle{color:var(--muted); font-size:1.1rem; margin:.5rem 0 1rem}
+    .tagline{color:var(--ink-weak); font-style:italic; font-size:1rem}
+    .live-stats{
+      display:grid; gap:1rem; position:relative; z-index:2;
+      grid-template-columns:repeat(2, 1fr);
+    }
+    .stat-card{background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);
+      padding:1rem; border-radius:12px; text-align:center}
+    .stat-value{font-size:1.5rem; font-weight:700; margin-bottom:.2rem}
+    .stat-label{font-size:.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:.5px}
+    .stat-change{font-size:.75rem; margin-top:.3rem}
+    .stat-up{color:var(--accent)} .stat-down{color:var(--danger)}
+    /* Controls */
+    .toolbar{
+      display:flex; gap:.6rem; flex-wrap:wrap; align-items:center; margin:.5rem 0 1.2rem
+    }
+    .btn{
+      border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06);
+      color:var(--ink); padding:.55rem .9rem; border-radius:10px; cursor:pointer; transition:all var(--dur) var(--ease);
+    }
+    .btn:hover{background:rgba(255,255,255,.12); transform:translateY(-1px)}
+    .btn[aria-pressed="true"]{background:var(--accent); color:#000; border-color:var(--accent)}
+    .control-panel{
+      display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem;
+      padding:1.2rem; background:rgba(255,255,255,.03); border-radius:var(--radius);
+      border:1px solid rgba(255,255,255,.08); margin-bottom:1.2rem;
+    }
+    .control-group{display:flex; flex-direction:column; gap:.4rem}
+    .control-label{font-size:.85rem; color:var(--muted); font-weight:600}
+    .slider{appearance:none; height:4px; border-radius:2px; background:rgba(255,255,255,.2); outline:none}
+    .slider::-webkit-slider-thumb{appearance:none; width:16px; height:16px; border-radius:50%; background:var(--accent); cursor:pointer}
+    .toggle{appearance:none; width:46px; height:24px; border-radius:12px; background:rgba(255,255,255,.2); cursor:pointer; position:relative; transition:background var(--dur)}
+    .toggle:checked{background:var(--accent)}
+    .toggle::before{content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:white; top:3px; left:3px; transition:transform var(--dur)}
+    .toggle:checked::before{transform:translateX(22px)}
+    /* Modes */
+    .mode-selector{display:flex; gap:.5rem; margin-bottom:1rem; padding:.8rem; background:rgba(255,255,255,.03); border-radius:var(--radius)}
+    .mode-btn{comp:btn}
+    /* Solutions */
+    .solutions-container{position:relative}
+    .solutions-grid{
+      display:grid; gap:var(--gap); transition:all var(--dur) var(--ease);
+      grid-template-columns:repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+    }
+    .solutions-grid.network{grid-template-columns:repeat(5,1fr)}
+    .solutions-grid.timeline{grid-template-columns:1fr}
+    .solution-card{
+      background:var(--card); border:1px solid rgba(255,255,255,.08);
+      border-radius:var(--radius); padding:1.2rem; box-shadow:var(--shadow);
+      transition:transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), border-color var(--dur);
+      position:relative; overflow:hidden; cursor:pointer; outline:none;
+    }
+    .solution-card:focus{box-shadow:var(--focus)}
+    .solution-card::before{
+      content:''; position:absolute; top:0; left:0; right:0; height:3px;
+      background:linear-gradient(90deg, var(--accent), var(--mystic), var(--warm));
+      transform:scaleX(0); transition:transform var(--dur) var(--ease);
+    }
+    .solution-card:hover{transform:translateY(-3px)}
+    .solution-card:hover::before{transform:scaleX(1)}
+    .solution-card.active{border-color:var(--accent); box-shadow:0 0 0 2px rgba(52,211,153,.35)}
+    .solution-header{display:flex; align-items:flex-start; gap:1rem; margin-bottom:.7rem}
+    .solution-number{flex-shrink:0; width:3rem; height:3rem; border-radius:50%;
+      background:linear-gradient(135deg, var(--accent), var(--mystic));
+      display:flex; align-items:center; justify-content:center; font-weight:800; color:white; font-size:1rem; position:relative}
+    .solution-number::after{content:attr(data-status); position:absolute; top:-8px; right:-8px; width:16px; height:16px; border-radius:50%; font-size:10px; display:grid; place-items:center}
+    .solution-number[data-status="🟢"]::after{background:var(--accent)}
+    .solution-number[data-status="🟡"]::after{background:var(--warm)}
+    .solution-number[data-status="🔴"]::after{background:var(--danger)}
+    .solution-title{font-weight:800; font-size:1.2rem; margin:0}
+    .solution-description{color:var(--muted); margin:.4rem 0 .8rem}
+    .simulation-panel{background:rgba(0,0,0,.25); border-radius:12px; padding:.8rem; margin:.6rem 0; font-family:ui-monospace,monospace; font-size:.86rem; border:1px solid rgba(52,211,153,.3)}
+    .sim-header{color:var(--accent); font-weight:700; margin-bottom:.3rem}
+    .sim-data{display:grid; grid-template-columns:1fr 1fr; gap:.4rem}
+    .sim-metric{padding:.3rem; background:rgba(255,255,255,.05); border-radius:6px}
+    .expandable{background:rgba(255,255,255,.02); border:1px dashed rgba(255,255,255,.15); border-radius:12px; margin-top:.6rem; overflow:hidden; max-height:0; opacity:0; transition:max-height var(--dur) var(--ease), opacity var(--dur) var(--ease), padding var(--dur) var(--ease); padding:0}
+    .expandable.expanded{max-height:2000px; opacity:1; padding:1rem}
+    .feature-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:.8rem}
+    .feature-card{background:rgba(255,255,255,.05); padding:.8rem; border-radius:8px; border-left:3px solid var(--accent)}
+    .prototype-demo{background:linear-gradient(135deg, rgba(52,211,153,.1), rgba(168,85,247,.06)); border:1px solid rgba(52,211,153,.3); border-radius:8px; padding:.9rem; font-family:ui-monospace,monospace; font-size:.88rem; position:relative}
+    .prototype-demo::before{content:'LIVE PROTOTYPE'; position:absolute; top:.5rem; right:.8rem; font-size:.7rem; color:var(--accent); font-weight:700}
+    /* Network stub */
+    .network-canvas{width:100%; height:300px; border-radius:12px; margin:.6rem 0; background:radial-gradient(circle at 50% 50%, rgba(52,211,153,.1), transparent 70%); position:relative; overflow:hidden}
+    .network-node{position:absolute; width:12px; height:12px; border-radius:50%; background:var(--accent); cursor:pointer; transition:transform var(--dur)}
+    .network-node:focus{outline:none; box-shadow:var(--focus)}
+    .network-connection{position:absolute; height:2px; background:rgba(52,211,153,.4); transform-origin:left center}
+    /* Metrics */
+    .metrics-dashboard{display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1rem; margin:1.2rem 0; padding:1rem; background:rgba(255,255,255,.02); border-radius:var(--radius); border:1px solid rgba(255,255,255,.08)}
+    .metric-card{text-align:center; padding:1rem}
+    .metric-value{font-size:2.2rem; font-weight:900; margin-bottom:.25rem; background:linear-gradient(135deg, var(--accent), var(--mystic)); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent}
+    .metric-label{color:var(--muted); font-size:.95rem; margin-bottom:.3rem}
+    .metric-trend{display:flex; align-items:center; justify-content:center; gap:.3rem; font-size:.82rem; font-weight:600}
+    /* Activity */
+    .activity-feed{max-height:300px; overflow-y:auto; padding:1rem; margin:1rem 0; background:rgba(0,0,0,.2); border-radius:12px; border:1px solid rgba(255,255,255,.1)}
+    .activity-item{padding:.7rem; margin-bottom:.5rem; border-radius:8px; background:rgba(255,255,255,.03); border-left:3px solid var(--accent); font-size:.92rem}
+    .activity-time{color:var(--muted); font-size:.8rem}
+    .activity-desc{margin:.2rem 0}
+    .activity-impact{color:var(--accent); font-weight:700; font-size:.8rem}
+    /* Scenario explorer */
+    .scenario-explorer{padding:1rem; background:rgba(168,85,247,.06); border-radius:var(--radius); border:1px solid rgba(168,85,247,.25); margin:1rem 0}
+    .scenario-controls{display:flex; gap:.5rem; margin-bottom:.7rem; flex-wrap:wrap}
+    .scenario-btn{border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.06); color:var(--ink); padding:.45rem .8rem; border-radius:8px; cursor:pointer; transition:all var(--dur); font-size:.9rem}
+    .scenario-btn:hover{background:rgba(168,85,247,.2); border-color:var(--mystic)}
+    .scenario-btn[aria-pressed="true"]{background:var(--mystic); color:#fff}
+    .scenario-output{padding:.8rem; background:rgba(0,0,0,.28); border-radius:8px; font-family:ui-monospace,monospace; font-size:.86rem; min-height:120px; border:1px solid rgba(168,85,247,.3)}
+    /* Responsive */
+    @media (max-width: 1200px){ .solutions-grid.network{grid-template-columns:repeat(3,1fr)} }
+    @media (max-width: 768px){
+      .solutions-grid{grid-template-columns:1fr}
+      .solutions-grid.network{grid-template-columns:1fr}
+      .wrap{padding:1rem}
+      header{grid-template-columns:1fr; text-align:center}
+      .control-panel{grid-template-columns:1fr}
+      .live-stats{grid-template-columns:1fr}
+      .mode-selector{flex-wrap:wrap}
+    }
+    /* Utilities */
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .muted{color:var(--muted)}
+    .kbd{background:rgba(255,255,255,.1);padding:.18rem .38rem;border-radius:4px}
+  </style>
+</head>
+<body>
+  <a class="sr-only" href="#main">Skip to content</a>
+  <div class="wrap">
+    <header role="banner" aria-labelledby="lab-title">
+      <div class="header-content">
+        <h1 id="lab-title" class="title">Mycelial Peace Laboratory</h1>
+        <p class="subtitle" id="subtitle">Live AI Conflict Transformation Simulator</p>
+        <p class="tagline">“Cross-pollinating solutions to destabilize destructive entropies.”</p>
+        <div class="toolbar" role="toolbar" aria-label="Session tools">
+          <button id="btnPause" class="btn" aria-pressed="false" title="Space to toggle pause">⏯ Pause</button>
+          <button id="btnReset" class="btn" title="R to reset">🔄 Reset</button>
+          <button id="btnExport" class="btn" title="Export current state">📤 Export</button>
+          <label class="btn" for="importFile" title="Import a saved state" style="position:relative">
+            📥 Import
+            <input id="importFile" type="file" accept="application/json" aria-label="Import state" style="position:absolute;inset:0;opacity:0;cursor:pointer">
+          </label>
+          <button id="btnLang" class="btn" aria-pressed="false" title="Toggle Russian/English">🌐 RU/EN</button>
+        </div>
+      </div>
+      <div class="live-stats" role="status" aria-live="polite">
+        <div class="stat-card" aria-label="Active Connections">
+          <div class="stat-value" id="activeConnections">0</div>
+          <div class="stat-label">Active Connections</div>
+          <div class="stat-change stat-up" id="connectionTrend">+0%</div>
+        </div>
+        <div class="stat-card" aria-label="Entropy Level">
+          <div class="stat-value" id="entropyLevel">0.0</div>
+          <div class="stat-label">Entropy Level</div>
+          <div class="stat-change" id="entropyTrend">stable</div>
+        </div>
+        <div class="stat-card" aria-label="Peace Index">
+          <div class="stat-value" id="peaceIndex">0</div>
+          <div class="stat-label">Peace Index</div>
+          <div class="stat-change stat-up" id="peaceTrend">+0%</div>
+        </div>
+        <div class="stat-card" aria-label="Cultural Bridges">
+          <div class="stat-value" id="culturalBridges">0</div>
+          <div class="stat-label">Cultural Bridges</div>
+          <div class="stat-change stat-up" id="bridgeTrend">+0%</div>
+        </div>
+      </div>
+    </header>
+
+    <section class="control-panel" aria-labelledby="controls-title">
+      <h2 id="controls-title" class="sr-only">Controls</h2>
+      <div class="control-group">
+        <label class="control-label" for="speedSlider">Simulation Speed</label>
+        <input type="range" class="slider" id="speedSlider" min="0.5" max="3" step="0.1" value="1" />
+        <span id="speedValue" aria-live="polite">1.0×</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="entropySlider">Entropy Sensitivity</label>
+        <input type="range" class="slider" id="entropySlider" min="0.1" max="2" step="0.1" value="1" />
+        <span id="entropyValue" aria-live="polite">1.0</span>
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="culturalToggle">Cultural Mixing</label>
+        <input type="checkbox" class="toggle" id="culturalToggle" checked role="switch" aria-checked="true" />
+      </div>
+      <div class="control-group">
+        <label class="control-label" for="liveToggle">Live Data Feed</label>
+        <input type="checkbox" class="toggle" id="liveToggle" checked role="switch" aria-checked="true" />
+      </div>
+    </section>
+
+    <nav class="mode-selector" role="tablist" aria-label="Exploration modes">
+      <button class="btn mode-btn" role="tab" aria-selected="true" data-mode="grid">Solution Grid</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="network">Network View</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="timeline">Timeline</button>
+      <button class="btn mode-btn" role="tab" aria-selected="false" data-mode="scenarios">Scenarios</button>
+    </nav>
+
+    <main id="main" class="solutions-container" tabindex="-1">
+      <section id="solutionsGrid" class="solutions-grid" aria-label="Solutions list"></section>
+
+      <section class="metrics-dashboard" id="metricsBoard" aria-label="Impact metrics">
+        <div class="metric-card">
+          <div class="metric-value" id="narrativeSync">0</div>
+          <div class="metric-label">Narrative Convergence</div>
+          <div class="metric-trend"><span>↗</span> <span id="narrativeTrend">+0% this hour</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="empathyScore">0</div>
+          <div class="metric-label">Cross-Cultural Empathy</div>
+          <div class="metric-trend"><span>↗</span> <span id="empathyTrend">+0% this hour</span></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value" id="cooperationIndex">0</div>
+          <div class="metric-label">Cooperation Events</div>
+          <div class="metric-trend"><span>↗</span> <span id="cooperationTrend">+0% this hour</span></div>
+        </div>
+      </section>
+
+      <section class="scenario-explorer" id="scenarioPanel" hidden aria-labelledby="scenarioTitle">
+        <h3 id="scenarioTitle">Scenario Explorer</h3>
+        <p class="muted">Test solution interplay under different conflict conditions.</p>
+        <div class="scenario-controls" role="tablist" aria-label="Scenarios">
+          <button class="scenario-btn" role="tab" aria-selected="true" data-scenario="baseline">Baseline</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="escalation">Tension Escalation</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="breakthrough">Cultural Breakthrough</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="resource">Resource Crisis</button>
+          <button class="scenario-btn" role="tab" aria-selected="false" data-scenario="diaspora">Diaspora Activation</button>
+        </div>
+        <div class="scenario-output" id="scenarioOutput" role="region" aria-live="polite"></div>
+      </section>
+
+      <section class="activity-feed" id="activityFeed" aria-label="Activity feed">
+        <div class="activity-item">
+          <div class="activity-time">just now</div>
+          <div class="activity-desc">System online. Local cache primed.</div>
+          <div class="activity-impact">ready</div>
+        </div>
+      </section>
+    </main>
+
+    <footer style="margin-top:2rem; text-align:center; padding:2rem; color:var(--muted); font-size:.9rem">
+      <p>Each node strengthens the network. Press <span class="kbd">Space</span> to pause • <span class="kbd">R</span> to reset entropy.</p>
+    </footer>
+  </div>
+
+  <script>
+  (() => {
+    // -------- Progressive i18n scaffold (EN/RU). Claude can expand the RU map later.
+    const i18n = {
+      en: {
+        title: "Mycelial Peace Laboratory",
+        subtitle: "Live AI Conflict Transformation Simulator",
+        tagline: "“Cross-pollinating solutions to destabilize destructive entropies.”",
+        controls: { speed: "Simulation Speed", entropy: "Entropy Sensitivity", mix: "Cultural Mixing", live: "Live Data Feed" },
+        modes: ["Solution Grid","Network View","Timeline","Scenarios"],
+        scenarios: ["Baseline","Tension Escalation","Cultural Breakthrough","Resource Crisis","Diaspora Activation"]
+      },
+      ru: {
+        title: "Мицелиальная Лаборатория Мира",
+        subtitle: "Живой симулятор трансформации конфликтов на ИИ",
+        tagline: "«Перекрёстное опыление решений для ослабления разрушительных энтропий»",
+        controls: { speed: "Скорость симуляции", entropy: "Чувствительность к энтропии", mix: "Культурное смешение", live: "Поток живых данных" },
+        modes: ["Сетка решений","Сеть","Хронология","Сценарии"],
+        scenarios: ["Базовый","Эскалация напряжения","Культурный прорыв","Ресурсный кризис","Активация диаспоры"]
+      }
+    };
+    let lang = localStorage.getItem('mpl.lang') || 'en';
+    const t = (path) => path.split('.').reduce((o,k)=>o?.[k], i18n[lang]);
+
+    // -------- Data model: ten seeds (expandable)
+    const solutions = [
+      { id:1, title:"Narrative Symbiosis Engine", status:"🟢",
+        description:"AI mines cultural archives across languages to surface shared myths & collaborations and deploys living stories as counterweights to enmity.",
+        features:[
+          {icon:"🔍", title:"Deep Archive Mining", desc:"Processes multilingual corpora for collaboration patterns"},
+          {icon:"🧬", title:"Myth Pattern Recognition", desc:"Detects archetypes common to all sides"},
+          {icon:"🎮", title:"Living Story Deployment", desc:"Publishes interactive storylines into games/media"},
+          {icon:"📊", title:"Narrative Impact Analytics", desc:"Measures perception shifts over time"}
+        ],
+        demoCode:`const narrativeEngine={discover(){/* ... */}, trackNarrativeResonance(id){return {reach:42}}};`,
+        connections:["Cross-Cultural Commons","Mythic Convergence","Peace Games","Polyglot Mediation"],
+        progress:73, implementation:"Active prototype in 3 communities",
+        liveMetrics:{ storiesGenerated:0, culturalResonance:0, narrativeShift:0 }
+      },
+      { id:2, title:"Cross-Cultural Generative Commons", status:"🟡",
+        description:"Co-designs hybrid songs, art, humor, and slang that feel 'half mine' to everyone involved.",
+        features:[
+          {icon:"🎨", title:"Multilingual Creative AI", desc:"Blends cultural motifs into new works"},
+          {icon:"😄", title:"Humor Bridge Generator", desc:"Crafts jokes that soften identity borders"},
+          {icon:"🎵", title:"Hybrid Music Composer", desc:"Merges folk scales and rhythms"},
+          {icon:"💬", title:"Slang Evolution Lab", desc:"Tracks & seeds cross-pollinated phrases"}
+        ],
+        demoCode:`class CulturalCommons{ generateHybridArt(){return {/* ... */}} }`,
+        connections:["Narrative Symbiosis","Polyglot Mediation","Emotional Thermometer","Mythic Convergence"],
+        progress:58, implementation:"Beta with artist collectives",
+        liveMetrics:{ hybridWorks:0, culturalAdoption:0, bridgeStrength:0 }
+      },
+      { id:3, title:"Entropy Mapping Dashboard", status:"🟢",
+        description:"Quantifies 'entropic hotspots' across info-energy-emotion layers to time preemptive interventions.",
+        features:[
+          {icon:"🌡️", title:"Real-time Tension Monitoring", desc:"Tracks 200+ indicators"},
+          {icon:"🎯", title:"Predictive Intervention Points", desc:"Suggests windows to act"},
+          {icon:"📈", title:"Entropy Visualization", desc:"Maps instability fields"},
+          {icon:"⚡", title:"Early Warning System", desc:"Sends just-in-time signals"}
+        ],
+        demoCode:`const entropyMapper={calculate(){return {overall:Math.random()}}};`,
+        connections:["Emotional Thermometer","Peace Games","Resource Contracts"],
+        progress:66, implementation:"Pilot with peace NGOs",
+        liveMetrics:{ alerts:0, hotspots:0, avoidedCrises:0 }
+      },
+      { id:4, title:"Peace Games (AI DM)", status:"🟡",
+        description:"Cooperative narrative scenarios where all sides must survive together; empathy by doing.",
+        features:[
+          {icon:"🧠", title:"Adaptive Difficulty", desc:"Keeps agency balanced"},
+          {icon:"🤝", title:"Asymmetric Roles", desc:"Mutual reliance mechanics"},
+          {icon:"📜", title:"Lore Infusion", desc:"Pulls from real history"},
+          {icon:"🛰️", title:"Live Events", desc:"Diaspora matchmaking"}
+        ],
+        demoCode:`/* scenario() -> payoff matrix that rewards coop */`,
+        connections:["Narrative Symbiosis","Mythic Convergence"],
+        progress:49, implementation:"University labs sandbox",
+        liveMetrics:{ matches:0, coopRate:0, empathyGain:0 }
+      },
+      { id:5, title:"Polyglot Mediation Agent", status:"🟢",
+        description:"Not just translation—relational repair across Russian/Ukrainian/English pragmatics.",
+        features:[
+          {icon:"🗣️", title:"Connotation Smoothing", desc:"Rephrases to reduce threat"},
+          {icon:"🧩", title:"Grounded Context", desc:"Pulls shared references"},
+          {icon:"🧯", title:"De-escalation Tactics", desc:"Micro-interventions"},
+          {icon:"🔐", title:"Privacy by Design", desc:"On-device options"}
+        ],
+        demoCode:`async function mediate(msg){/* ... sentiment & tone shift ... */}`,
+        connections:["Emotional Thermometer","Generative Commons"],
+        progress:62, implementation:"Mediator cohort trials",
+        liveMetrics:{ sessions:0, reframes:0, tensionDrop:0 }
+      },
+      { id:6, title:"Ecological Reciprocity AI", status:"🟢",
+        description:"Pairs cross-border communities on river/forest restoration so peace is rooted in land.",
+        features:[
+          {icon:"🌲", title:"Bioregion Matchmaking", desc:"Watershed-first logic"},
+          {icon:"💧", title:"Upstream/Downstream Equity", desc:"Fair benefits"},
+          {icon:"🛠️", title:"Toolkits & Grants", desc:"Low-friction starts"},
+          {icon:"📐", title:"Impact Modeling", desc:"Hydro & fire metrics"}
+        ],
+        demoCode:`const eco={match(bioregions){/* ... */}};`,
+        connections:["Resource Contracts","Peace Games"],
+        progress:71, implementation:"Two river basins onboarded",
+        liveMetrics:{ hectares:0, jointCrews:0, waterQuality:0 }
+      },
+      { id:7, title:"Distributed Ancestral Archive", status:"🟡",
+        description:"Genealogies & oral histories stitched to reveal long entanglements & kinship.",
+        features:[
+          {icon:"🧬", title:"Kinship Graphs", desc:"Consent-respecting"},
+          {icon:"🗂️", title:"Oral Story Capture", desc:"Low-tech workflows"},
+          {icon:"🔎", title:"Serendipity Finds", desc:"Shared ancestors/habits"},
+          {icon:"📜", title:"Cultural Licenses", desc:"Community control"}
+        ],
+        demoCode:`/* DAG of family ties with privacy gates */`,
+        connections:["Narrative Symbiosis","Mythic Convergence"],
+        progress:38, implementation:"Community archives pilots",
+        liveMetrics:{ linesLinked:0, reunions:0, sharedRituals:0 }
+      },
+      { id:8, title:"AI-Backed Resource Rotation Contracts", status:"🟢",
+        description:"Transparent, rotating access (grain/energy corridors) with cross-chain audits.",
+        features:[
+          {icon:"🔁", title:"Rotation Schedules", desc:"Fair-use windows"},
+          {icon:"🔭", title:"Forecast Guardrails", desc:"Weather/logistics-aware"},
+          {icon:"⚖️", title:"Dispute Escrow", desc:"Third-party verifiable"},
+          {icon:"🧾", title:"Public Ledgers", desc:"Censorship-resistant reads"}
+        ],
+        demoCode:`/* oracle -> rotation -> audit proofs */`,
+        connections:["Ecological AI","Entropy Mapping"],
+        progress:44, implementation:"Spec + sandbox chain",
+        liveMetrics:{ onTimeRotations:0, disputes:0, trustScore:0 }
+      },
+      { id:9, title:"Emotional Thermometer", status:"🟢",
+        description:"Tracks emotional temperature (fear/anger/hope) to cue cooling interventions.",
+        features:[
+          {icon:"📡", title:"Signal Mix", desc:"Text, audio prosody, tempos"},
+          {icon:"🧯", title:"Cooling Toolkit", desc:"Music/humor/ritual prompts"},
+          {icon:"🧭", title:"Ethics Layer", desc:"No covert manipulation"},
+          {icon:"🪄", title:"Cultural Tailoring", desc:"Local idiom packs"}
+        ],
+        demoCode:`/* stream sentiment -> recommend action */`,
+        connections:["Polyglot Mediation","Generative Commons","Peace Games"],
+        progress:69, implementation:"City newsroom pilot",
+        liveMetrics:{ alerts:0, cooledSpikes:0, avgTemp:0 }
+      },
+      { id:10, title:"Mythic Convergence AI", status:"🟡",
+        description:"Merges mythic threads into shared epics; transnational heroes/quests.",
+        features:[
+          {icon:"🐉", title:"Archetype Merge", desc:"Dragon/bogatyr/kozaks"},
+          {icon:"🎭", title:"Ritual Kits", desc:"Schools & festivals"},
+          {icon:"📚", title:"Public Domain First", desc:"Open cultural commons"},
+          {icon:"🧵", title:"Diaspora Loom", desc:"Weaves abroad/home"]
+        ],
+        demoCode:`/* archetype graphs -> new epics generator */`,
+        connections:["Narrative Symbiosis","Peace Games","Ancestral Archive"],
+        progress:41, implementation:"Festival scripting phase",
+        liveMetrics:{ stories:0, adoptions:0, festivalNodes:0 }
+      }
+    ];
+
+    // -------- Simple state engine
+    const state = {
+      paused:false,
+      speed: parseFloat(localStorage.getItem('mpl.speed') || '1'),
+      entropySensitivity: parseFloat(localStorage.getItem('mpl.entropy') || '1'),
+      culturalMix: localStorage.getItem('mpl.mix') !== 'false',
+      live: localStorage.getItem('mpl.live') !== 'false',
+      mode: localStorage.getItem('mpl.mode') || 'grid',
+      metrics: { narrative:0, empathy:0, cooperation:0 },
+      entropy: 0.42,
+      connections: 3,
+      peace: 12,
+      bridges: 1
+    };
+
+    // -------- DOM helpers
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    // -------- Render solutions
+    const grid = $('#solutionsGrid');
+    function renderSolutions(){
+      grid.classList.toggle('network', state.mode==='network');
+      grid.classList.toggle('timeline', state.mode==='timeline');
+      grid.setAttribute('aria-busy','true');
+      grid.innerHTML = '';
+      solutions.forEach(s => {
+        const card = document.createElement('article');
+        card.className = 'solution-card';
+        card.tabIndex = 0;
+        card.setAttribute('role','button');
+        card.setAttribute('aria-expanded','false');
+        card.dataset.id = s.id;
+
+        card.innerHTML = `
+          <div class="solution-header">
+            <div class="solution-number" data-status="${s.status}" aria-hidden="true">${s.id}</div>
+            <div>
+              <h3 class="solution-title">${s.title}</h3>
+              <p class="solution-description">${s.description}</p>
+            </div>
+          </div>
+          <div class="simulation-panel">
+            <div class="sim-header">Live Simulation</div>
+            <div class="sim-data">
+              <div class="sim-metric">Progress: <strong>${s.progress}%</strong></div>
+              <div class="sim-metric">Implementation: <strong>${s.implementation}</strong></div>
+            </div>
+          </div>
+          <div class="expandable" id="expand-${s.id}">
+            <div class="feature-grid">
+              ${s.features.map(f=>`<div class="feature-card"><div class="feature-icon">${f.icon}</div><div class="feature-title">${f.title}</div><div class="feature-desc">${f.desc}</div></div>`).join('')}
+            </div>
+            <div class="prototype-demo" aria-label="Prototype snippet"><pre><code>${s.demoCode.replace(/[<>&]/g,m=>({'<':'&lt;','>':'&gt;','&':'&amp;'}[m]))}</code></pre></div>
+            <div class="network-canvas" aria-hidden="true"></div>
+          </div>
+        `;
+        card.addEventListener('click', ()=>toggleExpand(card,s.id));
+        card.addEventListener('keydown', (e)=>{
+          if(e.key==='Enter' || e.key===' ') { e.preventDefault(); toggleExpand(card,s.id); }
+          if(e.key==='Escape'){ collapse(card,s.id); }
+        });
+        grid.appendChild(card);
+      });
+      grid.removeAttribute('aria-busy');
+    }
+    function toggleExpand(card,id){
+      const box = document.getElementById(`expand-${id}`);
+      const expanded = box.classList.toggle('expanded');
+      card.classList.toggle('active', expanded);
+      card.setAttribute('aria-expanded', String(expanded));
+      if(document.startViewTransition && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+        document.startViewTransition(()=>{});
+      }
+    }
+    function collapse(card,id){
+      const box = document.getElementById(`expand-${id}`);
+      box.classList.remove('expanded'); card.classList.remove('active');
+      card.setAttribute('aria-expanded','false');
+    }
+
+    // -------- Modes
+    $$('.mode-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        $$('.mode-btn').forEach(b=>b.setAttribute('aria-selected','false'));
+        btn.setAttribute('aria-selected','true');
+        state.mode = btn.dataset.mode;
+        localStorage.setItem('mpl.mode', state.mode);
+        if(state.mode==='scenarios'){ $('#scenarioPanel').hidden=false; }
+        else { $('#scenarioPanel').hidden=true; }
+        renderSolutions();
+      });
+    });
+
+    // -------- Controls
+    const speed = $('#speedSlider'), speedValue = $('#speedValue');
+    const ent = $('#entropySlider'), entValue = $('#entropyValue');
+    const mix = $('#culturalToggle'), live = $('#liveToggle');
+
+    speed.value = String(state.speed); speedValue.textContent = `${state.speed.toFixed(1)}×`;
+    ent.value = String(state.entropySensitivity); entValue.textContent = state.entropySensitivity.toFixed(1);
+    mix.checked = state.culturalMix; live.checked = state.live;
+
+    speed.addEventListener('input', ()=>{ state.speed=parseFloat(speed.value); speedValue.textContent = `${state.speed.toFixed(1)}×`; localStorage.setItem('mpl.speed', state.speed); });
+    ent.addEventListener('input', ()=>{ state.entropySensitivity=parseFloat(ent.value); entValue.textContent = state.entropySensitivity.toFixed(1); localStorage.setItem('mpl.entropy', state.entropySensitivity); });
+    mix.addEventListener('change', ()=>{ state.culturalMix=mix.checked; localStorage.setItem('mpl.mix', state.culturalMix); });
+    live.addEventListener('change', ()=>{ state.live=live.checked; localStorage.setItem('mpl.live', state.live); });
+
+    // -------- Stats + metrics loop
+    const el = {
+      activeConnections: $('#activeConnections'), connectionTrend: $('#connectionTrend'),
+      entropyLevel: $('#entropyLevel'), entropyTrend: $('#entropyTrend'),
+      peaceIndex: $('#peaceIndex'), peaceTrend: $('#peaceTrend'),
+      culturalBridges: $('#culturalBridges'), bridgeTrend: $('#bridgeTrend'),
+      narrativeSync: $('#narrativeSync'), empathyScore: $('#empathyScore'), cooperationIndex: $('#cooperationIndex'),
+      narrativeTrend: $('#narrativeTrend'), empathyTrend: $('#empathyTrend'), cooperationTrend: $('#cooperationTrend'),
+      activityFeed: $('#activityFeed')
+    };
+
+    function tick(){
+      if(state.paused){ requestAnimationFrame(tick); return; }
+      const k = 0.0025 * state.speed;
+      // toy dynamics
+      state.entropy = Math.max(0, Math.min(1, state.entropy + (Math.random()-0.5)*k*state.entropySensitivity - 0.0008*state.speed*(state.culturalMix?1.2:0.8)));
+      state.connections = Math.max(0, state.connections + Math.random()*2*state.speed - 0.8);
+      state.bridges = Math.max(0, state.bridges + (state.culturalMix?0.04:0.015)*state.speed);
+      state.peace = Math.max(0, Math.min(100, state.peace + (0.12 - state.entropy*0.1)*state.speed + (state.culturalMix?0.06:0)));
+
+      // UI
+      el.entropyLevel.textContent = state.entropy.toFixed(2);
+      el.entropyTrend.textContent = state.entropy > 0.5 ? 'rising' : (state.entropy < 0.3 ? 'cooling' : 'stable');
+      el.activeConnections.textContent = Math.round(state.connections);
+      el.peaceIndex.textContent = Math.round(state.peace);
+      el.culturalBridges.textContent = Math.round(state.bridges);
+      el.connectionTrend.textContent = (Math.random()>0.5?'+':'-') + (Math.random()*3|0) + '%';
+      el.peaceTrend.textContent = '+' + (Math.random()*4|0) + '%';
+      el.bridgeTrend.textContent = '+' + (Math.random()*5|0) + '%';
+
+      // impact metrics drift
+      state.metrics.narrative = Math.min(100, state.metrics.narrative + (Math.random()*0.6)*state.speed);
+      state.metrics.empathy = Math.min(100, state.metrics.empathy + (Math.random()*0.5 + (state.culturalMix?0.2:0))*state.speed);
+      state.metrics.cooperation = Math.min(100, state.metrics.cooperation + (Math.random()*0.7 - state.entropy*0.2)*state.speed);
+
+      el.narrativeSync.textContent = Math.round(state.metrics.narrative);
+      el.empathyScore.textContent = Math.round(state.metrics.empathy);
+      el.cooperationIndex.textContent = Math.round(state.metrics.cooperation);
+      el.narrativeTrend.textContent = `+${(Math.random()*12|0)}% this hour`;
+      el.empathyTrend.textContent = `+${(Math.random()*8|0)}% this hour`;
+      el.cooperationTrend.textContent = `+${(Math.random()*23|0)}% this hour`;
+
+      requestAnimationFrame(tick);
+    }
+
+    // -------- Scenarios
+    const scenarioPanel = $('#scenarioPanel');
+    const scenarioOutput = $('#scenarioOutput');
+    $$('.scenario-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        $$('.scenario-btn').forEach(b=>b.setAttribute('aria-selected','false'));
+        btn.setAttribute('aria-selected','true');
+        const kind = btn.dataset.scenario;
+        runScenario(kind);
+      });
+    });
+    function runScenario(kind){
+      const effects = {
+        baseline: { e:-0.02, p:+1.2, text:"Baseline: steady outreach, mild cooling."},
+        escalation: { e:+0.08, p:-1.8, text:"Escalation: spikes in fear/anger; deploy cooling kits."},
+        breakthrough: { e:-0.12, p:+3.4, text:"Breakthrough: cross-myth festival lowers barriers."},
+        resource: { e:+0.05, p:-1.1, text:"Resource shock: rotation contracts stabilize flows."},
+        diaspora: { e:-0.06, p:+1.9, text:"Diaspora activation: bridges multiply across borders."}
+      }[kind] || {e:0,p:0,text:"…"};
+
+      state.entropy = Math.max(0, state.entropy + effects.e);
+      state.peace = Math.max(0, state.peace + effects.p);
+      scenarioOutput.textContent = `[${new Date().toLocaleTimeString()}] ${effects.text}`;
+      pushActivity(`Scenario '${kind}' applied`, `Δentropy ${effects.e.toFixed(2)}, Δpeace ${effects.p.toFixed(1)}`);
+    }
+
+    // -------- Activity feed API
+    function pushActivity(desc, impact){
+      const item = document.createElement('div');
+      item.className = 'activity-item';
+      item.innerHTML = `
+        <div class="activity-time">${new Date().toLocaleTimeString()}</div>
+        <div class="activity-desc">${desc}</div>
+        <div class="activity-impact">${impact}</div>`;
+      el.activityFeed.prepend(item);
+    }
+
+    // -------- Keyboard & buttons
+    document.addEventListener('keydown', (e)=>{
+      if(e.code==='Space'){ e.preventDefault(); togglePause(); }
+      if(e.key==='r' || e.key==='R'){ reset(); }
+      if(e.key==='Escape'){ $$('.solution-card.active').forEach(c=>collapse(c, c.dataset.id)); }
+    });
+    $('#btnPause').addEventListener('click', togglePause);
+    $('#btnReset').addEventListener('click', reset);
+    $('#btnExport').addEventListener('click', exportState);
+    $('#importFile').addEventListener('change', importState);
+    $('#btnLang').addEventListener('click', ()=>{
+      lang = lang === 'en' ? 'ru' : 'en';
+      localStorage.setItem('mpl.lang', lang);
+      applyI18n();
+    });
+
+    function togglePause(){
+      state.paused = !state.paused;
+      $('#btnPause').setAttribute('aria-pressed', String(state.paused));
+      $('#btnPause').textContent = state.paused ? '▶ Resume' : '⏯ Pause';
+      pushActivity(state.paused?'Paused simulation':'Resumed simulation', state.paused?'hold':'run');
+    }
+    function reset(){
+      state.entropy=0.42; state.peace=12; state.metrics={narrative:0,empathy:0,cooperation:0};
+      state.connections=3; state.bridges=1;
+      pushActivity('Reset to defaults','entropy 0.42, peace 12');
+    }
+
+    // -------- Export/Import
+    function exportState(){
+      const blob = new Blob([JSON.stringify({state, solutions}, null, 2)], {type:'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `mpl-state-${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    }
+    function importState(evt){
+      const file = evt.target.files?.[0]; if(!file) return;
+      file.text().then(txt=>{
+        try{
+          const data = JSON.parse(txt);
+          Object.assign(state, data.state||{});
+          pushActivity('State imported','ok');
+        }catch{ pushActivity('Import failed','invalid file'); }
+      });
+    }
+
+    // -------- Public hooks (for Claude or further agents)
+    window.peaceLab = {
+      pushActivity,
+      updateMetrics(partial){ Object.assign(state.metrics, partial||{}); },
+      addSolution(sol){ solutions.push(sol); renderSolutions(); pushActivity('New solution added', sol.title||'unnamed'); }
+    };
+
+    // -------- i18n apply
+    function applyI18n(){
+      document.title = t('title') + ' — ' + t('subtitle');
+      $('#lab-title').textContent = t('title');
+      $('#subtitle').textContent = t('subtitle');
+      document.querySelector('.tagline').textContent = t('tagline');
+      const modeBtns = $$('.mode-btn');
+      t('modes').forEach((label,i)=> modeBtns[i] && (modeBtns[i].textContent = label));
+      const scBtns = $$('.scenario-btn');
+      t('scenarios').forEach((label,i)=> scBtns[i] && (scBtns[i].textContent = label));
+    }
+
+    // -------- Service worker (inline, blob-based)
+    if('serviceWorker' in navigator){
+      const swCode = `
+        const NAME='mpl-sw-v1';
+        self.addEventListener('install',e=>{ e.waitUntil(caches.open(NAME).then(c=>c.addAll(['./']))); self.skipWaiting(); });
+        self.addEventListener('activate',e=>{ e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==NAME).map(k=>caches.delete(k))))); self.clients.claim(); });
+        self.addEventListener('fetch',e=>{
+          const req = e.request;
+          e.respondWith(
+            caches.match(req).then(res=> res || fetch(req).then(net=>{
+              if(req.method==='GET' && (req.url.endsWith('/') || req.url.endsWith('.html'))){
+                const copy = net.clone(); caches.open(NAME).then(c=>c.put(req, copy)); }
+              return net;
+            }).catch(()=> caches.match('./')))
+          );
+        });
+      `;
+      const blob = new Blob([swCode], {type:'text/javascript'});
+      navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
+    }
+
+    // -------- Init
+    renderSolutions(); applyI18n(); requestAnimationFrame(tick);
+    if(state.mode==='scenarios'){ $('#scenarioPanel').hidden=false; }
+    pushActivity('Narrative Symbiosis Engine discovered shared folk-song pattern','+0.3 bridge formation');
+  })();
+  </script>
+</body>
+</html>
